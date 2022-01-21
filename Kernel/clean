@@ -1,2 +1,8 @@
 rm bin/*
-rm obj/*
+rm bin/dsk/*
+rm bin/dsk/efi/*
+rm bin/dsk/efi/boot/*
+
+rm -rf obj/*
+
+echo Clean complete

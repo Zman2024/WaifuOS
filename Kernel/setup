@@ -1,0 +1,9 @@
+mkdir bin
+mkdir obj
+
+mkdir bin/dsk
+mkdir bin/dsk/efi
+mkdir bin/dsk/efi/boot
+
+echo Completed setup
+

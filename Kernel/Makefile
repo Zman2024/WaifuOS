@@ -66,3 +66,6 @@ buildimg:
 	cp $(BOOTEFI) $(BUILDDIR)/dsk/efi/boot/bootx64.efi
 	cp $(BUILDDIR)/kernel.elf $(BUILDDIR)/dsk
 	cp zap-light16.psf $(BUILDDIR)/dsk
+
+run:
+	qemu-system-x86_64 -device qemu-xhci -machine q35 -rtc base=localtime -drive file=$(BUILDDIR)/$(OSNAME).img -m 2G -cpu qemu64,+sse2,+sse3,+sse4.1,+sse4.2 -drive if=pflash,format=raw,unit=0,file=$(OVMFDIR)/OVMF_CODE-pure-efi.fd,readonly=on -drive if=pflash,format=raw,unit=1,file=$(OVMFDIR)/OVMF_VARS-pure-efi.fd -net none -vga virtio

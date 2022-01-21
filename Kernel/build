@@ -1,4 +1,7 @@
-echo ========== Building Kernel ==========
+echo \ \ \ \ ~~~~~~~~~~ Building Kernel ~~~~~~~~~~
+echo 
 make
-echo ========== Building Image ===========
+echo 
+echo \ \ \ \ ~~~~~~~~~~ Building Image ~~~~~~~~~~~
+echo 
 make buildimg
