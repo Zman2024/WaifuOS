@@ -1,7 +1,12 @@
 #include <Types.h>
 #include <Structs.h>
+#include <KernelUtils.h>
 
-global void KernelStart(BootInfo bootInfo)
+namespace Kernel
 {
-	while (true) ;
+	global void KernelStart(BootInfo bootInfo)
+	{
+		Kernel::InitializeKernel(&bootInfo);
+		OS_HLT;
+	}
 }

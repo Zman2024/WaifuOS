@@ -1,8 +1,8 @@
 #pragma once
-#ifndef H_Structs
-#define H_Structs
 #include <Types.h>
 #include <EFI.h>
+#ifndef H_Structs
+#define H_Structs
 
 struct FontHeader
 {

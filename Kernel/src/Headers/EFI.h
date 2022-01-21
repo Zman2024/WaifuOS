@@ -1,7 +1,7 @@
 #pragma once
+#include <Types.h>
 #ifndef H_EFI
 #define H_EFI
-#include <Types.h>
 
 struct EfiMemoryDescriptor
 {

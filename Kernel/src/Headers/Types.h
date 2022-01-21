@@ -1,7 +1,7 @@
 #pragma once
+#include <stddef.h>
 #ifndef H_Types
 #define H_Types
-#include <stddef.h>
 
 #define global extern "C"
 #define null 0x00
