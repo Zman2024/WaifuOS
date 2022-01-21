@@ -1,0 +1,26 @@
+﻿
+Microsoft Visual Studio Solution File, Format Version 12.00
+# Visual Studio 15
+VisualStudioVersion = 15.0.28307.1778
+MinimumVisualStudioVersion = 10.0.40219.1
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Kernel", "Kernel\src\Kernel.vcxproj", "{6DA0C8D4-52DC-410C-B70C-C06E0E245D48}"
+EndProject
+Project("{8BC9CEB8-8B4A-11D0-8D11-00A0C91BC942}") = "Bootloader", "Bootloader\Bootloader.vcxproj", "{251CB211-DAFB-4A91-BA54-E6655F2ECA27}"
+EndProject
+Global
+	GlobalSection(SolutionConfigurationPlatforms) = preSolution
+		Release|x64 = Release|x64
+	EndGlobalSection
+	GlobalSection(ProjectConfigurationPlatforms) = postSolution
+		{6DA0C8D4-52DC-410C-B70C-C06E0E245D48}.Release|x64.ActiveCfg = Release|x64
+		{6DA0C8D4-52DC-410C-B70C-C06E0E245D48}.Release|x64.Build.0 = Release|x64
+		{251CB211-DAFB-4A91-BA54-E6655F2ECA27}.Release|x64.ActiveCfg = Release|x64
+		{251CB211-DAFB-4A91-BA54-E6655F2ECA27}.Release|x64.Build.0 = Release|x64
+	EndGlobalSection
+	GlobalSection(SolutionProperties) = preSolution
+		HideSolutionNode = FALSE
+	EndGlobalSection
+	GlobalSection(ExtensibilityGlobals) = postSolution
+		SolutionGuid = {AD612921-3BDE-451C-96E4-FF3B67969734}
+	EndGlobalSection
+EndGlobal

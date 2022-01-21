@@ -1,0 +1,68 @@
+OSNAME = WaifuOS
+
+GNUEFI = ../Bootloader
+OVMFDIR = ../OVMFbin
+LDS = kernel.ld
+GC = gcc
+LD = ld
+ASMC = nasm
+
+SRCDIR := src
+OBJDIR := obj
+BUILDDIR = bin
+
+CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone -O0 -fno-exceptions -fno-rtti -masm=intel -I$(SRCDIR)/Headers
+INTFLAGS = -mno-red-zone -mgeneral-regs-only -ffreestanding -masm=intel -I$(SRCDIR)/Headers -c $^ -o $@
+ASMFLAGS = 
+LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
+
+BOOTEFI := $(GNUEFI)/x86_64/bootloader/main.efi
+
+rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
+
+SRC = $(call rwildcard,$(SRCDIR),*.cpp)   
+ASMSRC = $(call rwildcard,$(SRCDIR),*.asm)
+OBJS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRC))
+OBJS += $(patsubst $(SRCDIR)/%.asm, $(OBJDIR)/%.asmo, $(ASMSRC))
+DIRS = $(wildcard $(SRCDIR)/*)
+
+
+kernel: $(OBJS) link
+# $(OBJDIR)/Interrupts/Interrupts.o: $(SRCDIR)/Interrupts/Interrupts.cpp
+# 	@ echo ===== Compiling $^ =====
+# 	@ mkdir -p $(@D)
+# 	$(GC) $(INTFLAGS)
+
+$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+	@ echo ===== Compiling $^ =====
+	@ mkdir -p $(@D)
+	$(GC) $(CFLAGS) -c $^ -o $@
+
+$(OBJDIR)/%.asmo: $(SRCDIR)/%.asm
+	@ echo ===== Compiling $^ =====
+	@ mkdir -p $(@D)
+	$(ASMC) $(ASMFLAGS) $^ -f elf64 -o $@
+
+link:
+	@ echo ===== Linking =====
+	$(LD) $(LDFLAGS) -o $(BUILDDIR)/kernel.elf $(OBJS)
+
+setup:
+	@mkdir $(BUILDDIR)
+	@mkdir $(SRCDIR)
+	@mkdir $(OBJDIR)
+
+buildimg:
+	dd if=/dev/zero of=$(BUILDDIR)/$(OSNAME).img bs=512 count=93750
+	mformat -i $(BUILDDIR)/$(OSNAME).img -f 1440 ::
+	mmd -i $(BUILDDIR)/$(OSNAME).img ::/EFI
+	mmd -i $(BUILDDIR)/$(OSNAME).img ::/EFI/BOOT
+	mcopy -i $(BUILDDIR)/$(OSNAME).img $(BOOTEFI) ::/EFI/BOOT
+	mcopy -i $(BUILDDIR)/$(OSNAME).img startup.nsh ::
+	mcopy -i $(BUILDDIR)/$(OSNAME).img $(BUILDDIR)/kernel.elf ::
+	mcopy -i $(BUILDDIR)/$(OSNAME).img zap-light16.psf ::
+
+	cp $(BOOTEFI) $(BUILDDIR)/dsk/efi/boot
+	cp $(BOOTEFI) $(BUILDDIR)/dsk/efi/boot/bootx64.efi
+	cp $(BUILDDIR)/kernel.elf $(BUILDDIR)/dsk
+	cp zap-light16.psf $(BUILDDIR)/dsk

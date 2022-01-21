@@ -1,0 +1,182 @@
+<?xml version="1.0" encoding="utf-8"?>
+<Project DefaultTargets="Build" ToolsVersion="15.0" xmlns="http://schemas.microsoft.com/developer/msbuild/2003">
+  <ItemGroup Label="ProjectConfigurations">
+    <ProjectConfiguration Include="Release|x64">
+      <Configuration>Release</Configuration>
+      <Platform>x64</Platform>
+    </ProjectConfiguration>
+  </ItemGroup>
+  <PropertyGroup Label="Globals">
+    <VCProjectVersion>15.0</VCProjectVersion>
+    <ProjectGuid>{251CB211-DAFB-4A91-BA54-E6655F2ECA27}</ProjectGuid>
+    <Keyword>MakeFileProj</Keyword>
+    <ProjectName>Bootloader</ProjectName>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.Default.props" />
+  <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'" Label="Configuration">
+    <ConfigurationType>Application</ConfigurationType>
+    <UseDebugLibraries>false</UseDebugLibraries>
+    <PlatformToolset>v141</PlatformToolset>
+  </PropertyGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.props" />
+  <ImportGroup Label="ExtensionSettings">
+  </ImportGroup>
+  <ImportGroup Label="Shared">
+  </ImportGroup>
+  <ImportGroup Label="PropertySheets" Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
+    <Import Project="$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props" Condition="exists('$(UserRootDir)\Microsoft.Cpp.$(Platform).user.props')" Label="LocalAppDataPlatform" />
+  </ImportGroup>
+  <PropertyGroup Label="UserMacros" />
+  <ItemDefinitionGroup>
+  </ItemDefinitionGroup>
+  <ItemGroup>
+    <ClCompile Include="apps\AllocPages.c" />
+    <ClCompile Include="apps\bltgrid.c" />
+    <ClCompile Include="apps\debughook.c" />
+    <ClCompile Include="apps\drv0.c" />
+    <ClCompile Include="apps\drv0_use.c" />
+    <ClCompile Include="apps\exit.c" />
+    <ClCompile Include="apps\FreePages.c" />
+    <ClCompile Include="apps\lfbgrid.c" />
+    <ClCompile Include="apps\modelist.c" />
+    <ClCompile Include="apps\printenv.c" />
+    <ClCompile Include="apps\route80h.c" />
+    <ClCompile Include="apps\setdbg.c" />
+    <ClCompile Include="apps\setjmp.c" />
+    <ClCompile Include="apps\t.c" />
+    <ClCompile Include="apps\t2.c" />
+    <ClCompile Include="apps\t3.c" />
+    <ClCompile Include="apps\t4.c" />
+    <ClCompile Include="apps\t5.c" />
+    <ClCompile Include="apps\t6.c" />
+    <ClCompile Include="apps\t7.c" />
+    <ClCompile Include="apps\t8.c" />
+    <ClCompile Include="apps\tcc.c" />
+    <ClCompile Include="apps\tpause.c" />
+    <ClCompile Include="apps\unsetdbg.c" />
+    <ClCompile Include="bootloader\main.c" />
+    <ClCompile Include="gnuefi\reloc_aarch64.c" />
+    <ClCompile Include="gnuefi\reloc_arm.c" />
+    <ClCompile Include="gnuefi\reloc_ia32.c" />
+    <ClCompile Include="gnuefi\reloc_mips64el.c" />
+    <ClCompile Include="gnuefi\reloc_x86_64.c" />
+    <ClCompile Include="lib\aarch64\initplat.c" />
+    <ClCompile Include="lib\aarch64\math.c" />
+    <ClCompile Include="lib\arm\initplat.c" />
+    <ClCompile Include="lib\arm\math.c" />
+    <ClCompile Include="lib\boxdraw.c" />
+    <ClCompile Include="lib\cmdline.c" />
+    <ClCompile Include="lib\console.c" />
+    <ClCompile Include="lib\crc.c" />
+    <ClCompile Include="lib\data.c" />
+    <ClCompile Include="lib\debug.c" />
+    <ClCompile Include="lib\dpath.c" />
+    <ClCompile Include="lib\error.c" />
+    <ClCompile Include="lib\event.c" />
+    <ClCompile Include="lib\exit.c" />
+    <ClCompile Include="lib\guid.c" />
+    <ClCompile Include="lib\hand.c" />
+    <ClCompile Include="lib\hw.c" />
+    <ClCompile Include="lib\ia32\initplat.c" />
+    <ClCompile Include="lib\ia32\math.c" />
+    <ClCompile Include="lib\ia64\initplat.c" />
+    <ClCompile Include="lib\ia64\math.c" />
+    <ClCompile Include="lib\ia64\salpal.c" />
+    <ClCompile Include="lib\init.c" />
+    <ClCompile Include="lib\lock.c" />
+    <ClCompile Include="lib\mips64el\initplat.c" />
+    <ClCompile Include="lib\mips64el\math.c" />
+    <ClCompile Include="lib\misc.c" />
+    <ClCompile Include="lib\print.c" />
+    <ClCompile Include="lib\runtime\efirtlib.c" />
+    <ClCompile Include="lib\runtime\rtdata.c" />
+    <ClCompile Include="lib\runtime\rtlock.c" />
+    <ClCompile Include="lib\runtime\rtstr.c" />
+    <ClCompile Include="lib\runtime\vm.c" />
+    <ClCompile Include="lib\smbios.c" />
+    <ClCompile Include="lib\sread.c" />
+    <ClCompile Include="lib\str.c" />
+    <ClCompile Include="lib\x86_64\callwrap.c" />
+    <ClCompile Include="lib\x86_64\initplat.c" />
+    <ClCompile Include="lib\x86_64\math.c" />
+  </ItemGroup>
+  <ItemGroup>
+    <ClInclude Include="apps\drv0.h" />
+    <ClInclude Include="bootloader\Funcs.h" />
+    <ClInclude Include="bootloader\Structs.h" />
+    <ClInclude Include="inc\aarch64\efibind.h" />
+    <ClInclude Include="inc\aarch64\efilibplat.h" />
+    <ClInclude Include="inc\aarch64\efisetjmp_arch.h" />
+    <ClInclude Include="inc\arm\efibind.h" />
+    <ClInclude Include="inc\arm\efilibplat.h" />
+    <ClInclude Include="inc\arm\efisetjmp_arch.h" />
+    <ClInclude Include="inc\efi.h" />
+    <ClInclude Include="inc\efiapi.h" />
+    <ClInclude Include="inc\eficompiler.h" />
+    <ClInclude Include="inc\eficon.h" />
+    <ClInclude Include="inc\efidebug.h" />
+    <ClInclude Include="inc\efidef.h" />
+    <ClInclude Include="inc\efidevp.h" />
+    <ClInclude Include="inc\efierr.h" />
+    <ClInclude Include="inc\efifs.h" />
+    <ClInclude Include="inc\efigpt.h" />
+    <ClInclude Include="inc\efiip.h" />
+    <ClInclude Include="inc\efilib.h" />
+    <ClInclude Include="inc\efilink.h" />
+    <ClInclude Include="inc\efinet.h" />
+    <ClInclude Include="inc\efipart.h" />
+    <ClInclude Include="inc\efipciio.h" />
+    <ClInclude Include="inc\efipoint.h" />
+    <ClInclude Include="inc\efiprot.h" />
+    <ClInclude Include="inc\efipxebc.h" />
+    <ClInclude Include="inc\efirtlib.h" />
+    <ClInclude Include="inc\efiser.h" />
+    <ClInclude Include="inc\efisetjmp.h" />
+    <ClInclude Include="inc\efishellintf.h" />
+    <ClInclude Include="inc\efishellparm.h" />
+    <ClInclude Include="inc\efistdarg.h" />
+    <ClInclude Include="inc\efitcp.h" />
+    <ClInclude Include="inc\efiudp.h" />
+    <ClInclude Include="inc\efiui.h" />
+    <ClInclude Include="inc\efi_nii.h" />
+    <ClInclude Include="inc\efi_pxe.h" />
+    <ClInclude Include="inc\elf.h" />
+    <ClInclude Include="inc\ia32\efibind.h" />
+    <ClInclude Include="inc\ia32\efilibplat.h" />
+    <ClInclude Include="inc\ia32\efisetjmp_arch.h" />
+    <ClInclude Include="inc\ia32\pe.h" />
+    <ClInclude Include="inc\ia64\efibind.h" />
+    <ClInclude Include="inc\ia64\efilibplat.h" />
+    <ClInclude Include="inc\ia64\efisetjmp_arch.h" />
+    <ClInclude Include="inc\ia64\pe.h" />
+    <ClInclude Include="inc\ia64\salproc.h" />
+    <ClInclude Include="inc\libsmbios.h" />
+    <ClInclude Include="inc\mips64el\efibind.h" />
+    <ClInclude Include="inc\mips64el\efilibplat.h" />
+    <ClInclude Include="inc\mips64el\efisetjmp_arch.h" />
+    <ClInclude Include="inc\pci22.h" />
+    <ClInclude Include="inc\protocol\adapterdebug.h" />
+    <ClInclude Include="inc\protocol\eficonsplit.h" />
+    <ClInclude Include="inc\protocol\efidbg.h" />
+    <ClInclude Include="inc\protocol\efivar.h" />
+    <ClInclude Include="inc\protocol\ia64\eficontext.h" />
+    <ClInclude Include="inc\protocol\intload.h" />
+    <ClInclude Include="inc\protocol\legacyboot.h" />
+    <ClInclude Include="inc\protocol\piflash64.h" />
+    <ClInclude Include="inc\protocol\vgaclass.h" />
+    <ClInclude Include="inc\romload.h" />
+    <ClInclude Include="inc\x86_64\efibind.h" />
+    <ClInclude Include="inc\x86_64\efilibplat.h" />
+    <ClInclude Include="inc\x86_64\efisetjmp_arch.h" />
+    <ClInclude Include="inc\x86_64\pe.h" />
+    <ClInclude Include="lib\arm\edk2asm.h" />
+    <ClInclude Include="lib\ia64\palproc.h" />
+    <ClInclude Include="lib\lib.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Make.defaults" />
+  </ItemGroup>
+  <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
+  <ImportGroup Label="ExtensionTargets">
+  </ImportGroup>
+</Project>
