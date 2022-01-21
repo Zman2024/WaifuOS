@@ -1,0 +1,4 @@
+echo ========== Building Kernel ==========
+make
+echo ========== Building Image ===========
+make buildimg
