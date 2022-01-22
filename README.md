@@ -32,7 +32,7 @@ Clone the repo (Code -> Download ZIP) and extract it somewhere
 Compilation (Bootloader): 
 
   1. cd to Bootloader
-  2. Ppen cmd
+  2. Open cmd
   3. Run wsl make all
   4. Wow cool
 
