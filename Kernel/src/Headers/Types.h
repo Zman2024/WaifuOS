@@ -8,7 +8,7 @@
 #define attribute __attribute__
 #define intr attribute ((interrupt))
 
-constexpr int PAGE_SIZE = 0x1000;
+constexpr auto PAGE_SIZE = 0x1000;
 
 typedef signed char sbyte;
 typedef signed char int8;

@@ -15,9 +15,6 @@
     </Filter>
   </ItemGroup>
   <ItemGroup>
-    <ClCompile Include="KernelMain.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="KernelUtils.cpp">
       <Filter>src</Filter>
     </ClCompile>
@@ -34,6 +31,18 @@
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="MemoryUtils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="Main.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="BitMap.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="PageFrameAllocator.cpp">
       <Filter>src</Filter>
     </ClCompile>
   </ItemGroup>
@@ -66,6 +75,15 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Headers\cstr.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Memory.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\BitMap.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\PageFrameAllocator.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

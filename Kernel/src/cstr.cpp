@@ -37,6 +37,11 @@ namespace cstr
 		memset<uint64>(strBuffer, 0, 32);
 
 		char* buffer = strBuffer;
+		if (num == 0)
+		{
+			buffer[0] = '0';
+			return strBuffer;
+		}
 		if (num < 0)
 		{
 			strBuffer[0] = '-';
@@ -62,12 +67,23 @@ namespace cstr
 		hexBuffer[1] = 'x';
 		char* buffer = hexBuffer + 2;
 
+		if (num == 0)
+		{
+			buffer[0] = '0';
+			buffer[1] = '0';
+			return hexBuffer;
+		}
+		if (num < 0x10)
+		{
+			buffer[1] = '0';
+		}
+
 		byte index = 0;
 		// the lazy way to do this but oh well
 		while (num != 0)
 		{
-			byte val = num % 0x10;
-			buffer[index++] = (val > 9) ? val + 0x41 : val + 0x30;
+			byte val = (num % 0x10);
+			buffer[index++] = (val > 9) ? ((val) + 0x37) : val + 0x30;
 			num /= 0x10;
 		}
 

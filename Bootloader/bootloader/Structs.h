@@ -45,6 +45,7 @@ typedef struct BootInfo
 	uint64_t MapSize;
 	uint64_t DescriptorSize;
 	void* RSDP;
+	void* LoadingImage;
 } BootInfo;
 
 #endif

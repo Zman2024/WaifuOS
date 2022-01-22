@@ -7,4 +7,8 @@
 
 global PrimitiveConsole gConsole;
 
+// The value doesn't matter, we just need the address that they are at
+global byte _KernelStart;
+global byte _KernelEnd;
+
 #endif

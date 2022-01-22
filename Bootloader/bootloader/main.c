@@ -10,10 +10,9 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 	Print(L"Bootloader Initialized\n\r");
 
 	EFI_FILE* Kernel = LoadFile(NULL, L"kernel.elf", ImageHandle, SystemTable);
+
 	uint64_t pos = 0;
-
 	Kernel->GetPosition(Kernel, &pos);
-
 
 	if (Kernel == NULL)
 	{
@@ -34,6 +33,9 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 		UINTN size = sizeof(header);
 		Kernel->Read(Kernel, &size, &header);
 	}
+
+	void* ImageData = LoadFileRaw(NULL, L"loadingicon.raw", ImageHandle, SystemTable);
+
 
 	if (memcmp(&header.e_ident[EI_MAG0], ELFMAG, SELFMAG) != 0 ||
 		header.e_ident[EI_CLASS] != ELFCLASS64 ||
@@ -139,6 +141,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 		info.MapSize = MapSize;
 		info.DescriptorSize = DescriptorSize;
 		info.RSDP = rsdp;
+		info.LoadingImage = ImageData;
 	}
 
 	SystemTable->BootServices->ExitBootServices(ImageHandle, MapKey);

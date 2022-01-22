@@ -35,6 +35,7 @@ struct BootInfo
 	uint64 MapSize;
 	uint64 MapDescriptorSize;
 	void* RSDP;
+	void* LoadingImage;
 };
 
 struct Rectangle
