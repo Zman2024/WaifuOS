@@ -7,5 +7,7 @@
 
 namespace Kernel
 {
+	void ShowLoadingImage(BootInfo* info);
 	void InitializeKernel(BootInfo* bootInfo);
+	global void KernelStart(BootInfo bootInfo);
 }

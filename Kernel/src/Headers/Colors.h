@@ -1,6 +1,6 @@
 #pragma once
 #include <Types.h>
-#include <Structs.h>
+
 #ifndef H_Colors
 #define H_Colors
 

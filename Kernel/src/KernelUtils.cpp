@@ -2,6 +2,22 @@
 
 namespace Kernel
 {
+	void ShowLoadingImage(BootInfo* info)
+	{
+		Color* colorFB = (Color*)info->Framebuffer->BaseAddress;
+		Color* img = (Color*)(info->LoadingImage);
+
+		for (u16 y = 0; y < 256; y++)
+		{
+			for (u16 x = 0; x < 256; x++)
+			{
+				// wow this is massive, cringe. 10/10 very readable code
+				colorFB[((y + (u64)(info->Framebuffer->Height / 1.5) - 128) * info->Framebuffer->PixelsPerScanline) + x + (info->Framebuffer->PixelsPerScanline / 2) - 128] = img[(y * 256) + x];
+			}
+		}
+
+	}
+
 	void InitializeKernel(BootInfo* bootInfo)
 	{
 		// Create console

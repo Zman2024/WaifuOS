@@ -63,9 +63,9 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="KernelUtils.cpp" />
     <ClCompile Include="Main.cpp" />
-    <ClCompile Include="Memory.cpp" />
-    <ClCompile Include="MemoryUtils.cpp" />
-    <ClCompile Include="PageFrameAllocator.cpp" />
+    <ClCompile Include="Memory\Memory.cpp" />
+    <ClCompile Include="Memory\MemoryUtils.cpp" />
+    <ClCompile Include="Memory\PageFrameAllocator.cpp" />
     <ClCompile Include="PrimitiveConsole.cpp" />
   </ItemGroup>
   <ItemGroup>

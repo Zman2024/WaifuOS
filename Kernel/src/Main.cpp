@@ -8,27 +8,14 @@
 
 namespace Kernel
 {
-	void ShowLoadingImage(BootInfo* info)
-	{
-		Color* colorFB = (Color*)info->Framebuffer->BaseAddress;
-		Color* img = (Color*)(info->LoadingImage);
-
-		for (uint32 y = 0; y < 256; y++)
-		{
-			for (uint32 x = 0; x < 256; x++)
-			{
-				colorFB[((y + (uint64)(info->Framebuffer->Height/2)-128) * info->Framebuffer->PixelsPerScanline) + x + (info->Framebuffer->PixelsPerScanline/2) - 128] = img[(y * 256) + x];
-			}
-		}
-
-	}
-
 	global void KernelStart(BootInfo bootInfo)
 	{
 		Kernel::InitializeKernel(&bootInfo);
 		gConsole.Clear();
 		gConsole.WriteLine("Hello WaifuOS!");
 		
+		gConsole.WriteLine(cstr::ToString(cstr::ToInt("-100")));
+		gConsole.WriteLine(cstr::ToString(cstr::ToInt("ABC", true), true));
 
 		for (byte x = 0; x < 10; x++)
 		{

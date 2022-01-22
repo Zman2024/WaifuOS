@@ -13,6 +13,9 @@
       <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
       <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
     </Filter>
+    <Filter Include="src\Memory">
+      <UniqueIdentifier>{2036a91e-7205-434b-8d53-3949faa2926c}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KernelUtils.cpp">
@@ -30,20 +33,20 @@
     <ClCompile Include="cstr.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="MemoryUtils.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
     <ClCompile Include="Main.cpp">
-      <Filter>src</Filter>
-    </ClCompile>
-    <ClCompile Include="Memory.cpp">
       <Filter>src</Filter>
     </ClCompile>
     <ClCompile Include="BitMap.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="PageFrameAllocator.cpp">
-      <Filter>src</Filter>
+    <ClCompile Include="Memory\PageFrameAllocator.cpp">
+      <Filter>src\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\MemoryUtils.cpp">
+      <Filter>src\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\Memory.cpp">
+      <Filter>src\Memory</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>

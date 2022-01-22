@@ -97,9 +97,52 @@ namespace cstr
 		return _ToStr(num);
 	}
 
+	int64 _ToIntBase10(const char* str)
+	{
+		int64 value = 0;
+		bool isNegative = str[0] == '-';
+		const char* buffer = str;
+
+		if (isNegative) buffer += 1;
+
+		u64 length = len(buffer);
+
+		for (u64 x = 0; x < length; x++)
+		{
+			value *= 10;
+			value += (buffer[x] - 0x30);
+		}
+
+		if (isNegative) value *= -1;
+
+		return value;
+	}
+
+	int64 _ToIntBase16(const char* str)
+	{
+		int64 value = 0;
+		const char* buffer = str;
+
+		if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
+		{
+			buffer = str + 2;
+		}
+
+		u64 length = len(buffer);
+
+		for (u64 x = 0; x < length; x++)
+		{
+			value *= 0x10;
+			value += (buffer[x] > 0x39 ? buffer[x] - 0x37 : buffer[x] - 0x30);
+		}
+
+		return value;
+	}
+
 	int64 ToInt(const char* str, bool hex)
 	{
-		return 0;
+		if (hex) return _ToIntBase16(str);
+		return _ToIntBase10(str);
 	}
 
 }
