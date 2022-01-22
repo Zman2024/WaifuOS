@@ -48,6 +48,8 @@ set PATH=$(PATH)
 C:\Windows\sysnative\wsl ./clean
 C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <SourcePath />
+    <IntDir>$(SolutionDir)bin\</IntDir>
+    <OutDir>$(SolutionDir)bin\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PreBuildEvent>

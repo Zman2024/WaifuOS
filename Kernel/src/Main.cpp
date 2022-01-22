@@ -29,23 +29,6 @@ namespace Kernel
 		gConsole.Clear();
 		gConsole.WriteLine("Hello WaifuOS!");
 		
-		PageFrameAllocator::ReadEfiMemoryMap(bootInfo.MemoryMap, bootInfo.MapSize, bootInfo.MapDescriptorSize);
-
-		gConsole.Write("Free RAM: ");
-		gConsole.Write(cstr::ToString(PageFrameAllocator::GetFreeRAM() / 1024), Color::Cyan);
-		gConsole.WriteLine(" KB", Color::Cyan);
-
-		gConsole.Write("Allocated RAM: ");
-		gConsole.Write(cstr::ToString(PageFrameAllocator::GetAllocatedRAM() / 1024), Color::Cyan);
-		gConsole.WriteLine(" KB", Color::Cyan);
-
-		gConsole.Write("Reserved RAM: ");
-		gConsole.Write(cstr::ToString(PageFrameAllocator::GetReservedRAM() / 1024), Color::Cyan);
-		gConsole.WriteLine(" KB", Color::Cyan);
-
-		u64 kSize = (u64)&_KernelEnd - (u64)&_KernelStart;
-
-		PageFrameAllocator::LockPages(&_KernelStart, kSize / PAGE_SIZE +1);
 
 		for (byte x = 0; x < 10; x++)
 		{

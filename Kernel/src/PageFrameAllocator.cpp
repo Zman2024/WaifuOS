@@ -42,10 +42,11 @@ namespace PageFrameAllocator
 
 		if (!PageBitmap[index]) return;
 
-		PageBitmap.Set(index, false);
-
-		FreeMemory += PAGE_SIZE;
-		AllocatedMemory -= PAGE_SIZE;
+		if (PageBitmap.Set(index, false))
+		{
+			FreeMemory += PAGE_SIZE;
+			AllocatedMemory -= PAGE_SIZE;
+		}
 	}
 
 	void LockPage(void* address)
@@ -54,10 +55,11 @@ namespace PageFrameAllocator
 
 		if (PageBitmap[index]) return;
 
-		PageBitmap.Set(index, true);
-
-		FreeMemory -= PAGE_SIZE;
-		AllocatedMemory += PAGE_SIZE;
+		if (PageBitmap.Set(index, true))
+		{
+			FreeMemory -= PAGE_SIZE;
+			AllocatedMemory += PAGE_SIZE;
+		}
 
 	}
 
@@ -83,10 +85,11 @@ namespace PageFrameAllocator
 
 		if (!PageBitmap[index]) return;
 
-		PageBitmap.Set(index, false);
-
-		FreeMemory += PAGE_SIZE;
-		ReservedMemory -= PAGE_SIZE;
+		if (PageBitmap.Set(index, false))
+		{
+			FreeMemory += PAGE_SIZE;
+			ReservedMemory -= PAGE_SIZE;
+		}
 	}
 
 	void ReservePage(void* address)
@@ -95,10 +98,11 @@ namespace PageFrameAllocator
 
 		if (PageBitmap[index]) return;
 
-		PageBitmap.Set(index, true);
-
-		FreeMemory -= PAGE_SIZE;
-		ReservedMemory += PAGE_SIZE;
+		if (PageBitmap.Set(index, true))
+		{
+			FreeMemory -= PAGE_SIZE;
+			ReservedMemory += PAGE_SIZE;
+		}
 	}
 
 	void UnreservePages(void* address, u64 count)
