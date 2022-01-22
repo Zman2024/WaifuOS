@@ -11,8 +11,9 @@ namespace Kernel
 		Kernel::InitializeKernel(&bootInfo);
 
 		gConsole.WriteLine("Ok this shit works. good");
-		gConsole.WriteLine(cstr::ToString(123456789));
-		gConsole.WriteLine(cstr::ToString(0x123456789, true));
+		gConsole.WriteLine(cstr::ToString(1234567890));
+		gConsole.WriteLine(cstr::ToString(-1234567890));
+		gConsole.WriteLine(cstr::ToString(0x1234567890, true));
 
 
 		OS_HLT;

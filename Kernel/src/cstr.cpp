@@ -31,29 +31,36 @@ namespace cstr
 
 	}
 
-	inline char* _ToStr(uint64 num)
+	inline char* _ToStr(int64 num)
 	{
 		// Zero out the buffer
 		memset<uint64>(strBuffer, 0, 32);
 
+		char* buffer = strBuffer;
+		if (num < 0)
+		{
+			strBuffer[0] = '-';
+			buffer = strBuffer + 1;
+			num *= -1;
+		}
+
 		byte index = 0;
 		while (num != 0)
 		{
-			strBuffer[index++] = (num % 10) + 0x30;
+			buffer[index++] = (num % 10) + 0x30;
 			num /= 10;
 		}
 
-		Reverse(strBuffer);
+		Reverse(buffer);
 		return strBuffer;
 	}
 
 	inline char* _ToHex(uint64 num)
 	{
+		memset<uint64>(hexBuffer, 0, 32);
 		hexBuffer[0] = '0';
 		hexBuffer[1] = 'x';
 		char* buffer = hexBuffer + 2;
-
-		memset<uint64>(buffer, 0, 30);
 
 		byte index = 0;
 		// the lazy way to do this but oh well
@@ -68,7 +75,7 @@ namespace cstr
 		return hexBuffer;
 	}
 
-	char* ToString(uint64 num, bool hex)
+	char* ToString(int64 num, bool hex)
 	{
 		if (hex) return _ToHex(num);
 		return _ToStr(num);

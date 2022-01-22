@@ -8,7 +8,7 @@ namespace cstr
 {
 	uint64 len(const char* str);
 	void Reverse(char* str, uint64 length = 0);
-	char* ToString(uint64 num, bool hex = false);
+	char* ToString(int64 num, bool hex = false);
 	int64 ToInt(const char* str, bool hex = false);
 
 }
