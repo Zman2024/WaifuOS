@@ -1,6 +1,7 @@
 #pragma once
 #include <Types.h>
 #include <EFI.h>
+
 #ifndef H_Structs
 #define H_Structs
 
@@ -79,4 +80,5 @@ struct Version
 	byte Revision;
 	byte Extra [4];
 };
+
 #endif

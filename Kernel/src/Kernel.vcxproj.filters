@@ -27,6 +27,15 @@
     <ClCompile Include="Globals.cpp">
       <Filter>src</Filter>
     </ClCompile>
+    <ClCompile Include="EFI.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="cstr.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
+    <ClCompile Include="MemoryUtils.cpp">
+      <Filter>src</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\EFI.h">
@@ -36,9 +45,6 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="headers\Types.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
-    <ClInclude Include="KernelUtils.h">
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Headers\PrimitiveConsole.h">
@@ -54,6 +60,12 @@
       <Filter>Headers</Filter>
     </ClInclude>
     <ClInclude Include="Headers\Globals.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\KernelUtils.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\cstr.h">
       <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>

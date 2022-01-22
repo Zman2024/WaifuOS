@@ -1,5 +1,6 @@
 #pragma once
 #include <Types.h>
+
 #ifndef H_MemoryUtils
 #define H_MemoryUtils
 
@@ -21,4 +22,7 @@ template <typename T> inline void memset(void* address, T value, uint64 nBytes)
 	}
 
 }
+
+void memcpy(const void* src, void* dest, uint64 nBytes);
+
 #endif

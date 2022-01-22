@@ -41,21 +41,25 @@
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="cstr.cpp" />
+    <ClCompile Include="EFI.cpp" />
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="KernelMain.cpp" />
     <ClCompile Include="KernelUtils.cpp" />
+    <ClCompile Include="MemoryUtils.cpp" />
     <ClCompile Include="PrimitiveConsole.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\Colors.h" />
     <ClInclude Include="Headers\Direction.hpp" />
-    <ClInclude Include="headers\EFI.h" />
+    <ClInclude Include="Headers\EFI.h" />
     <ClInclude Include="Headers\Globals.h" />
     <ClInclude Include="Headers\MemoryUtils.hpp" />
     <ClInclude Include="Headers\PrimitiveConsole.h" />
-    <ClInclude Include="headers\Structs.h" />
-    <ClInclude Include="headers\Types.h" />
-    <ClInclude Include="KernelUtils.h" />
+    <ClInclude Include="Headers\cstr.h" />
+    <ClInclude Include="Headers\Structs.h" />
+    <ClInclude Include="Headers\Types.h" />
+    <ClInclude Include="Headers\KernelUtils.h" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
