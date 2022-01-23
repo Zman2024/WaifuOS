@@ -1,8 +1,8 @@
 #pragma once
-#include <Types.h>
-
 #ifndef H_Colors
 #define H_Colors
+#include <Types.h>
+
 
 enum struct Color : uint32
 {

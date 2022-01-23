@@ -16,6 +16,15 @@
     <Filter Include="src\Memory">
       <UniqueIdentifier>{2036a91e-7205-434b-8d53-3949faa2926c}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headers\Memory">
+      <UniqueIdentifier>{3c090064-7fef-4e3e-b6e4-94111dbc0a03}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Memory\Paging">
+      <UniqueIdentifier>{236fa8ba-f8ec-40d5-a3b0-f0f0315f3d70}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="src\Memory\Paging">
+      <UniqueIdentifier>{b25d0253-53ce-4043-b07f-e4213dc375c9}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KernelUtils.cpp">
@@ -39,14 +48,23 @@
     <ClCompile Include="BitMap.cpp">
       <Filter>src</Filter>
     </ClCompile>
-    <ClCompile Include="Memory\PageFrameAllocator.cpp">
-      <Filter>src\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="Memory\MemoryUtils.cpp">
       <Filter>src\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Memory\Memory.cpp">
       <Filter>src\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\Paging.cpp">
+      <Filter>src\Memory\Paging</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\PageFrameAllocator.cpp">
+      <Filter>src\Memory\Paging</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\PageMapIndexer.cpp">
+      <Filter>src\Memory\Paging</Filter>
+    </ClCompile>
+    <ClCompile Include="Memory\PageTableManager.cpp">
+      <Filter>src\Memory\Paging</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -68,9 +86,6 @@
     <ClInclude Include="Headers\Direction.hpp">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\MemoryUtils.hpp">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Headers\Globals.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -80,14 +95,26 @@
     <ClInclude Include="Headers\cstr.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\Memory.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Headers\BitMap.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\Memory.h">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\MemoryUtils.hpp">
+      <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Paging.h">
+      <Filter>Headers\Memory\Paging</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\PageMapIndexer.h">
+      <Filter>Headers\Memory\Paging</Filter>
+    </ClInclude>
     <ClInclude Include="Headers\PageFrameAllocator.h">
-      <Filter>Headers</Filter>
+      <Filter>Headers\Memory\Paging</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\PageTableManager.h">
+      <Filter>Headers\Memory\Paging</Filter>
     </ClInclude>
   </ItemGroup>
 </Project>

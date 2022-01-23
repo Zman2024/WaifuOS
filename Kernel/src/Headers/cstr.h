@@ -1,8 +1,7 @@
 #pragma once
-#include <Types.h>
-
 #ifndef H_cstr
 #define H_cstr
+#include <Types.h>
 
 namespace cstr
 {
@@ -17,7 +16,6 @@ namespace cstr
 
 	// Convert a cstring to an int
 	int64 ToInt(const char* str, bool hex = false);
-
 }
 
 #endif

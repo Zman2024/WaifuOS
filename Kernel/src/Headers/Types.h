@@ -1,7 +1,7 @@
 #pragma once
-#include <stddef.h>
 #ifndef H_Types
 #define H_Types
+#include <stddef.h>
 
 #define global extern "C"
 #define null 0x00
@@ -46,6 +46,7 @@ typedef double fp64;
 #define hlt asm ("hlt");
 #define intcall(x) { asm ("int %0" : : "byte"((byte)x)); }
 #define OS_HLT asm ("cli"); while(true) asm ("hlt");
+#define halt asm ("cli"); while(true) asm ("hlt");
 #define cpuid(code, rax, rbx, rcx, rdx) asm ("cpuid" : "=rax"(rax), "=rbx"(rbx), "=rcx"(rcx), "=rdx"(rdx) : "rax"(code) : "memory")
 #define spin(x) for(uint64 y = 0; x > y; y++)
 #endif

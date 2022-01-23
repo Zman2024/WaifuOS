@@ -1,9 +1,9 @@
 #pragma once
+#ifndef H_Globals
+#define H_Globals
 #include <Types.h>
 #include <Structs.h>
 #include <PrimitiveConsole.h>
-#ifndef H_Globals
-#define H_Globals
 
 global PrimitiveConsole gConsole;
 

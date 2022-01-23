@@ -66,6 +66,9 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="Memory\Memory.cpp" />
     <ClCompile Include="Memory\MemoryUtils.cpp" />
     <ClCompile Include="Memory\PageFrameAllocator.cpp" />
+    <ClCompile Include="Memory\PageMapIndexer.cpp" />
+    <ClCompile Include="Memory\PageTableManager.cpp" />
+    <ClCompile Include="Memory\Paging.cpp" />
     <ClCompile Include="PrimitiveConsole.cpp" />
   </ItemGroup>
   <ItemGroup>
@@ -77,6 +80,9 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\Memory.h" />
     <ClInclude Include="Headers\MemoryUtils.hpp" />
     <ClInclude Include="Headers\PageFrameAllocator.h" />
+    <ClInclude Include="Headers\PageMapIndexer.h" />
+    <ClInclude Include="Headers\PageTableManager.h" />
+    <ClInclude Include="Headers\Paging.h" />
     <ClInclude Include="Headers\PrimitiveConsole.h" />
     <ClInclude Include="Headers\cstr.h" />
     <ClInclude Include="Headers\Structs.h" />

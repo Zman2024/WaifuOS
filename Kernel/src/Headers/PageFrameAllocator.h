@@ -1,11 +1,10 @@
 #pragma once
+#ifndef H_PageFrameAllocator
+#define H_PageFrameAllocator
 #include <Types.h>
 #include <Structs.h>
 #include <BitMap.h>
 #include <Memory.h>
-
-#ifndef H_PageFrameAllocator
-#define H_PageFrameAllocator
 
 // namespace cause i only plan on having one of these
 namespace PageFrameAllocator

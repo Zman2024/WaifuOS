@@ -1,10 +1,10 @@
 #pragma once
+#ifndef H_PrimitiveConsole
+#define H_PrimitiveConsole
 #include <Types.h>
 #include <Structs.h>
 #include <Colors.h>
 #include <Direction.hpp>
-#ifndef H_PrimitiveConsole
-#define H_PrimitiveConsole
 
 class PrimitiveConsole
 {

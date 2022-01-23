@@ -1,8 +1,8 @@
 #pragma once
-#include <Types.h>
-#include <EFI.h>
 #ifndef H_Memory
 #define H_Memory
+#include <Types.h>
+#include <EFI.h>
 
 namespace Memory
 {

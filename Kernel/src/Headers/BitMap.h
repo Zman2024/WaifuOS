@@ -1,7 +1,7 @@
 #pragma once
-#include <Types.h>
 #ifndef H_Bitmap
 #define H_Bitmap
+#include <Types.h>
 
 struct BitMap
 {

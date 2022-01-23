@@ -20,14 +20,16 @@ namespace PageFrameAllocator
 		memset<u64>(buffer, 0x00, size);
 	}
 
+	uint64 LastPageIndex = 0;
 	void* RequestPage()
 	{
-		for (u64 index = 0; index < PageBitmap.SizeBytes * 8; index++)
+		for (; LastPageIndex < PageBitmap.SizeBytes * 8; LastPageIndex++)
 		{
-			if (PageBitmap[index]) continue;
+			// Already used
+			if (PageBitmap[LastPageIndex]) continue;
 
-			LockPage((void*)(index * PAGE_SIZE));
-			return (void*)(index * PAGE_SIZE);
+			LockPage((void*)(LastPageIndex * PAGE_SIZE));
+			return (void*)(LastPageIndex * PAGE_SIZE);
 		}
 
 		// Should do an interrupt for pageframe swap before this but i have no ints setup yet
@@ -46,6 +48,7 @@ namespace PageFrameAllocator
 		{
 			FreeMemory += PAGE_SIZE;
 			AllocatedMemory -= PAGE_SIZE;
+			if (LastPageIndex > index) LastPageIndex = index;
 		}
 	}
 
@@ -89,6 +92,7 @@ namespace PageFrameAllocator
 		{
 			FreeMemory += PAGE_SIZE;
 			ReservedMemory -= PAGE_SIZE;
+			if (LastPageIndex > index) LastPageIndex = index;
 		}
 	}
 
