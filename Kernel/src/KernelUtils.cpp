@@ -18,11 +18,25 @@ namespace Kernel
 
 	}
 
+	void InitializeGDT()
+	{
+		// Create and load GDT
+		GDTDescriptor desc{};
+		desc.Size = sizeof(GDT) - 1;
+		desc.Offset = (u64)&GlobalGDT;
+		LoadGDT(&desc);
+	}
+
 	void InitializeKernel(BootInfo* bootInfo)
 	{
+		cli;
+
 		// Create console
 		gConsole = PrimitiveConsole(bootInfo->Framebuffer, bootInfo->font);
 		
+		// Do GDT stuff
+		InitializeGDT();
+
 		// Paging / Memory Mapping
 		InitializePaging(bootInfo);
 		gConsole.Clear();
@@ -30,6 +44,7 @@ namespace Kernel
 		if (bootInfo->LoadingImage) ShowLoadingImage(bootInfo);
 		else gConsole.WriteLine("ERROR: NO BOOT IMAGE", Color::Red);
 
+		sti;
 	}
 
 	void InitializePaging(BootInfo* bootInfo)

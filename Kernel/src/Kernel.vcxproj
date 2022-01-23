@@ -61,6 +61,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="cstr.cpp" />
     <ClCompile Include="EFI.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Interrupts\GDT.cpp" />
     <ClCompile Include="KernelUtils.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Memory\Memory.cpp" />
@@ -76,6 +77,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\Colors.h" />
     <ClInclude Include="Headers\Direction.hpp" />
     <ClInclude Include="Headers\EFI.h" />
+    <ClInclude Include="Headers\GDT.h" />
     <ClInclude Include="Headers\Globals.h" />
     <ClInclude Include="Headers\Memory.h" />
     <ClInclude Include="Headers\MemoryUtils.hpp" />
@@ -88,6 +90,9 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\Structs.h" />
     <ClInclude Include="Headers\Types.h" />
     <ClInclude Include="Headers\KernelUtils.h" />
+  </ItemGroup>
+  <ItemGroup>
+    <None Include="Interrupts\GDT.asm" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
