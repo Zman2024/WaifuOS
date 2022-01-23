@@ -72,7 +72,10 @@
     <ClCompile Include="Memory\PageTableManager.cpp">
       <Filter>src\Memory\Paging</Filter>
     </ClCompile>
-    <ClCompile Include="Interrupts\GDT.cpp">
+    <ClCompile Include="Interrupts\IDT.cpp">
+      <Filter>src\Interrupts</Filter>
+    </ClCompile>
+    <ClCompile Include="Interrupts\Interrupts.cpp">
       <Filter>src\Interrupts</Filter>
     </ClCompile>
   </ItemGroup>
@@ -126,6 +129,12 @@
       <Filter>Headers\Memory\Paging</Filter>
     </ClInclude>
     <ClInclude Include="Headers\GDT.h">
+      <Filter>Headers\Interrupts</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\IDT.h">
+      <Filter>Headers\Interrupts</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Interrupts.h">
       <Filter>Headers\Interrupts</Filter>
     </ClInclude>
   </ItemGroup>

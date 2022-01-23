@@ -12,6 +12,7 @@
 #include <MemoryUtils.hpp>
 #include <PageTableManager.h>
 #include <GDT.h>
+#include <Interrupts.h>
 
 namespace Kernel
 {
@@ -23,6 +24,9 @@ namespace Kernel
 
 	// Initializes Paging and Memory Mapping
 	void InitializePaging(BootInfo* bootInfo);
+
+	// Initializes interrupts (duh)
+	void InitializeInterrupts();
 
 	// Initializes the global descriptor table for interrupts
 	void InitializeGDT();

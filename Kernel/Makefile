@@ -11,7 +11,7 @@ SRCDIR := src
 OBJDIR := obj
 BUILDDIR = bin
 
-CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone -O0 -fno-exceptions -fno-rtti -masm=intel -I$(SRCDIR)/Headers
+CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone -O0 -fno-exceptions -fno-rtti -masm=intel -fpermissive -I$(SRCDIR)/Headers
 INTFLAGS = -mno-red-zone -mgeneral-regs-only -ffreestanding -masm=intel -I$(SRCDIR)/Headers -c $^ -o $@
 ASMFLAGS = 
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
@@ -28,10 +28,10 @@ DIRS = $(wildcard $(SRCDIR)/*)
 
 
 kernel: $(OBJS) link
-# $(OBJDIR)/Interrupts/Interrupts.o: $(SRCDIR)/Interrupts/Interrupts.cpp
-# 	@ echo ===== Compiling $^ =====
-# 	@ mkdir -p $(@D)
-# 	$(GC) $(INTFLAGS)
+$(OBJDIR)/Interrupts/Interrupts.o: $(SRCDIR)/Interrupts/Interrupts.cpp
+	@ echo ===== Compiling $^ =====
+	@ mkdir -p $(@D)
+	$(GC) $(INTFLAGS)
 
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@ echo ===== Compiling $^ =====

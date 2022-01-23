@@ -1,6 +1,7 @@
 #include <Globals.h>
 
 PrimitiveConsole gConsole;
+IDTR GlobalIDTR;
 
 attribute((aligned(PAGE_SIZE))) GDT GlobalGDT = 
 {

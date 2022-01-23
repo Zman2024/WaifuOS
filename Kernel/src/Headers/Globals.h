@@ -5,8 +5,10 @@
 #include <Structs.h>
 #include <PrimitiveConsole.h>
 #include <GDT.h>
+#include <IDT.h>
 
 global PrimitiveConsole gConsole;
+global IDTR GlobalIDTR;
 global GDT GlobalGDT; // yeah i know, "Global Global Descriptor Table" makes no sense. Cope.
 
 // The value doesn't matter, we just need the address that they are at

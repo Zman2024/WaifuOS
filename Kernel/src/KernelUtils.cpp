@@ -2,6 +2,29 @@
 
 namespace Kernel
 {
+	void InitializeKernel(BootInfo* bootInfo)
+	{
+		cli;
+
+		// Create console
+		gConsole = PrimitiveConsole(bootInfo->Framebuffer, bootInfo->font);
+		
+		// Paging / Memory Mapping
+		InitializePaging(bootInfo);
+		gConsole.Clear();
+
+		// Do GDT stuff
+		InitializeGDT();
+
+		// Interrupts
+		InitializeInterrupts();
+
+		if (bootInfo->LoadingImage) ShowLoadingImage(bootInfo);
+		else gConsole.WriteLine("ERROR: NO BOOT IMAGE", Color::Red);
+
+		sti;
+	}
+
 	void ShowLoadingImage(BootInfo* info)
 	{
 		Color* colorFB = (Color*)info->Framebuffer->BaseAddress;
@@ -18,6 +41,30 @@ namespace Kernel
 
 	}
 
+	void InitializeInterrupts()
+	{
+		using namespace Interrupts;
+
+		// Setup GIDTR
+		GlobalIDTR.Limit = 0x0FFF;
+		GlobalIDTR.Offset = (u64)PageFrameAllocator::RequestPage<void>();
+
+		// Register interrupts
+		RegisterInterrupt((void*)hDivideByZeroFault, Interrupt::DivideByZero);
+
+		RegisterInterrupt((void*)hDoubleFault, Interrupt::DoubleFault);
+
+		RegisterInterrupt((void*)hGeneralProtectionFault, Interrupt::GeneralProtection);
+		
+		RegisterInterrupt((void*)hPageFault, Interrupt::PageFault);
+		
+		RegisterInterrupt((void*)hCoprocessorFault, Interrupt::CoprocessorError);
+
+		// Load global IDT
+		LoadIDT();
+		sti;
+	}
+
 	void InitializeGDT()
 	{
 		// Create and load GDT
@@ -25,26 +72,6 @@ namespace Kernel
 		desc.Size = sizeof(GDT) - 1;
 		desc.Offset = (u64)&GlobalGDT;
 		LoadGDT(&desc);
-	}
-
-	void InitializeKernel(BootInfo* bootInfo)
-	{
-		cli;
-
-		// Create console
-		gConsole = PrimitiveConsole(bootInfo->Framebuffer, bootInfo->font);
-		
-		// Do GDT stuff
-		InitializeGDT();
-
-		// Paging / Memory Mapping
-		InitializePaging(bootInfo);
-		gConsole.Clear();
-
-		if (bootInfo->LoadingImage) ShowLoadingImage(bootInfo);
-		else gConsole.WriteLine("ERROR: NO BOOT IMAGE", Color::Red);
-
-		sti;
 	}
 
 	void InitializePaging(BootInfo* bootInfo)

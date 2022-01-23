@@ -61,7 +61,8 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="cstr.cpp" />
     <ClCompile Include="EFI.cpp" />
     <ClCompile Include="Globals.cpp" />
-    <ClCompile Include="Interrupts\GDT.cpp" />
+    <ClCompile Include="Interrupts\IDT.cpp" />
+    <ClCompile Include="Interrupts\Interrupts.cpp" />
     <ClCompile Include="KernelUtils.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Memory\Memory.cpp" />
@@ -79,6 +80,8 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\EFI.h" />
     <ClInclude Include="Headers\GDT.h" />
     <ClInclude Include="Headers\Globals.h" />
+    <ClInclude Include="Headers\IDT.h" />
+    <ClInclude Include="Headers\Interrupts.h" />
     <ClInclude Include="Headers\Memory.h" />
     <ClInclude Include="Headers\MemoryUtils.hpp" />
     <ClInclude Include="Headers\PageFrameAllocator.h" />

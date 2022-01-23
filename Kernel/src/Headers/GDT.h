@@ -18,7 +18,7 @@ struct GDTEntry
 	byte AccessByte;
 	byte Limit1Flags;
 	byte Base2;
-} attribute((packed));;
+} attribute((packed));
 
 struct GDT
 {
