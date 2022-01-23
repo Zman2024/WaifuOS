@@ -7,7 +7,7 @@
 EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 {
 	InitializeLib(ImageHandle, SystemTable);
-	Print(L"Bootloader Initialized\n\r");
+	Print(L"\n\rBootloader Initialized\n\r");
 
 	EFI_FILE* Kernel = LoadFile(NULL, L"kernel.elf", ImageHandle, SystemTable);
 
@@ -35,7 +35,9 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 	}
 
 	void* ImageData = LoadFileRaw(NULL, L"loadingicon.raw", ImageHandle, SystemTable);
-
+	
+	if (!ImageData) Print(L"Loading image not loaded!\n\r");
+	else Print(L"Loading image loaded!\n\r");
 
 	if (memcmp(&header.e_ident[EI_MAG0], ELFMAG, SELFMAG) != 0 ||
 		header.e_ident[EI_CLASS] != ELFCLASS64 ||

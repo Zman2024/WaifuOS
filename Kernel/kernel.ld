@@ -11,9 +11,7 @@ SECTIONS
 
 	.data : ALIGN(0x1000)
 	{
-		_KernelDataStart = .;
 		*(.data)
-		_KernelDataEnd = .;
 	}
 
 	.rodata : ALIGN(0x1000)

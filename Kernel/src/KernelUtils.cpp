@@ -16,13 +16,11 @@ namespace Kernel
 		// Do GDT stuff
 		InitializeGDT();
 
-		// Interrupts
+		// Interrupts (enables interrupts)
 		InitializeInterrupts();
 
 		if (bootInfo->LoadingImage) ShowLoadingImage(bootInfo);
 		else gConsole.WriteLine("ERROR: NO BOOT IMAGE", Color::Red);
-
-		sti;
 	}
 
 	void ShowLoadingImage(BootInfo* info)
@@ -44,6 +42,8 @@ namespace Kernel
 	void InitializeInterrupts()
 	{
 		using namespace Interrupts;
+		// Make sure interrupts are off
+		cli;
 
 		// Setup GIDTR
 		GlobalIDTR.Limit = 0x0FFF;
@@ -67,6 +67,9 @@ namespace Kernel
 
 	void InitializeGDT()
 	{
+		// Make sure interrupts are off
+		cli;
+
 		// Create and load GDT
 		GDTDescriptor desc{};
 		desc.Size = sizeof(GDT) - 1;
