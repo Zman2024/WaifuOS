@@ -6,7 +6,13 @@
 namespace cstr
 {
 	// Get length of cstring
-	uint64 len(const char* str);
+	uint64 Length(const char* str);
+
+	// returns true if str0 and str1 are the same
+	bool strcmp(const char* str0, const char* str1);
+
+	// returns true if str0 and str1 are the same
+	bool strcmp(const char* str0, const char* str1, u64 len);
 
 	// Reverse a cstring
 	void Reverse(char* str, uint64 length = 0);

@@ -9,74 +9,86 @@
       <UniqueIdentifier>{93995380-89BD-4b04-88EB-625FBE52EBFB}</UniqueIdentifier>
       <Extensions>h;hh;hpp;hxx;hm;inl;inc;xsd</Extensions>
     </Filter>
-    <Filter Include="src">
-      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
-      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
-    </Filter>
-    <Filter Include="src\Memory">
-      <UniqueIdentifier>{2036a91e-7205-434b-8d53-3949faa2926c}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Headers\Memory">
       <UniqueIdentifier>{3c090064-7fef-4e3e-b6e4-94111dbc0a03}</UniqueIdentifier>
     </Filter>
     <Filter Include="Headers\Memory\Paging">
       <UniqueIdentifier>{236fa8ba-f8ec-40d5-a3b0-f0f0315f3d70}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Memory\Paging">
-      <UniqueIdentifier>{b25d0253-53ce-4043-b07f-e4213dc375c9}</UniqueIdentifier>
-    </Filter>
     <Filter Include="Headers\Interrupts">
       <UniqueIdentifier>{690937da-a9e8-4f47-8b11-e139f6c4c571}</UniqueIdentifier>
     </Filter>
-    <Filter Include="src\Interrupts">
+    <Filter Include="Source">
+      <UniqueIdentifier>{4FC737F1-C7A5-4376-A066-2A32D752A2FF}</UniqueIdentifier>
+      <Extensions>cpp;c;cc;cxx;def;odl;idl;hpj;bat;asm;asmx</Extensions>
+    </Filter>
+    <Filter Include="Source\Memory">
+      <UniqueIdentifier>{2036a91e-7205-434b-8d53-3949faa2926c}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Memory\Paging">
+      <UniqueIdentifier>{b25d0253-53ce-4043-b07f-e4213dc375c9}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Interrupts">
       <UniqueIdentifier>{c41e4361-48a1-4ec1-9253-7972dacc248a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\IO">
+      <UniqueIdentifier>{245ff149-cabd-4403-a29c-00195695ebfc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\IO">
+      <UniqueIdentifier>{be3968fc-8d92-4ef5-b3cd-61c775d2b629}</UniqueIdentifier>
     </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KernelUtils.cpp">
-      <Filter>src</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="PrimitiveConsole.cpp">
-      <Filter>src</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Globals.cpp">
-      <Filter>src</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="EFI.cpp">
-      <Filter>src</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="cstr.cpp">
-      <Filter>src</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Main.cpp">
-      <Filter>src</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="BitMap.cpp">
-      <Filter>src</Filter>
+      <Filter>Source</Filter>
     </ClCompile>
     <ClCompile Include="Memory\MemoryUtils.cpp">
-      <Filter>src\Memory</Filter>
+      <Filter>Source\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Memory\Memory.cpp">
-      <Filter>src\Memory</Filter>
+      <Filter>Source\Memory</Filter>
     </ClCompile>
     <ClCompile Include="Memory\Paging.cpp">
-      <Filter>src\Memory\Paging</Filter>
+      <Filter>Source\Memory\Paging</Filter>
     </ClCompile>
     <ClCompile Include="Memory\PageFrameAllocator.cpp">
-      <Filter>src\Memory\Paging</Filter>
+      <Filter>Source\Memory\Paging</Filter>
     </ClCompile>
     <ClCompile Include="Memory\PageMapIndexer.cpp">
-      <Filter>src\Memory\Paging</Filter>
+      <Filter>Source\Memory\Paging</Filter>
     </ClCompile>
     <ClCompile Include="Memory\PageTableManager.cpp">
-      <Filter>src\Memory\Paging</Filter>
+      <Filter>Source\Memory\Paging</Filter>
     </ClCompile>
     <ClCompile Include="Interrupts\IDT.cpp">
-      <Filter>src\Interrupts</Filter>
+      <Filter>Source\Interrupts</Filter>
     </ClCompile>
     <ClCompile Include="Interrupts\Interrupts.cpp">
-      <Filter>src\Interrupts</Filter>
+      <Filter>Source\Interrupts</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\ACPI.cpp">
+      <Filter>Source\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\PCI.cpp">
+      <Filter>Source\IO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -137,10 +149,19 @@
     <ClInclude Include="Headers\Interrupts.h">
       <Filter>Headers\Interrupts</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\CPUIDCodes.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\ACPI.h">
+      <Filter>Headers\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\PCI.h">
+      <Filter>Headers\IO</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Interrupts\GDT.asm">
-      <Filter>src\Interrupts</Filter>
+      <Filter>Source\Interrupts</Filter>
     </None>
   </ItemGroup>
 </Project>

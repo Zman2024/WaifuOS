@@ -2,11 +2,10 @@
 #ifndef H_Types
 #define H_Types
 #include <stddef.h>
-
 #define global extern "C"
 #define null 0x00
 #define attribute __attribute__
-#define intr attribute ((interrupt))
+
 
 constexpr auto PAGE_SIZE = 0x1000;
 
@@ -38,6 +37,7 @@ typedef unsigned long long u64;
 
 typedef float fp32;
 typedef double fp64;
+typedef long double fp128; // sizeof(fp128) gives me 16 so... i guess?
 
 
 #define asm __asm__ volatile 
@@ -47,6 +47,12 @@ typedef double fp64;
 #define intcall(x) { asm ("int %0" : : "byte"((byte)x)); }
 #define OS_HLT asm ("cli"); while(true) asm ("hlt");
 #define halt asm ("cli"); while(true) asm ("hlt");
-#define cpuid(code, rax, rbx, rcx, rdx) asm ("cpuid" : "=rax"(rax), "=rbx"(rbx), "=rcx"(rcx), "=rdx"(rdx) : "rax"(code) : "memory")
+#define cpuid(level, a, b, c, d)			\
+  asm ("cpuid\n\t"					\
+	   : "=a" (a), "=b" (b), "=c" (c), "=d" (d)	\
+	   : "0" (level)	\
+	   : "memory")
+
+// #define cpuid(code, eax, ebx, ecx, edx) asm ("cpuid" : "=eax"(eax), "=ebx"(ebx), "=ecx"(ecx), "=edx"(edx) : "eax"(code) : "memory")
 #define spin(x) for(uint64 y = 0; x > y; y++)
 #endif

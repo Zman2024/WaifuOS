@@ -1,15 +1,24 @@
 #pragma once
 #ifndef H_Interrupts
 #define H_Interrupts
+#define interrupt __attribute__ ((interrupt)) 
 #include <Types.h>
 #include <Globals.h>
+#include <cstr.h>
 
 namespace Interrupts
 {
 	constexpr byte PIC_MASTER_OFFSET = 0x20;
 	constexpr byte PIC_SLAVE_OFFSET = PIC_MASTER_OFFSET + 8;
 
-	struct InterruptFrame;
+	struct InterruptFrame
+	{
+		size_t ip;
+		size_t cs;
+		size_t flags;
+		size_t sp;
+		size_t ss;
+	};
 
 	/* From: https://wiki.osdev.org/Interrupt_Vector_Table#CPU_Interrupt_Layout
 	| INT #     | Description
@@ -111,15 +120,29 @@ namespace Interrupts
 	};
 
 
-	void RegisterInterrupt(void* handlerAddress, byte interrupt, IdtType interruptType = IdtType::InterruptGate);
+	void RegisterInterrupt(void* handlerAddress, byte inter, IdtType interruptType = IdtType::InterruptGate);
 
 	void LoadIDT();
 
-	attribute((interrupt)) void hDivideByZeroFault(struct InterruptFrame* frame);
-	attribute((interrupt)) void hDoubleFault(struct InterruptFrame* frame);
-	attribute((interrupt)) void hGeneralProtectionFault(struct InterruptFrame* frame);
-	attribute((interrupt)) void hPageFault(struct InterruptFrame* frame);
-	attribute((interrupt)) void hCoprocessorFault(struct InterruptFrame* frame);
+	interrupt void hDivideByZeroFault(InterruptFrame* frame);
+	interrupt void hSingleStepFault(InterruptFrame* frame);
+	interrupt void hNonMaskableFault(InterruptFrame* frame);
+	interrupt void hBreakpointFault(InterruptFrame* frame);
+	interrupt void hOverflowTrap(InterruptFrame* frame);
+	interrupt void hBoundRangeFault(InterruptFrame* frame);
+	interrupt void hInvalidOpcodeFault(InterruptFrame* frame);
+	interrupt void hCoprocessorNAFault(InterruptFrame* frame);
+	interrupt void hDoubleFault(InterruptFrame* frame);
+	interrupt void hCoprocessorSegmentOverrunFault(InterruptFrame* frame);
+	interrupt void hInvalidStateSegmentFault(InterruptFrame* frame);
+	interrupt void hSegmentMissingFault(InterruptFrame* frame);
+	interrupt void hStackFault(InterruptFrame* frame);
+	interrupt void hGeneralProtectionFault(InterruptFrame* frame);
+	interrupt void hPageFault(InterruptFrame* frame);
+	interrupt void hCoprocessorFault(InterruptFrame* frame);
+	interrupt void hAlignmentCheck(InterruptFrame* frame);
+	interrupt void hMachineCheck(InterruptFrame* frame);
+	interrupt void hSIMDFault(InterruptFrame* frame);
 }
-
+#undef interrupt
 #endif

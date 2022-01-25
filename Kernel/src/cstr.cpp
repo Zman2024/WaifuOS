@@ -7,16 +7,32 @@ namespace cstr
 	char strBuffer[32];
 	char revBuffer[256];
 
-	uint64 len(const char* str)
+	uint64 Length(const char* str)
 	{
 		uint64 ln = 0;
 		while (str[ln]) ln++;
 		return ln;
 	}
 
+	bool strcmp(const char* str0, const char* str1)
+	{
+		u64 len = Length(str0);
+		if (len != Length(str1)) return false;
+
+		return strcmp(str0, str1, len);
+	}
+
+	bool strcmp(const char* str0, const char* str1, u64 len)
+	{
+		for (u64 x = 0; x < len; x++)
+			if (str0[x] != str1[x]) return false;
+
+		return true;
+	}
+
 	void Reverse(char* str, uint64 length)
 	{
-		if (!length) length = len(str);
+		if (!length) length = Length(str);
 		if (length > 255) return;
 
 		byte index = 0;
@@ -105,7 +121,7 @@ namespace cstr
 
 		if (isNegative) buffer += 1;
 
-		u64 length = len(buffer);
+		u64 length = Length(buffer);
 
 		for (u64 x = 0; x < length; x++)
 		{
@@ -128,7 +144,7 @@ namespace cstr
 			buffer = str + 2;
 		}
 
-		u64 length = len(buffer);
+		u64 length = Length(buffer);
 
 		for (u64 x = 0; x < length; x++)
 		{

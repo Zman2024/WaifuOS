@@ -13,6 +13,8 @@
 #include <PageTableManager.h>
 #include <GDT.h>
 #include <Interrupts.h>
+#include <ACPI.h>
+#include <PCI.h>
 
 namespace Kernel
 {
@@ -21,6 +23,8 @@ namespace Kernel
 
 	// Initializes hardware and kernel resources
 	void InitializeKernel(BootInfo* bootInfo);
+
+	void InitializeACPI(BootInfo* bootInfo);
 
 	// Initializes Paging and Memory Mapping
 	void InitializePaging(BootInfo* bootInfo);

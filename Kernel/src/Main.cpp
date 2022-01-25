@@ -5,6 +5,7 @@
 #include <cstr.h>
 #include <Memory.h>
 #include <PageFrameAllocator.h>
+#include <CPUIDCodes.h>
 
 namespace Kernel
 {

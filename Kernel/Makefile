@@ -26,7 +26,7 @@ OBJS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRC))
 OBJS += $(patsubst $(SRCDIR)/%.asm, $(OBJDIR)/%.asmo, $(ASMSRC))
 DIRS = $(wildcard $(SRCDIR)/*)
 
-
+# int need -mgeneral-regs-only
 kernel: $(OBJS) link
 $(OBJDIR)/Interrupts/Interrupts.o: $(SRCDIR)/Interrupts/Interrupts.cpp
 	@ echo ===== Compiling $^ =====

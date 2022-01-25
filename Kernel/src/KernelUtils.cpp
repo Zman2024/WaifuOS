@@ -8,19 +8,35 @@ namespace Kernel
 
 		// Create console
 		gConsole = PrimitiveConsole(bootInfo->Framebuffer, bootInfo->font);
-		
+
 		// Paging / Memory Mapping
 		InitializePaging(bootInfo);
-		gConsole.Clear();
 
 		// Do GDT stuff
 		InitializeGDT();
 
-		// Interrupts (enables interrupts)
+		// Interrupts
 		InitializeInterrupts();
+
+		// ACPI
+		InitializeACPI(bootInfo);
 
 		if (bootInfo->LoadingImage) ShowLoadingImage(bootInfo);
 		else gConsole.WriteLine("ERROR: NO BOOT IMAGE", Color::Red);
+
+		sti;
+	}
+
+	void InitializeACPI(BootInfo* bootInfo)
+	{
+		using namespace ACPI;
+		XSDTHeader* xsdt = (XSDTHeader*)bootInfo->RSDP->XSDTAddress;
+
+		MCFGHeader* mcfg = (MCFGHeader*)FindTable(xsdt, "MCFG");
+		{
+			PCI::EnumeratePCI(mcfg);
+		}
+
 	}
 
 	void ShowLoadingImage(BootInfo* info)
@@ -48,21 +64,49 @@ namespace Kernel
 		// Setup GIDTR
 		GlobalIDTR.Limit = 0x0FFF;
 		GlobalIDTR.Offset = (u64)PageFrameAllocator::RequestPage<void>();
+		memset<u64>((void*)GlobalIDTR.Offset, 0x00, PAGE_SIZE);
+
+		// Load global IDT
+		LoadIDT();
 
 		// Register interrupts
 		RegisterInterrupt((void*)hDivideByZeroFault, Interrupt::DivideByZero);
 
+		RegisterInterrupt((void*)hSingleStepFault, Interrupt::SingleStep);
+
+		RegisterInterrupt((void*)hNonMaskableFault, Interrupt::NonMaskable);
+
+		RegisterInterrupt((void*)hBreakpointFault, Interrupt::Breakpoint, IdtType::TrapGate);
+
+		RegisterInterrupt((void*)hOverflowTrap, Interrupt::OverflowTrap, IdtType::TrapGate);
+
+		RegisterInterrupt((void*)hBoundRangeFault, Interrupt::BoundRangeExceeded);
+
+		RegisterInterrupt((void*)hInvalidOpcodeFault, Interrupt::InvalideOpcode);
+
+		RegisterInterrupt((void*)hCoprocessorNAFault, Interrupt::CoprocessorNA);
+
 		RegisterInterrupt((void*)hDoubleFault, Interrupt::DoubleFault);
 
+		RegisterInterrupt((void*)hCoprocessorSegmentOverrunFault, Interrupt::CoprocessorSegmentOverrun);
+
+		RegisterInterrupt((void*)hInvalidStateSegmentFault, Interrupt::InvalidStateSegment);
+
+		RegisterInterrupt((void*)hSegmentMissingFault, Interrupt::SegmentMissing);
+
+		RegisterInterrupt((void*)hStackFault, Interrupt::StackException);
+
 		RegisterInterrupt((void*)hGeneralProtectionFault, Interrupt::GeneralProtection);
-		
+
 		RegisterInterrupt((void*)hPageFault, Interrupt::PageFault);
-		
+
 		RegisterInterrupt((void*)hCoprocessorFault, Interrupt::CoprocessorError);
 
-		// Load global IDT
-		LoadIDT();
-		sti;
+		RegisterInterrupt((void*)hAlignmentCheck, Interrupt::AlignmentCheck);
+
+		RegisterInterrupt((void*)hMachineCheck, Interrupt::MachineCheck);
+
+		RegisterInterrupt((void*)hSIMDFault, Interrupt::SIMDException);
 	}
 
 	void InitializeGDT()
@@ -79,6 +123,8 @@ namespace Kernel
 
 	void InitializePaging(BootInfo* bootInfo)
 	{
+		cli;
+
 		u64 nMapEntries = bootInfo->MapSize / bootInfo->MapDescriptorSize;
 
 		// Read EFI memory map and set up PFA
@@ -111,8 +157,20 @@ namespace Kernel
 			PageTableManager::MapMemory(x, x);
 		}
 
+		gConsole.Clear();
+
+		
+		// Enable paging (juuuust to be sure)
+		{
+			size_t cr0 = 0;
+			asm("mov %0, %%cr0" : "=r"(cr0));
+			cr0 |= 0x80000000;
+			asm("mov %%cr0, %0" : : "r" (cr0));
+		}
+
 		// Load PML4 into control3
 		asm("mov %%cr3, %0" : : "r" (PML4));
+
 	}
 
 }

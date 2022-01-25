@@ -149,14 +149,9 @@ namespace PageFrameAllocator
 						largestSizePages = desc->nPages;
 					}
 					break;
-
-				// Reserve shit we cant use lel
-				default:
-					ReservePages(desc->physAddr, desc->nPages);
-					break;
-
 			}
 		}
+
 		largestSizePages *= PAGE_SIZE;
 
 		u64 memorySize = Memory::CalculateMemorySize(map, entries, descSize);
@@ -167,9 +162,26 @@ namespace PageFrameAllocator
 		// Init bitmap
 		InitBitmap(bmpSize, largestRegionAddress);
 
-		// Lock pages of bmp
-		LockPages(PageBitmap.Buffer, PageBitmap.SizeBytes / PAGE_SIZE + 1);
+		// Reserve all memory
+		ReservePages(nullptr, memorySize / PAGE_SIZE);
 
+		for (u64 x = 0; x < entries; x++)
+		{
+			EfiMemoryDescriptor* desc = (EfiMemoryDescriptor*)((u64)map + (x * descSize));
+			switch (desc->type)
+			{
+				case UseableMemory:
+					UnreservePages(desc->physAddr, desc->nPages);
+					break;
+
+			}
+		}
+
+		// Reserve between 0x00 and 0x100000
+		ReservePages(nullptr, 0x100);
+
+		// Lock bitmap
+		LockPages(PageBitmap.Buffer, PageBitmap.SizeBytes / PAGE_SIZE + 1);
 
 	}
 

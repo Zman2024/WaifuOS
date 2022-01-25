@@ -28,7 +28,7 @@
   </ImportGroup>
   <PropertyGroup Label="UserMacros" />
   <PropertyGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
-    <IncludePath>$(ProjectDir)Headers</IncludePath>
+    <IncludePath>$(ProjectDir)Headers;$(WSL_ROOT)usr\local\x86_64elfgcc\lib\gcc\x86_64-elf\10.2.0\include</IncludePath>
     <ReferencePath />
     <ExecutablePath />
     <LibraryPath />
@@ -48,8 +48,8 @@ set PATH=$(PATH)
 C:\Windows\sysnative\wsl ./clean
 C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <SourcePath />
-    <IntDir>$(SolutionDir)bin\</IntDir>
-    <OutDir>$(SolutionDir)bin\</OutDir>
+    <IntDir>$(SolutionDir)Kernel\bin\</IntDir>
+    <OutDir>$(SolutionDir)Kernel\bin\</OutDir>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PreBuildEvent>
@@ -63,6 +63,8 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="Globals.cpp" />
     <ClCompile Include="Interrupts\IDT.cpp" />
     <ClCompile Include="Interrupts\Interrupts.cpp" />
+    <ClCompile Include="IO\ACPI.cpp" />
+    <ClCompile Include="IO\PCI.cpp" />
     <ClCompile Include="KernelUtils.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Memory\Memory.cpp" />
@@ -74,8 +76,10 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="PrimitiveConsole.cpp" />
   </ItemGroup>
   <ItemGroup>
+    <ClInclude Include="Headers\ACPI.h" />
     <ClInclude Include="Headers\BitMap.h" />
     <ClInclude Include="Headers\Colors.h" />
+    <ClInclude Include="Headers\CPUIDCodes.h" />
     <ClInclude Include="Headers\Direction.hpp" />
     <ClInclude Include="Headers\EFI.h" />
     <ClInclude Include="Headers\GDT.h" />
@@ -88,6 +92,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\PageMapIndexer.h" />
     <ClInclude Include="Headers\PageTableManager.h" />
     <ClInclude Include="Headers\Paging.h" />
+    <ClInclude Include="Headers\PCI.h" />
     <ClInclude Include="Headers\PrimitiveConsole.h" />
     <ClInclude Include="Headers\cstr.h" />
     <ClInclude Include="Headers\Structs.h" />

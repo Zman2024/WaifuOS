@@ -3,6 +3,7 @@
 #define H_Structs
 #include <Types.h>
 #include <EFI.h>
+#include <ACPI.h>
 
 struct FontHeader
 {
@@ -33,7 +34,7 @@ struct BootInfo
 	EfiMemoryDescriptor* MemoryMap;
 	uint64 MapSize;
 	uint64 MapDescriptorSize;
-	void* RSDP;
+	ACPI::RSDP2* RSDP;
 	void* LoadingImage;
 };
 

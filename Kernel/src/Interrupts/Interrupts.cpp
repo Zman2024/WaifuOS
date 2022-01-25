@@ -2,11 +2,12 @@
 
 namespace Interrupts
 {
-	void RegisterInterrupt(void* handlerAddress, byte interrupt, IdtType interruptType)
+	void RegisterInterrupt(void* handlerAddress, byte inter, IdtType interruptType)
 	{
-		IDTDescEntry* intDescEntry = (IDTDescEntry*)(GlobalIDTR.Offset + interrupt * sizeof(IDTDescEntry));
+		IDTDescEntry* intDescEntry = (IDTDescEntry*)(GlobalIDTR.Offset + inter * sizeof(IDTDescEntry));
 		intDescEntry->SetOffset((u64)handlerAddress);
 		intDescEntry->TypeAttribs = interruptType;
+		intDescEntry->Ignore = 0x00;
 		intDescEntry->Selector = 0x08;
 	}
 
@@ -22,14 +23,64 @@ namespace Interrupts
 		gConsole.SetForegroundColor(Color(0xFFDDDDDD));
 	}
 
-	void hDivideByZeroFault(struct InterruptFrame* frame)
+	void hDivideByZeroFault(InterruptFrame* frame)
 	{
 		PanicScreen();
 		gConsole.WriteLine("ERROR: DIVIDE BY ZERO FAULT!");
 		halt;
 	}
 
-	void hDoubleFault(struct InterruptFrame* frame)
+	void hSingleStepFault(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.WriteLine("Single Step");
+		halt;
+	}
+
+	void hNonMaskableFault(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.WriteLine("NMI");
+		halt;
+	}
+
+	void hBreakpointFault(InterruptFrame* frame)
+	{
+		//PanicScreen();
+		gConsole.WriteLine("Breakpoint");
+		halt;
+	}
+
+	void hOverflowTrap(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.WriteLine("Overflow trap");
+		halt;
+	}
+
+	void hBoundRangeFault(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.WriteLine("Bound Range");
+		halt;
+	}
+
+	void hInvalidOpcodeFault(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.Write("Invalid Opcode at address: ");
+		gConsole.WriteLine(cstr::ToString(frame->ip, true));
+		halt;
+	}
+
+	void hCoprocessorNAFault(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.WriteLine("Coprocessor NA");
+		halt;
+	}
+
+	void hDoubleFault(InterruptFrame* frame)
 	{
 		gConsole.Clear(Color::Red);
 		gConsole.SetBackgroundColor(Color::Red);
@@ -38,24 +89,81 @@ namespace Interrupts
 		halt;
 	}
 
-	void hGeneralProtectionFault(struct InterruptFrame* frame)
+	void hCoprocessorSegmentOverrunFault(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.WriteLine("Segment Overrun!");
+		halt;
+	}
+
+	void hInvalidStateSegmentFault(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.WriteLine("Invalid State Segment!");
+		halt;
+	}
+
+	void hSegmentMissingFault(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.WriteLine("Segment Missing!");
+		halt;
+	}
+
+	void hStackFault(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.WriteLine("Stack Exception!");
+		halt;
+	}
+
+	void hGeneralProtectionFault(InterruptFrame* frame)
 	{
 		PanicScreen();
 		gConsole.WriteLine("ERROR: GENERAL PROTECTION FAULT!");
 		halt;
 	}
 
-	void hPageFault(struct InterruptFrame* frame)
+	void hPageFault(InterruptFrame* frame)
 	{
 		PanicScreen();
 		gConsole.WriteLine("ERROR: PAGE FAULT!");
+		gConsole.Write("ATTEMPTED TO ACCESS ADDRESS: ");
+
+		uint64 addr = 0;
+		// cr2 contains the page fault linear address (PFLA)
+		asm ("mov %0, %%cr2" : "=r" (addr) );
+
+		gConsole.WriteLine(cstr::ToString(addr, true));
+
 		halt;
 	}
 
-	void hCoprocessorFault(struct InterruptFrame* frame)
+	void hCoprocessorFault(InterruptFrame* frame)
 	{
 		PanicScreen();
 		gConsole.WriteLine("ERROR: COPROCESSOR FAULT!");
+		halt;
+	}
+
+	void hAlignmentCheck(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.WriteLine("Alignment Check");
+		halt;
+	}
+
+	void hMachineCheck(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.WriteLine("Machine Check");
+		halt;
+	}
+
+	void hSIMDFault(InterruptFrame* frame)
+	{
+		PanicScreen();
+		gConsole.WriteLine("SIMD Exception");
 		halt;
 	}
 
