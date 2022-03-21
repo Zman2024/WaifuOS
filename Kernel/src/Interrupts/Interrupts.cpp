@@ -1,4 +1,6 @@
 #include <Interrupts.h>
+#include <PIC.hpp>
+#include <APIC.h>
 
 namespace Interrupts
 {
@@ -11,7 +13,7 @@ namespace Interrupts
 		intDescEntry->Selector = 0x08;
 	}
 
-	void LoadIDT()
+	void LoadGIDT()
 	{
 		asm ("lidt %0" : : "m" (GlobalIDTR));
 	}
@@ -27,6 +29,9 @@ namespace Interrupts
 	{
 		PanicScreen();
 		gConsole.WriteLine("ERROR: DIVIDE BY ZERO FAULT!");
+		halt;
+
+		// bro just in case
 		halt;
 	}
 
@@ -165,6 +170,24 @@ namespace Interrupts
 		PanicScreen();
 		gConsole.WriteLine("SIMD Exception");
 		halt;
+	}
+
+	void hKeyboardInt(InterruptFrame* frame)
+	{
+		constexpr uint16 kbPort = 0x60;
+		gConsole.Write("Key pressed ");
+		
+		// special ps2 magic
+		byte scanCode = IO::inb(kbPort);
+
+		// End of int
+		if (APIC::InUse) APIC::EndOfInterrupt();
+		else PIC::SendEIO(false);
+	}
+
+	void hStub(InterruptFrame* frame)
+	{
+		debug("Interrupt 0xFF called");
 	}
 
 }

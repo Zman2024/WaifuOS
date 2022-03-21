@@ -11,7 +11,8 @@ namespace PageFrameAllocator
 {
 	void ReadEfiMemoryMap(EfiMemoryDescriptor* map, u64 mapSize, u64 descSize);
 
-	void* RequestPage();
+	vptr RequestPage();
+	vptr RequestPages(u64 pages);
 
 	void FreePage(void* address);
 	void LockPage(void* address);
@@ -24,9 +25,15 @@ namespace PageFrameAllocator
 	uint64 GetReservedRAM();
 
 	template <typename T>
-	T* RequestPage()
+	static inline T* RequestPage()
 	{
 		return (T*)RequestPage();
+	}
+
+	template <typename T>
+	static inline T* RequestPages(u64 pages)
+	{
+		return (T*)RequestPages(pages);
 	}
 
 }

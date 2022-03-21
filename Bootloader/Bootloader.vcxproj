@@ -35,6 +35,8 @@
     <LibraryPath />
     <LibraryWPath />
     <ExcludePath />
+    <NMakeBuildCommandLine>cd "$(ProjectDir)"
+C:\Windows\SysNative\wsl ./rebuild</NMakeBuildCommandLine>
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>

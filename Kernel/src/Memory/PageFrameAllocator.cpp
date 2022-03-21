@@ -23,10 +23,14 @@ namespace PageFrameAllocator
 	uint64 LastPageIndex = 0;
 	void* RequestPage()
 	{
-		for (; LastPageIndex < PageBitmap.SizeBytes * 8; LastPageIndex++)
+		while (LastPageIndex < PageBitmap.SizeBytes * 8)
 		{
 			// Already used
-			if (PageBitmap[LastPageIndex]) continue;
+			if (PageBitmap[LastPageIndex])
+			{
+				LastPageIndex++;
+				continue;
+			}
 
 			LockPage((void*)(LastPageIndex * PAGE_SIZE));
 			return (void*)(LastPageIndex * PAGE_SIZE);
@@ -34,6 +38,41 @@ namespace PageFrameAllocator
 
 		// Should do an interrupt for pageframe swap before this but i have no ints setup yet
 		return nullptr;
+	}
+
+	vptr RequestPages(u64 pages)
+	{
+		vptr ret = nullptr;
+		while (LastPageIndex < PageBitmap.SizeBytes * 8)
+		{
+			// Already used
+			if (PageBitmap[LastPageIndex])
+			{
+				LastPageIndex++;
+				continue;
+			}
+
+			for (u64 x = 0; x < pages; x++)
+			{
+				// make sure the rest are available
+				if (PageBitmap[LastPageIndex + x])
+				{
+					LastPageIndex += x;
+					goto skip;
+				}
+			}
+
+			// If we get here it means that LastPageIndex is valid for the number of pages requested, so we lock da pages
+
+			ret = vptr(LastPageIndex * PAGE_SIZE);
+			LockPages(ret, pages);
+			return (vptr)(LastPageIndex * PAGE_SIZE);
+
+			skip:; // cope
+		}
+
+		// Should do an interrupt for pageframe swap before this but i have no ints setup yet
+		return ret;
 	}
 
 	#pragma region Page locking / unlocking

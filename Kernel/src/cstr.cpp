@@ -6,6 +6,7 @@ namespace cstr
 	char hexBuffer[32];
 	char strBuffer[32];
 	char revBuffer[256];
+	char formatBuffer[512];
 
 	uint64 Length(const char* str)
 	{
@@ -111,6 +112,119 @@ namespace cstr
 	{
 		if (hex) return _ToHex(num);
 		return _ToStr(num);
+	}
+
+	char* format(const char* str, int64 p0, int64 p1, int64 p2, int64 p3, int64 p4, int64 p5, int64 p6, int64 p7, int64 p8, int64 p9)
+	{
+		u64 fBufferOffset = 0;
+		memset(formatBuffer, 0L, 512);
+		for (u64 x = 0; str[x] != 0x00; x++)
+		{
+			bool UseHex = false;
+
+			auto Insert = [&](char chr)
+			{
+				char* pstr = nullptr;
+				int64 param = 0;
+
+				switch (chr)
+				{
+					case '0':
+						param = p0;
+						break;
+
+					case '1':
+						param = p1;
+						break;
+						
+					case '2':
+						param = p2;
+						break;
+
+					case '3':
+						param = p3;
+						break;
+
+					case '4':
+						param = p4;
+						break;
+
+					case '5':
+						param = p5;
+						break;
+
+					case '6':
+						param = p6;
+						break;
+
+					case '7':
+						param = p7;
+						break;
+
+					case '8':
+						param = p8;
+						break;
+
+					case '9':
+						param = p9;
+						break;
+				}
+
+				pstr = ToString(param, UseHex);
+				for (u32 y = 0; pstr[y] != 0x00; y++)
+				{
+					formatBuffer[x + y + fBufferOffset] = pstr[y];
+				}
+				fBufferOffset += Length(pstr)-1;
+			};
+
+			switch (str[x])
+			{
+				case '%':
+					switch (str[x+1])
+					{
+						case 'x':
+							UseHex = true;
+							switch (str[x + 2])
+							{
+								case '0':
+								case '1':
+								case '2':
+								case '3':
+								case '4':
+								case '5':
+								case '6':
+								case '7':
+								case '8':
+								case '9':
+									Insert(str[x + 2]);
+									x += 2;
+									fBufferOffset -= 2;
+									break;
+							}
+							break;
+
+						case '0':
+						case '1':
+						case '2':
+						case '3':
+						case '4':
+						case '5':
+						case '6':
+						case '7':
+						case '8':
+						case '9':
+							Insert(str[x + 1]);
+							x += 1;
+							fBufferOffset -= 1;
+						break;
+					}
+					continue;
+			}
+			formatBuffer[x + fBufferOffset] = str[x];
+		}
+
+		return formatBuffer;
 	}
 
 	int64 _ToIntBase10(const char* str)

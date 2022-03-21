@@ -9,4 +9,6 @@ namespace Memory
 	uint64 CalculateMemorySize(EfiMemoryDescriptor* map, uint64 nEntries, uint64 descSize);
 }
 
+
+
 #endif

@@ -90,6 +90,24 @@
     <ClCompile Include="IO\PCI.cpp">
       <Filter>Source\IO</Filter>
     </ClCompile>
+    <ClCompile Include="Interrupts\APIC.cpp">
+      <Filter>Source\Interrupts</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\IOBus.cpp">
+      <Filter>Source\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Interrupts\PIC.cpp">
+      <Filter>Source\Interrupts</Filter>
+    </ClCompile>
+    <ClCompile Include="Interrupts\IOAPIC.cpp">
+      <Filter>Source\Interrupts</Filter>
+    </ClCompile>
+    <ClCompile Include="Interrupts\LocalAPIC.cpp">
+      <Filter>Source\Interrupts</Filter>
+    </ClCompile>
+    <ClCompile Include="string.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\EFI.h">
@@ -158,10 +176,36 @@
     <ClInclude Include="Headers\PCI.h">
       <Filter>Headers\IO</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\APIC.h">
+      <Filter>Headers\Interrupts</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\IOBus.hpp">
+      <Filter>Headers\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\PIC.hpp">
+      <Filter>Headers\Interrupts</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\IOAPIC.h">
+      <Filter>Headers\Interrupts</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\APICStructs.h">
+      <Filter>Headers\Interrupts</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\LocalAPIC.h">
+      <Filter>Headers\Interrupts</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\string.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Interrupts\GDT.asm">
       <Filter>Source\Interrupts</Filter>
     </None>
+    <None Include="..\kernel.ld" />
+    <None Include="..\Makefile" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\stuff for apic.txt" />
   </ItemGroup>
 </Project>

@@ -15,6 +15,11 @@
 #include <Interrupts.h>
 #include <ACPI.h>
 #include <PCI.h>
+#include <APIC.h>
+#include <IOAPIC.h>
+#include <CPUIDCodes.h>
+#include <PIC.hpp>
+#include <IOBus.hpp>
 
 namespace Kernel
 {
@@ -24,13 +29,17 @@ namespace Kernel
 	// Initializes hardware and kernel resources
 	void InitializeKernel(BootInfo* bootInfo);
 
+	// Use PIC / APIC
+	void InitializeIRQ();
+
+	// Init ACPI
 	void InitializeACPI(BootInfo* bootInfo);
 
 	// Initializes Paging and Memory Mapping
 	void InitializePaging(BootInfo* bootInfo);
 
 	// Initializes interrupts (duh)
-	void InitializeInterrupts();
+	void InitializeExceptions();
 
 	// Initializes the global descriptor table for interrupts
 	void InitializeGDT();

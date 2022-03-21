@@ -13,11 +13,7 @@ namespace PCI
 		PCIDeviceHeader* pci = (PCIDeviceHeader*)funcAddress;
 		if (!pci->DeviceID || pci->DeviceID == 0xFFFF) return;
 
-		gConsole.Write(cstr::ToString(pci->VendorID, true));
-		gConsole.Write(" ");
-		gConsole.Write(cstr::ToString(pci->DeviceID, true));
-		gConsole.WriteLine();
-
+		// Do stuff like cache or something idk
 	}
 
 	void EnumerateDevice(u64 busAddress, u64 dev)

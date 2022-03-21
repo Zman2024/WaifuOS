@@ -1,15 +1,22 @@
-#pragma once
+﻿#pragma once
 #ifndef H_Interrupts
 #define H_Interrupts
-#define interrupt __attribute__ ((interrupt)) 
+
+// intelicock:tm: fix
+#ifdef VISUAL_STUDIO_EDITOR
+#define _isr_ 
+#else
+#define _isr_ __attribute__ ((interrupt)) 
+#endif
 #include <Types.h>
 #include <Globals.h>
 #include <cstr.h>
+#include <IOBus.hpp>
 
 namespace Interrupts
 {
-	constexpr byte PIC_MASTER_OFFSET = 0x20;
-	constexpr byte PIC_SLAVE_OFFSET = PIC_MASTER_OFFSET + 8;
+	constexpr byte SpuriousInterruptVector = 0xFF;
+	constexpr byte IRQ_OFFSET = 0x20;
 
 	struct InterruptFrame
 	{
@@ -70,7 +77,7 @@ namespace Interrupts
 	| 14    | Hard disk controller 1
 	| 15    | Hard disk controller 2
 	*/
-	struct Interrupt
+	namespace Interrupt
 	{
 		enum : byte
 		{
@@ -97,24 +104,26 @@ namespace Interrupts
 			SIMDException = 0x13,
 
 			// Master
-			PIT = PIC_MASTER_OFFSET, HPET0 = PIC_MASTER_OFFSET,
-			Keyboard = PIC_MASTER_OFFSET + 1,
-			SlaveEnabled = PIC_MASTER_OFFSET + 2,
-			COM2 = PIC_MASTER_OFFSET + 3,
-			COM1 = PIC_MASTER_OFFSET + 4,
-			DataLPT2 = PIC_MASTER_OFFSET + 5,
-			FloppyDisk = PIC_MASTER_OFFSET + 6,
-			DataLPT1 = PIC_MASTER_OFFSET + 7,
+			PIT = IRQ_OFFSET, HPET0 = IRQ_OFFSET,
+			Keyboard = IRQ_OFFSET + 1,
+			SlaveEnabled = IRQ_OFFSET + 2,
+			COM2 = IRQ_OFFSET + 3,
+			COM1 = IRQ_OFFSET + 4,
+			DataLPT2 = IRQ_OFFSET + 5,
+			FloppyDisk = IRQ_OFFSET + 6,
+			DataLPT1 = IRQ_OFFSET + 7,
 
 			// Slave
-			RTC = PIC_SLAVE_OFFSET, HPET1 = PIC_SLAVE_OFFSET,
-			Redirect0 = PIC_SLAVE_OFFSET + 1,
-			Reserved1 = PIC_SLAVE_OFFSET + 2,
-			Reserved2 = PIC_SLAVE_OFFSET + 3,
-			Mouse = PIC_SLAVE_OFFSET + 4,
-			NumericCoprocessorError = PIC_SLAVE_OFFSET + 5,
-			FixedDiskController1 = PIC_SLAVE_OFFSET + 6,
-			FixedDiskController2 = PIC_SLAVE_OFFSET + 7,
+			RTC = IRQ_OFFSET + 8, HPET1 = IRQ_OFFSET + 8,
+			Redirect0 = IRQ_OFFSET + 9,
+			Reserved1 = IRQ_OFFSET + 0xA,
+			Reserved2 = IRQ_OFFSET + 0xB,
+			Mouse = IRQ_OFFSET + 0xC,
+			NumericCoprocessorError = IRQ_OFFSET + 0xD,
+			FixedDiskController1 = IRQ_OFFSET + 0xE,
+			FixedDiskController2 = IRQ_OFFSET + 0xF,
+
+			SpuriousInterrupt = 0xFF,
 
 		};
 	};
@@ -122,27 +131,30 @@ namespace Interrupts
 
 	void RegisterInterrupt(void* handlerAddress, byte inter, IdtType interruptType = IdtType::InterruptGate);
 
-	void LoadIDT();
+	void LoadGIDT();
 
-	interrupt void hDivideByZeroFault(InterruptFrame* frame);
-	interrupt void hSingleStepFault(InterruptFrame* frame);
-	interrupt void hNonMaskableFault(InterruptFrame* frame);
-	interrupt void hBreakpointFault(InterruptFrame* frame);
-	interrupt void hOverflowTrap(InterruptFrame* frame);
-	interrupt void hBoundRangeFault(InterruptFrame* frame);
-	interrupt void hInvalidOpcodeFault(InterruptFrame* frame);
-	interrupt void hCoprocessorNAFault(InterruptFrame* frame);
-	interrupt void hDoubleFault(InterruptFrame* frame);
-	interrupt void hCoprocessorSegmentOverrunFault(InterruptFrame* frame);
-	interrupt void hInvalidStateSegmentFault(InterruptFrame* frame);
-	interrupt void hSegmentMissingFault(InterruptFrame* frame);
-	interrupt void hStackFault(InterruptFrame* frame);
-	interrupt void hGeneralProtectionFault(InterruptFrame* frame);
-	interrupt void hPageFault(InterruptFrame* frame);
-	interrupt void hCoprocessorFault(InterruptFrame* frame);
-	interrupt void hAlignmentCheck(InterruptFrame* frame);
-	interrupt void hMachineCheck(InterruptFrame* frame);
-	interrupt void hSIMDFault(InterruptFrame* frame);
+	_isr_ void hDivideByZeroFault(InterruptFrame* frame);
+	_isr_ void hSingleStepFault(InterruptFrame* frame);
+	_isr_ void hNonMaskableFault(InterruptFrame* frame);
+	_isr_ void hBreakpointFault(InterruptFrame* frame);
+	_isr_ void hOverflowTrap(InterruptFrame* frame);
+	_isr_ void hBoundRangeFault(InterruptFrame* frame);
+	_isr_ void hInvalidOpcodeFault(InterruptFrame* frame);
+	_isr_ void hCoprocessorNAFault(InterruptFrame* frame);
+	_isr_ void hDoubleFault(InterruptFrame* frame);
+	_isr_ void hCoprocessorSegmentOverrunFault(InterruptFrame* frame);
+	_isr_ void hInvalidStateSegmentFault(InterruptFrame* frame);
+	_isr_ void hSegmentMissingFault(InterruptFrame* frame);
+	_isr_ void hStackFault(InterruptFrame* frame);
+	_isr_ void hGeneralProtectionFault(InterruptFrame* frame);
+	_isr_ void hPageFault(InterruptFrame* frame);
+	_isr_ void hCoprocessorFault(InterruptFrame* frame);
+	_isr_ void hAlignmentCheck(InterruptFrame* frame);
+	_isr_ void hMachineCheck(InterruptFrame* frame);
+	_isr_ void hSIMDFault(InterruptFrame* frame);
+	_isr_ void hKeyboardInt(InterruptFrame* frame);
+	_isr_ void hStub(InterruptFrame* frame);
+
 }
-#undef interrupt
+#undef _isr_
 #endif

@@ -51,7 +51,8 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 	}
 
 	Print(L"Kernel header successfully verified!\n\r");
-
+	
+	// Program / segment header
 	Elf64_Phdr* phdrs;
 	{
 		Kernel->SetPosition(Kernel, header.e_phoff);
@@ -146,6 +147,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 		info.LoadingImage = ImageData;
 	}
 
+	Print(L"Starting Kernel... ");
 	SystemTable->BootServices->ExitBootServices(ImageHandle, MapKey);
 	KernelStart(info);
 	return EFI_SUCCESS; // Exit the UEFI application

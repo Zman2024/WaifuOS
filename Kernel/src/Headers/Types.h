@@ -3,11 +3,16 @@
 #define H_Types
 #include <stddef.h>
 #define global extern "C"
-#define null 0x00
+#ifdef VISUAL_STUDIO_EDITOR
+#define attribute(x)
+#define attribute
+#else
 #define attribute __attribute__
-
+#endif
 
 constexpr auto PAGE_SIZE = 0x1000;
+
+typedef void* vptr;
 
 typedef signed char sbyte;
 typedef signed char int8;
@@ -39,7 +44,6 @@ typedef float fp32;
 typedef double fp64;
 typedef long double fp128; // sizeof(fp128) gives me 16 so... i guess?
 
-
 #define asm __asm__ volatile 
 #define cli asm ("cli");
 #define sti asm ("sti");
@@ -54,5 +58,5 @@ typedef long double fp128; // sizeof(fp128) gives me 16 so... i guess?
 	   : "memory")
 
 // #define cpuid(code, eax, ebx, ecx, edx) asm ("cpuid" : "=eax"(eax), "=ebx"(ebx), "=ecx"(ecx), "=edx"(edx) : "eax"(code) : "memory")
-#define spin(x) for(uint64 y = 0; x > y; y++)
+#define spin(x) for(volatile uint64 y = 0; x > y; y++)
 #endif

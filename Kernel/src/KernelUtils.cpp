@@ -6,60 +6,96 @@ namespace Kernel
 	{
 		cli;
 
-		// Create console
-		gConsole = PrimitiveConsole(bootInfo->Framebuffer, bootInfo->font);
-
 		// Paging / Memory Mapping
 		InitializePaging(bootInfo);
 
 		// Do GDT stuff
 		InitializeGDT();
 
-		// Interrupts
-		InitializeInterrupts();
+		// Basic Interrupts / CPU exceptions
+		InitializeExceptions();
 
 		// ACPI
 		InitializeACPI(bootInfo);
 
-		if (bootInfo->LoadingImage) ShowLoadingImage(bootInfo);
-		else gConsole.WriteLine("ERROR: NO BOOT IMAGE", Color::Red);
+		// IRQs
+		InitializeIRQ();
 
 		sti;
+	}
+
+	void InitializeIRQ()
+	{
+		PIC::Remap();
+		Interrupts::RegisterInterrupt((void*)Interrupts::hKeyboardInt, Interrupts::Interrupt::Keyboard);
+		if (APIC::UsableAPIC)
+		{
+			PIC::Disable();
+			APIC::Initialize(); // inits both lapic and ioapic
+
+			APIC::SetEntry(Interrupts::Interrupt::Keyboard);
+
+			APIC::Enable();
+		}
+		else
+		{
+			PIC::Remap();
+			PIC::Disable();
+			PIC::Mask(PicMask::Keyboard, true);
+		}
 	}
 
 	void InitializeACPI(BootInfo* bootInfo)
 	{
 		using namespace ACPI;
 		XSDTHeader* xsdt = (XSDTHeader*)bootInfo->RSDP->XSDTAddress;
+		if (!xsdt)
+		{
+			gConsole.WriteLine("ROOT XSDT NOT FOUND! CANNOT INITIALIZE ACPI DEVICES!");
+			return;
+		}
+
+		APIC::MADTHeader* madt = (APIC::MADTHeader*)FindTable(xsdt, "APIC");
+		if (madt) APIC::ParseMADT(madt);
+		else gConsole.WriteLine("APIC NOT FOUND! USING FALLBACK PIC!", Color::Red);
 
 		MCFGHeader* mcfg = (MCFGHeader*)FindTable(xsdt, "MCFG");
-		{
-			PCI::EnumeratePCI(mcfg);
-		}
+		if (mcfg) PCI::EnumeratePCI(mcfg);
+		else gConsole.WriteLine("MCFG NOT FOUND!", Color::Red);
 
 	}
 
 	void ShowLoadingImage(BootInfo* info)
 	{
+		if (!info->LoadingImage)
+		{
+			gConsole.WriteLine("ERROR LOADING BOOT IMAGE!", Color::Red);
+			return;
+		}
+
+		constexpr uint16 ImageWidth = 256;
+		constexpr uint16 ImageHeight = 256;
+
 		Color* colorFB = (Color*)info->Framebuffer->BaseAddress;
 		Color* img = (Color*)(info->LoadingImage);
 
-		for (u16 y = 0; y < 256; y++)
+		for (u16 y = 0; y < ImageHeight; y++)
 		{
-			for (u16 x = 0; x < 256; x++)
+			for (u16 x = 0; x < ImageWidth; x++)
 			{
 				// wow this is massive, cringe. 10/10 very readable code
-				colorFB[((y + (u64)(info->Framebuffer->Height / 1.5) - 128) * info->Framebuffer->PixelsPerScanline) + x + (info->Framebuffer->PixelsPerScanline / 2) - 128] = img[(y * 256) + x];
+				// fixed a bit, seperated things into variables, still looks cringe
+				uint64 framebufferOffsetY = u64((y + (u64)(info->Framebuffer->Height / 1.5) - (ImageHeight / 2)) * info->Framebuffer->PixelsPerScanline);
+				uint64 framebufferOffsetX = u64(x + (info->Framebuffer->Width / 2) - (ImageWidth / 2));
+				colorFB[framebufferOffsetY + framebufferOffsetX] = img[(y * (ImageWidth)) + x];
 			}
 		}
 
 	}
 
-	void InitializeInterrupts()
+	void InitializeExceptions()
 	{
 		using namespace Interrupts;
-		// Make sure interrupts are off
-		cli;
 
 		// Setup GIDTR
 		GlobalIDTR.Limit = 0x0FFF;
@@ -67,9 +103,9 @@ namespace Kernel
 		memset<u64>((void*)GlobalIDTR.Offset, 0x00, PAGE_SIZE);
 
 		// Load global IDT
-		LoadIDT();
+		LoadGIDT();
 
-		// Register interrupts
+		// Register exceptions
 		RegisterInterrupt((void*)hDivideByZeroFault, Interrupt::DivideByZero);
 
 		RegisterInterrupt((void*)hSingleStepFault, Interrupt::SingleStep);
@@ -111,8 +147,6 @@ namespace Kernel
 
 	void InitializeGDT()
 	{
-		// Make sure interrupts are off
-		cli;
 
 		// Create and load GDT
 		GDTDescriptor desc{};
@@ -123,8 +157,6 @@ namespace Kernel
 
 	void InitializePaging(BootInfo* bootInfo)
 	{
-		cli;
-
 		u64 nMapEntries = bootInfo->MapSize / bootInfo->MapDescriptorSize;
 
 		// Read EFI memory map and set up PFA
@@ -156,9 +188,6 @@ namespace Kernel
 		{
 			PageTableManager::MapMemory(x, x);
 		}
-
-		gConsole.Clear();
-
 		
 		// Enable paging (juuuust to be sure)
 		{

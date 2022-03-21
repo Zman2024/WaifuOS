@@ -50,6 +50,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <SourcePath />
     <IntDir>$(SolutionDir)Kernel\bin\</IntDir>
     <OutDir>$(SolutionDir)Kernel\bin\</OutDir>
+    <NMakePreprocessorDefinitions>VISUAL_STUDIO_EDITOR</NMakePreprocessorDefinitions>
   </PropertyGroup>
   <ItemDefinitionGroup Condition="'$(Configuration)|$(Platform)'=='Release|x64'">
     <PreBuildEvent>
@@ -61,9 +62,14 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="cstr.cpp" />
     <ClCompile Include="EFI.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Interrupts\APIC.cpp" />
     <ClCompile Include="Interrupts\IDT.cpp" />
     <ClCompile Include="Interrupts\Interrupts.cpp" />
+    <ClCompile Include="Interrupts\IOAPIC.cpp" />
+    <ClCompile Include="Interrupts\LocalAPIC.cpp" />
+    <ClCompile Include="Interrupts\PIC.cpp" />
     <ClCompile Include="IO\ACPI.cpp" />
+    <ClCompile Include="IO\IOBus.cpp" />
     <ClCompile Include="IO\PCI.cpp" />
     <ClCompile Include="KernelUtils.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -74,9 +80,12 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="Memory\PageTableManager.cpp" />
     <ClCompile Include="Memory\Paging.cpp" />
     <ClCompile Include="PrimitiveConsole.cpp" />
+    <ClCompile Include="string.cpp" />
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\ACPI.h" />
+    <ClInclude Include="Headers\APIC.h" />
+    <ClInclude Include="Headers\APICStructs.h" />
     <ClInclude Include="Headers\BitMap.h" />
     <ClInclude Include="Headers\Colors.h" />
     <ClInclude Include="Headers\CPUIDCodes.h" />
@@ -86,6 +95,9 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\Globals.h" />
     <ClInclude Include="Headers\IDT.h" />
     <ClInclude Include="Headers\Interrupts.h" />
+    <ClInclude Include="Headers\IOAPIC.h" />
+    <ClInclude Include="Headers\IOBus.hpp" />
+    <ClInclude Include="Headers\LocalAPIC.h" />
     <ClInclude Include="Headers\Memory.h" />
     <ClInclude Include="Headers\MemoryUtils.hpp" />
     <ClInclude Include="Headers\PageFrameAllocator.h" />
@@ -93,14 +105,21 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\PageTableManager.h" />
     <ClInclude Include="Headers\Paging.h" />
     <ClInclude Include="Headers\PCI.h" />
+    <ClInclude Include="Headers\PIC.hpp" />
     <ClInclude Include="Headers\PrimitiveConsole.h" />
     <ClInclude Include="Headers\cstr.h" />
+    <ClInclude Include="Headers\string.h" />
     <ClInclude Include="Headers\Structs.h" />
     <ClInclude Include="Headers\Types.h" />
     <ClInclude Include="Headers\KernelUtils.h" />
   </ItemGroup>
   <ItemGroup>
+    <None Include="..\kernel.ld" />
+    <None Include="..\Makefile" />
     <None Include="Interrupts\GDT.asm" />
+  </ItemGroup>
+  <ItemGroup>
+    <Text Include="..\stuff for apic.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />
   <ImportGroup Label="ExtensionTargets">
