@@ -31,10 +31,12 @@ namespace Kernel
 	{
 		debug("Initializing IRQs...");
 
+		// Add IRQ handlers to IDT
 		Interrupts::RegisterInterrupt((vptr)Interrupts::hKeyboardInt, Interrupts::Interrupt::Keyboard);
 		Interrupts::RegisterInterrupt((vptr)Interrupts::hPitTick, Interrupts::Interrupt::PIT);
 		Interrupts::RegisterInterrupt((vptr)Interrupts::hRtcTick, Interrupts::Interrupt::RTC);
 
+		// Remap and mask all ints in PIC
 		PIC::Remap();
 		PIC::Disable();
 
@@ -56,6 +58,7 @@ namespace Kernel
 			PIC::Mask(PicMask::Keyboard | PicMask::PIT | PicMask::RTC, true);
 		}
 
+		// start stuff that can fire IRQ ints
 		PIT::Initialize();
 		RTC::Initialize();
 
