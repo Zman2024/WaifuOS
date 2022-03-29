@@ -7,9 +7,9 @@ namespace APIC
 {
 	void InitializeLAPIC(int cpu)
 	{
-		LAPIC = PageFrameAllocator::RequestPage<LocalAPIC>();
-		PageTableManager::MapMemory(LAPIC, (vptr)PhysicalLAPIC);
-		PageFrameAllocator::LockPage((vptr)PhysicalLAPIC);
+		PageTableManager::MapMemory(PhysicalLAPIC, PhysicalLAPIC);
+		PageFrameAllocator::LockPage(PhysicalLAPIC);
+		LAPIC = PhysicalLAPIC;
 
 		LAPIC->TaskPriorityRegister = 0x00; // enable all ints
 		LAPIC->DestinationFormatRegister = -1; // flat

@@ -37,7 +37,7 @@ namespace Kernel
 
 		PIC::Remap();
 		PIC::Disable();
-		// APIC::UsableAPIC = false;
+
 		if (APIC::UsableAPIC)
 		{
 			debug("\tUsing APIC");
