@@ -41,7 +41,7 @@ Compilation (Kernel):
   1. Navigate to Kernel
   2. Run setup.bat
   3. Run build.bat
-  4. Image can be found in Kernel/bin/WaifuOS.img it can be flashed to a USB and booted as an EFI application
+  4. Image can be found in Kernel/bin/WaifuOS.img it can be flashed to a USB and booted as an EFI application\*
 
 <h2>Running in QEMU</h2>
 Windows users can (assuming you have QEMU installed correctly) simply double click run.bat in the Kernel folder
@@ -53,3 +53,4 @@ Linux users:
   3. waifus (maybe)
 
 # I'm getting tired of writing a readme so im done
+\*The image is in FAT format and might not work correctly, you should just copy all from bin/dsk to the root of a FAT32 formatted USB, that's what works for me. Don't use NTFS most BIOSes will shit themselves
