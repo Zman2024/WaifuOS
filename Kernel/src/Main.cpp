@@ -9,14 +9,6 @@ namespace Kernel
 		u64 bssSize = u64(bssEnd) - u64(bssStart);
 		memset<u64>(bssStart, 0x00, bssSize);
 	}
-
-	void t1()
-	{
-		static nint x = 0;
-		++x;
-		debug("X: %0", x);
-		if (x == 6000) PIT::RemoveTimer((vptr)t1);
-	}
 	
 	global void KernelStart(BootInfo bootInfo)
 	{

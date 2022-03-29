@@ -9,7 +9,7 @@
 #include <Memory.h>
 #include <string.h>
 
-#define NO_ANIME
+//#define NO_ANIME
 
 global PrimitiveConsole gConsole;
 global IDTR GlobalIDTR;
