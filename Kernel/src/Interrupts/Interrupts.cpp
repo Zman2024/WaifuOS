@@ -1,6 +1,8 @@
 #include <Interrupts.h>
 #include <PIC.hpp>
 #include <APIC.h>
+#include <PIT.h>
+#include <RTC.h>
 
 namespace Interrupts
 {
@@ -20,6 +22,7 @@ namespace Interrupts
 
 	void PanicScreen()
 	{
+		cli;
 		gConsole.Clear(Color::DarkRed);
 		gConsole.SetBackgroundColor(Color::DarkRed);
 		gConsole.SetForegroundColor(Color(0xFFDDDDDD));
@@ -141,6 +144,7 @@ namespace Interrupts
 
 		gConsole.WriteLine(cstr::ToString(addr, true));
 
+		spin(0x100000);
 		halt;
 	}
 
@@ -185,9 +189,27 @@ namespace Interrupts
 		else PIC::SendEIO(false);
 	}
 
+	void hPitTick(InterruptFrame* frame)
+	{
+		PIT::Tick();
+		if (APIC::InUse) APIC::EndOfInterrupt();
+		else PIC::SendEIO(false);
+	}
+
+	void hRtcTick(InterruptFrame* frame)
+	{
+		RTC::Tick();
+
+		RTC::EndOfInterrupt();
+		if (APIC::InUse) APIC::EndOfInterrupt();
+		else PIC::SendEIO(false);
+	}
+
 	void hStub(InterruptFrame* frame)
 	{
-		debug("Interrupt 0xFF called");
+		debug("Interrupt stub called");
+		if (APIC::InUse) APIC::EndOfInterrupt();
+		else PIC::SendEIO(false);
 	}
 
 }

@@ -44,7 +44,7 @@ namespace cstr
 			revBuffer[--reverseIndex] = str[index++];
 		}
 
-		memcpy(revBuffer, str, length);
+		memcpy(str, revBuffer, length);
 
 	}
 

@@ -11,8 +11,11 @@ SRCDIR := src
 OBJDIR := obj
 BUILDDIR = bin
 
-CFLAGS = -ffreestanding -fshort-wchar -mno-red-zone -O0 -fno-exceptions -fno-rtti -masm=intel -fpermissive -I$(SRCDIR)/Headers
-INTFLAGS = -mno-red-zone -mgeneral-regs-only -ffreestanding -masm=intel -I$(SRCDIR)/Headers -c $^ -o $@
+# Ok GCC 4.8+ if you wont let me turn off -fpermissive warnings then I'll
+# disable ALL warnings. and that definetly won't cause more issues than just
+# allowing me to do what i want... riiiight?
+CFLAGS = -g -ffreestanding -fshort-wchar -mno-red-zone -O0 -fno-exceptions -fno-rtti -masm=intel -fpermissive -w -I$(SRCDIR)/Headers
+INTFLAGS = -g -fpermissive -w -mno-red-zone -mgeneral-regs-only -ffreestanding -masm=intel -I$(SRCDIR)/Headers -c $^ -o $@
 ASMFLAGS = 
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 

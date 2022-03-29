@@ -59,7 +59,7 @@ namespace APIC
 					auto iso = (IRQRemapRecord*)currentRecord;
 					IRQOverrides[iso->IrqSource] = iso;
 					IRQOverridesCount++;
-					debug("Found ISO: InterruptVector: %x1, IrqSource: %x1\n", iso->InterruptVector, iso->IrqSource);
+					debug("Found ISO: IrqSource: %x1, IrqOverride: %x1", iso->IrqOverride, iso->IrqSource);
 					break;
 				}
 

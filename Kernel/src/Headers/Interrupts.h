@@ -153,6 +153,9 @@ namespace Interrupts
 	_isr_ void hMachineCheck(InterruptFrame* frame);
 	_isr_ void hSIMDFault(InterruptFrame* frame);
 	_isr_ void hKeyboardInt(InterruptFrame* frame);
+	_isr_ void hPitTick(InterruptFrame* frame);
+	_isr_ void hRtcTick(InterruptFrame* frame);
+
 	_isr_ void hStub(InterruptFrame* frame);
 
 }

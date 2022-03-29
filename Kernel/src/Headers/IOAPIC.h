@@ -11,7 +11,7 @@ namespace APIC
 	{
 		if (IRQOverrides[irq] && IRQOverrides[irq]->IrqSource == irq)
 		{
-			return IRQOverrides[irq]->InterruptVector;
+			return IRQOverrides[irq]->IrqOverride;
 		}
 		return irq;
 	}
@@ -44,7 +44,6 @@ namespace APIC
 		{
 			auto record = IOAPICRecords[x];
 			IOAPICs[x] = IOAPIC(record);
-			debug("Initialized IOAPIC:%x0", IOAPICs[x].GetID());
 			IOAPICsCount++;
 		}
 	}

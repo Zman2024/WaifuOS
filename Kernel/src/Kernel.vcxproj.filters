@@ -37,6 +37,12 @@
     <Filter Include="Source\IO">
       <UniqueIdentifier>{be3968fc-8d92-4ef5-b3cd-61c775d2b629}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headers\Timers">
+      <UniqueIdentifier>{2100c565-72de-43b0-a48c-791d5fc2255a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Timers">
+      <UniqueIdentifier>{d5b73245-a029-4b62-a3e4-570154a68010}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KernelUtils.cpp">
@@ -107,6 +113,12 @@
     </ClCompile>
     <ClCompile Include="string.cpp">
       <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Timers\PIT.cpp">
+      <Filter>Source\Timers</Filter>
+    </ClCompile>
+    <ClCompile Include="Timers\RTC.cpp">
+      <Filter>Source\Timers</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -197,6 +209,12 @@
     <ClInclude Include="Headers\string.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\PIT.h">
+      <Filter>Headers\Timers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\RTC.h">
+      <Filter>Headers\Timers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Interrupts\GDT.asm">
@@ -204,6 +222,9 @@
     </None>
     <None Include="..\kernel.ld" />
     <None Include="..\Makefile" />
+    <None Include="Memory\Memory.asm">
+      <Filter>Source\Memory</Filter>
+    </None>
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\stuff for apic.txt" />

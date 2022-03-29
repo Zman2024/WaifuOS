@@ -4,8 +4,8 @@
 #include <stddef.h>
 #define global extern "C"
 #ifdef VISUAL_STUDIO_EDITOR
-#define attribute(x)
 #define attribute
+#define attribute(x) 
 #else
 #define attribute __attribute__
 #endif
@@ -13,6 +13,9 @@
 constexpr auto PAGE_SIZE = 0x1000;
 
 typedef void* vptr;
+
+// Architecture native integer (native int)
+typedef size_t nint;
 
 typedef signed char sbyte;
 typedef signed char int8;

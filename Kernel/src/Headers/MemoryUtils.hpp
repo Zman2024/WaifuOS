@@ -22,6 +22,12 @@ template <typename T> inline void memset(void* address, T value, uint64 nBytes)
 
 }
 
-void memcpy(const void* src, void* dest, uint64 nBytes);
+void memcpy(void* dest, const void* src, uint64 nBytes);
+
+global nint strlen(const char* str);
+
+global void strcpy(char* dest, const char* src);
+
+global void strcpys(char* dest, const char* src, nint max);
 
 #endif

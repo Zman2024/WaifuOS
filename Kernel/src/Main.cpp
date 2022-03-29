@@ -1,9 +1,8 @@
 #include <KernelUtils.h>
-#include <IOAPIC.h>
 
 namespace Kernel
 {
-	inline void ClearBss(BootInfo bootInfo)
+	inline void ClearBss(BootInfo& bootInfo)
 	{
 		vptr bssStart = &_BssDataStart;
 		vptr bssEnd = &_BssDataEnd;
@@ -11,6 +10,14 @@ namespace Kernel
 		memset<u64>(bssStart, 0x00, bssSize);
 	}
 
+	void t1()
+	{
+		static nint x = 0;
+		++x;
+		debug("X: %0", x);
+		if (x == 6000) PIT::RemoveTimer((vptr)t1);
+	}
+	
 	global void KernelStart(BootInfo bootInfo)
 	{
 		// Clear uninitialized data (just to be sure)
@@ -20,13 +27,17 @@ namespace Kernel
 		gConsole = PrimitiveConsole(bootInfo.Framebuffer, bootInfo.font);
 		gConsole.Clear();
 
+		#ifndef NO_ANIME
 		// Show loading image
-		ShowLoadingImage(&bootInfo);
+		ShowLoadingImage(bootInfo);
+		#endif
 
 		// Initialize Hardware
-		Kernel::InitializeKernel(&bootInfo);
+		Kernel::InitializeKernel(bootInfo);
 
-		gConsole.Write(OSName, Color::Green); gConsole.WriteLine(" Initialized!", Color::Green);
+		gConsole.WriteLine(string(OSName) + " Initialized!", Color::Green);
+		Memory::PrintLeaks();
+
 		while (true) hlt;
 	}
 }

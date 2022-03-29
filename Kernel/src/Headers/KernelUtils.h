@@ -20,6 +20,9 @@
 #include <CPUIDCodes.h>
 #include <PIC.hpp>
 #include <IOBus.hpp>
+#include <string.h>
+#include <PIT.h>
+#include <RTC.h>
 
 namespace Kernel
 {
@@ -27,16 +30,16 @@ namespace Kernel
 	global void KernelStart(BootInfo bootInfo);
 
 	// Initializes hardware and kernel resources
-	void InitializeKernel(BootInfo* bootInfo);
+	void InitializeKernel(const BootInfo& bootInfo);
 
 	// Use PIC / APIC
 	void InitializeIRQ();
 
 	// Init ACPI
-	void InitializeACPI(BootInfo* bootInfo);
+	void InitializeACPI(const BootInfo& bootInfo);
 
 	// Initializes Paging and Memory Mapping
-	void InitializePaging(BootInfo* bootInfo);
+	void InitializePaging(const BootInfo& bootInfo);
 
 	// Initializes interrupts (duh)
 	void InitializeExceptions();
@@ -45,7 +48,7 @@ namespace Kernel
 	void InitializeGDT();
 
 	// Shows loading image loaded from bootloader
-	void ShowLoadingImage(BootInfo* info);
+	void ShowLoadingImage(const BootInfo& info);
 }
 
 #endif

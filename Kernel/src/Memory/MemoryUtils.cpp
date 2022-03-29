@@ -1,6 +1,6 @@
 #include <MemoryUtils.hpp>
 
-void memcpy(const void* src, void* dest, uint64 nBytes)
+void memcpy(void* dest, const void* src, uint64 nBytes)
 {
 	const byte* srcb = (const byte*)src;
 	byte* destb = (byte*)dest;

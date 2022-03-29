@@ -38,6 +38,8 @@ namespace ACPI
 		uint64 Reserved;
 	} attribute((packed));
 
+
+	void PrintTables(XSDTHeader* xsdt);
 	void* FindTable(XSDTHeader* sdtHeader, const char* signature);
 
 }

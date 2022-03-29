@@ -14,14 +14,14 @@ namespace APIC
 	IOAPIC::IOAPIC(IOAPICRecord* ioapic)
 	{
 		// address shit first
-		this->mPhysicalAddress = vptr((u64)ioapic->Address);
-		this->mVirtualAddress = PageFrameAllocator::RequestPage<vptr>();
+		this->mPhysicalAddress = this->mVirtualAddress = vptr((u64)ioapic->Address);
 
-		if (!this->mVirtualAddress)
-		{
-			debug("IOAPIC: PFA didn't give me a valid address (nullptr, very zad) we just memory map to physical");
-			this->mVirtualAddress = this->mPhysicalAddress;
-		}
+		// No reason to memory map it somewhere else
+		//if (!this->mVirtualAddress)
+		//{
+		//	debug("IOAPIC: PFA didn't give me a valid address (nullptr, very zad) we just memory map to physical");
+		//	this->mVirtualAddress = this->mPhysicalAddress;
+		//}
 
 		PageTableManager::MapMemory(this->mVirtualAddress, this->mPhysicalAddress);
 
@@ -46,7 +46,7 @@ namespace APIC
 			WriteIOAPICRedirectionEntry(x, entry);
 		}
 
-		debug("IOAPIC with ID #%0 Found at physical address: %x1, Memory mapped to %x2", this->mIOApicId, u64(this->mPhysicalAddress), u64(this->mVirtualAddress));
+		debug("Initialized IOAPIC with ID #%0 at address: %x1", this->mIOApicId, u64(this->mPhysicalAddress));
 	}
 
 	uint32 IOAPIC::ReadIOAPIC(uint32 reg)

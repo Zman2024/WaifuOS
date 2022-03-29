@@ -6,6 +6,10 @@
 #include <PrimitiveConsole.h>
 #include <GDT.h>
 #include <IDT.h>
+#include <Memory.h>
+#include <string.h>
+
+#define NO_ANIME
 
 global PrimitiveConsole gConsole;
 global IDTR GlobalIDTR;
@@ -18,14 +22,30 @@ global byte _KernelEnd;
 global byte _BssDataStart;
 global byte _BssDataEnd;
 
-global char OSName[] = "WaifuOS";
+#ifndef NO_ANIME
+static char OSName[] = "WaifuOS";
+#else
+static char OSName[] = "OS";
+#endif
+
+static byte GlobalIDTROffset[PAGE_SIZE];
 
 global byte _DataStart;
 global byte _DataEnd;
 
 static void debug(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
 {
-	gConsole.WriteLine(cstr::format(str, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9));
+	gConsole.WriteLine(cstr::format(str, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9), Color(0xC0C0C0));
+}
+
+static void warn(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
+{
+	gConsole.WriteLine(cstr::format(str, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9), Color::Yellow);
+}
+
+static void error(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
+{
+	gConsole.WriteLine(cstr::format(str, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9), Color::Red);
 }
 
 #endif

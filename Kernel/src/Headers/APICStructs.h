@@ -135,7 +135,7 @@ namespace APIC
 	{
 		byte BusSource;
 		byte IrqSource; // the IRQ number that is being replaced
-		uint32 InterruptVector; // the IRQ number that is replacing the original
+		uint32 IrqOverride; // the IRQ number that is replacing the original
 		uint16 Flags;
 	};
 
