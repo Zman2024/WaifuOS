@@ -10,11 +10,6 @@
 # User-specific files (MonoDevelop/Xamarin Studio)
 *.userprefs
 
-# Stuff
-*.o
-*.img
-*.elf
-
 # Build results
 [Dd]ebug/
 [Dd]ebugPublic/
@@ -265,6 +260,12 @@ paket-files/
 __pycache__/
 *.pyc
 
+
+
+# ================================================== Stuff ==================================================
+*.o
+*.img
+*.elf
 Kernel/stuff for apic.txt
 Bootloader/x86_64/
 Bootloader/x86_64/*
