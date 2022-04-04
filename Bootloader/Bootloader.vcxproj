@@ -37,6 +37,8 @@
     <ExcludePath />
     <NMakeBuildCommandLine>cd "$(ProjectDir)"
 C:\Windows\SysNative\wsl ./rebuild</NMakeBuildCommandLine>
+    <NMakeCleanCommandLine>cd "$(ProjectDir)"
+C:\Windows\SysNative\wsl make clean -j</NMakeCleanCommandLine>
   </PropertyGroup>
   <ItemDefinitionGroup>
   </ItemDefinitionGroup>
