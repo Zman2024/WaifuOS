@@ -22,7 +22,7 @@ Compilation (Kernel):
   1. cd to Kernel
   2. Do ./setup
   3. Do ./build
-  4. Image can be found in Kernel/bin/WaifuOS.img it can be flashed to a USB and booted as an EFI application
+  4. Image can be found in Kernel/bin/WaifuOS.img it can be flashed to a USB and booted as an EFI application\*
 
 <h3>Windows Users</h3>
 <h4>Note: You must have WSL installed</h4>
