@@ -27,6 +27,7 @@ namespace APIC
 
 	void ParseMADT(MADTHeader* madt)
 	{
+		debug("APIC Table: ");
 		u64 MaxAddress = madt->Length + u64(madt);
 		BaseRecord* currentRecord = (BaseRecord*)((u64)madt + sizeof(MADTHeader));
 		u64 lApicPhysAddress = u64(madt->LapicAddress);
@@ -59,7 +60,7 @@ namespace APIC
 					auto iso = (IRQRemapRecord*)currentRecord;
 					IRQOverrides[iso->IrqSource] = iso;
 					IRQOverridesCount++;
-					debug("Found ISO: IrqSource: %x1, IrqOverride: %x1", iso->IrqOverride, iso->IrqSource);
+					debug("\tFound ISO: IrqSource: %x1, IrqOverride: %x1", iso->IrqOverride, iso->IrqSource);
 					break;
 				}
 
@@ -73,7 +74,7 @@ namespace APIC
 				{
 					ApicAddressOverrideRecord* addr = (ApicAddressOverrideRecord*)currentRecord;
 					lApicPhysAddress = addr->Address;
-					debug("LAPIC Address overidden: %x0", addr->Address);
+					debug("\tLAPIC Address overidden: %x0", addr->Address);
 					break;
 				}
 

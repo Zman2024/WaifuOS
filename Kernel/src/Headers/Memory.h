@@ -2,7 +2,6 @@
 #ifndef H_Memory
 #define H_Memory
 #include <Types.h>
-#include <MemoryUtils.hpp>
 
 namespace Memory
 {
@@ -28,6 +27,27 @@ namespace Memory
 vptr malloc(nint size);
 vptr calloc(nint size);
 void free(vptr address);
+
+template <typename T> inline void memset(void* address, T value, uint64 nBytes)
+{
+	T* tAddr = (T*)address;
+	uint16 rem = nBytes % sizeof(T);
+	nBytes = nBytes / sizeof(T);
+	for (uint64 x = 0; x < nBytes; x++)
+	{
+		*tAddr = value;
+		tAddr++;
+	}
+
+	byte* cst = (byte*)&value;
+	for (uint16 x = 0; x < rem; x++)
+	{
+		((byte*)tAddr)[x] = cst[x];
+	}
+
+}
+
+void memcpy(vptr dest, const vptr src, uint64 nBytes);
 
 inline vptr operator new(nint size) { return malloc(size); }
 inline vptr operator new[](nint size) { return malloc(size); }

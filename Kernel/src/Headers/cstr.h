@@ -5,9 +5,6 @@
 
 namespace cstr
 {
-	// Get length of cstring
-	uint64 Length(const char* str);
-
 	// returns true if str0 and str1 are the same
 	bool strcmp(const char* str0, const char* str1);
 

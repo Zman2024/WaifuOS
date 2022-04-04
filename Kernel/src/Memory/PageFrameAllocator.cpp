@@ -1,5 +1,4 @@
 #include <PageFrameAllocator.h>
-#include <MemoryUtils.hpp>
 
 namespace PageFrameAllocator
 {

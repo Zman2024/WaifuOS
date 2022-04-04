@@ -2,7 +2,7 @@
 #include <APIC.h>
 #include <PageFrameAllocator.h>
 #include <PageTableManager.h>
-#include <MemoryUtils.hpp>
+#include <Memory.h>
 
 namespace APIC
 {

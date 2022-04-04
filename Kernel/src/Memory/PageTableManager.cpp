@@ -1,7 +1,6 @@
 #include <PageTableManager.h>
 #include <PageMapIndexer.h>
 #include <PageFrameAllocator.h>
-#include <MemoryUtils.hpp>
 
 namespace PageTableManager
 {

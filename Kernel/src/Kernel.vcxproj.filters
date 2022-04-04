@@ -66,9 +66,6 @@
     <ClCompile Include="BitMap.cpp">
       <Filter>Source</Filter>
     </ClCompile>
-    <ClCompile Include="Memory\MemoryUtils.cpp">
-      <Filter>Source\Memory</Filter>
-    </ClCompile>
     <ClCompile Include="Memory\Memory.cpp">
       <Filter>Source\Memory</Filter>
     </ClCompile>
@@ -155,9 +152,6 @@
     <ClInclude Include="Headers\Memory.h">
       <Filter>Headers\Memory</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\MemoryUtils.hpp">
-      <Filter>Headers\Memory</Filter>
-    </ClInclude>
     <ClInclude Include="Headers\Paging.h">
       <Filter>Headers\Memory\Paging</Filter>
     </ClInclude>
@@ -222,8 +216,8 @@
     </None>
     <None Include="..\kernel.ld" />
     <None Include="..\Makefile" />
-    <None Include="Memory\Memory.asm">
-      <Filter>Source\Memory</Filter>
+    <None Include="string.asm">
+      <Filter>Source</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

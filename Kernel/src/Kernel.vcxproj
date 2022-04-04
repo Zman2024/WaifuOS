@@ -116,7 +116,6 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="KernelUtils.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Memory\Memory.cpp" />
-    <ClCompile Include="Memory\MemoryUtils.cpp" />
     <ClCompile Include="Memory\PageFrameAllocator.cpp" />
     <ClCompile Include="Memory\PageMapIndexer.cpp" />
     <ClCompile Include="Memory\PageTableManager.cpp" />
@@ -143,7 +142,6 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\IOBus.hpp" />
     <ClInclude Include="Headers\LocalAPIC.h" />
     <ClInclude Include="Headers\Memory.h" />
-    <ClInclude Include="Headers\MemoryUtils.hpp" />
     <ClInclude Include="Headers\PageFrameAllocator.h" />
     <ClInclude Include="Headers\PageMapIndexer.h" />
     <ClInclude Include="Headers\PageTableManager.h" />
@@ -163,7 +161,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <None Include="..\kernel.ld" />
     <None Include="..\Makefile" />
     <None Include="Interrupts\GDT.asm" />
-    <None Include="Memory\Memory.asm" />
+    <None Include="string.asm" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\stuff for apic.txt" />

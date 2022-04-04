@@ -74,7 +74,7 @@ EFI_STATUS efi_main(EFI_HANDLE ImageHandle, EFI_SYSTEM_TABLE* SystemTable)
 				Elf64_Addr segment = phdr->p_paddr;
 				SystemTable->BootServices->AllocatePages(AllocateAddress, EfiLoaderData, pages, &segment);
 
-				// Zero it out for uninitialized data (real hardware issues, am i right?)
+				// Zero it out for reasons (real hardware issues, am i right?)
 				for (size_t x = 0; x < phdr->p_memsz; x++)
 				{
 					((uint8_t*)segment)[x] = 0x00;

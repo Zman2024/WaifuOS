@@ -14,6 +14,9 @@ namespace PCI
 		if (!pci->DeviceID || pci->DeviceID == 0xFFFF) return;
 
 		// Do stuff like cache or something idk
+
+		debug("\tVendor: %x0, Device: %x1", pci->VendorID, pci->DeviceID);
+
 	}
 
 	void EnumerateDevice(u64 busAddress, u64 dev)
@@ -49,6 +52,7 @@ namespace PCI
 
 	void EnumeratePCI(MCFGHeader* mcfg)
 	{
+		debug("MCFG Table: ");
 		u32 entries = (mcfg->Length - sizeof(MCFGHeader)) / sizeof(DeviceConfig);
 
 		for (u32 x = 0; x < entries; x++)

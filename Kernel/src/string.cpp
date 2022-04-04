@@ -1,7 +1,6 @@
 #include <string.h>
 #include <cstr.h>
 #include <Memory.h>
-#include <MemoryUtils.hpp>
 #include <Globals.h>
 
 string::string()
@@ -32,7 +31,7 @@ string::string(const string& value)
 
 string::string(const char* str)
 {
-	mBufferSize = cstr::Length(str) + 1;
+	mBufferSize = strlen(str) + 1;
 	mBuffer = (char*)calloc(mBufferSize);
 	memcpy(mBuffer, str, mBufferSize);
 }
@@ -191,7 +190,7 @@ string& string::operator=(const char* value)
 		this->~string();
 
 		// set this to be equal to right
-		this->mBufferSize = cstr::Length(value) + 1;
+		this->mBufferSize = strlen(value) + 1;
 		this->mBuffer = calloc(this->mBufferSize);
 
 		memcpy(this->mBuffer, value, this->mBufferSize);

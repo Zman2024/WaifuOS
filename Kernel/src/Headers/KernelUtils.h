@@ -9,7 +9,7 @@
 #include <PageMapIndexer.h>
 #include <cstr.h>
 #include <Paging.h>
-#include <MemoryUtils.hpp>
+#include <Memory.h>
 #include <PageTableManager.h>
 #include <GDT.h>
 #include <Interrupts.h>

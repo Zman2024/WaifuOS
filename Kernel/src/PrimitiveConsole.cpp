@@ -1,5 +1,5 @@
 #include <PrimitiveConsole.h>
-#include <MemoryUtils.hpp>
+#include <Memory.h>
 
 PrimitiveConsole::PrimitiveConsole() {  }
 

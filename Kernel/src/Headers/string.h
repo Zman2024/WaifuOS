@@ -49,4 +49,9 @@ inline string operator+(const char* left, const string& right)
 	return right.prepend(left);
 }
 
+// string.asm
+global nint strlen(const char* str);
+global void strcpy(char* dest, const char* src);
+global void strcpys(char* dest, const char* src, nint max);
+
 #endif
