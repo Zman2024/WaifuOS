@@ -1,6 +1,6 @@
 echo \ \ \ \ ~~~~~~~~~~ Building Kernel ~~~~~~~~~~
 echo 
-make
+make -j 1
 echo 
 echo \ \ \ \ ~~~~~~~~~~ Building Image ~~~~~~~~~~~
 echo 

@@ -1,12 +1,13 @@
 [bits 64]
 global strcpy
-global strcpys
+global strncpy
 global strlen
 
 ; rdi: const char* dest
 ; rsi: char* src
 strcpy:
 	xor rcx, rcx
+	mov rax, rdi
 	.loop:
 		test al, al
 	jz .end
@@ -21,8 +22,9 @@ ret
 ; rdi: const char* dest
 ; rsi: char* src
 ; rdx: max
-strcpys:
+strncpy:
 	xor rcx, rcx
+	mov rax, rdi
 	.loop:
 		test al, al
 	jz .end

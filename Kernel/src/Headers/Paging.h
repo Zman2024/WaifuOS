@@ -3,7 +3,7 @@
 #define H_Paging
 #include <Types.h>
 
-enum struct PTFlag
+enum struct PTFlag : byte
 {
 	Present = 0,
 	ReadWrite = 1,

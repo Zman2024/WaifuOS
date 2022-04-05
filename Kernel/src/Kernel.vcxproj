@@ -100,6 +100,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     </PreBuildEvent>
   </ItemDefinitionGroup>
   <ItemGroup>
+    <ClCompile Include="Audio\Speaker.cpp" />
     <ClCompile Include="BitMap.cpp" />
     <ClCompile Include="cstr.cpp" />
     <ClCompile Include="EFI.cpp" />
@@ -112,6 +113,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="Interrupts\PIC.cpp" />
     <ClCompile Include="IO\ACPI.cpp" />
     <ClCompile Include="IO\IOBus.cpp" />
+    <ClCompile Include="IO\Keyboard.cpp" />
     <ClCompile Include="IO\PCI.cpp" />
     <ClCompile Include="KernelUtils.cpp" />
     <ClCompile Include="Main.cpp" />
@@ -140,6 +142,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\Interrupts.h" />
     <ClInclude Include="Headers\IOAPIC.h" />
     <ClInclude Include="Headers\IOBus.hpp" />
+    <ClInclude Include="Headers\Keyboard.h" />
     <ClInclude Include="Headers\LocalAPIC.h" />
     <ClInclude Include="Headers\Memory.h" />
     <ClInclude Include="Headers\PageFrameAllocator.h" />
@@ -152,6 +155,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\PrimitiveConsole.h" />
     <ClInclude Include="Headers\cstr.h" />
     <ClInclude Include="Headers\RTC.h" />
+    <ClInclude Include="Headers\Speaker.h" />
     <ClInclude Include="Headers\string.h" />
     <ClInclude Include="Headers\Structs.h" />
     <ClInclude Include="Headers\Types.h" />

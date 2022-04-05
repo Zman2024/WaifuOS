@@ -14,7 +14,8 @@ BUILDDIR = bin
 # Ok GCC 4.8+ if you wont let me turn off -fpermissive warnings then I'll
 # disable ALL warnings. and that definetly won't cause more issues than just
 # allowing me to do what i want... riiiight?
-CFLAGS = -g -ffreestanding -fshort-wchar -mno-red-zone -O0 -fno-exceptions -fno-rtti -masm=intel -fpermissive -w -I$(SRCDIR)/Headers
+CXXFLAGS = -g -ffreestanding -fshort-wchar -mno-red-zone -O0 -fno-exceptions -fno-rtti -masm=intel -fpermissive -w -I$(SRCDIR)/Headers
+CFLAGS = -g -ffreestanding -fno-exceptions -fshort-wchar -O0 -fno-rtti -I$(SRCDIR)/Headers
 INTFLAGS = -g -fpermissive -w -mno-red-zone -mgeneral-regs-only -ffreestanding -masm=intel -I$(SRCDIR)/Headers -c $^ -o $@
 ASMFLAGS = 
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
@@ -24,8 +25,11 @@ BOOTEFI := $(GNUEFI)/x86_64/bootloader/main.efi
 rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
 
 SRC = $(call rwildcard,$(SRCDIR),*.cpp)   
+CSRC = $(call rwildcard,$(SRCDIR),*.c)
 ASMSRC = $(call rwildcard,$(SRCDIR),*.asm)
+
 OBJS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRC))
+OBJS += $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.co, $(CSRC))
 OBJS += $(patsubst $(SRCDIR)/%.asm, $(OBJDIR)/%.asmo, $(ASMSRC))
 DIRS = $(wildcard $(SRCDIR)/*)
 
@@ -39,7 +43,12 @@ $(OBJDIR)/Interrupts/Interrupts.o: $(SRCDIR)/Interrupts/Interrupts.cpp
 $(OBJDIR)/%.o: $(SRCDIR)/%.cpp
 	@ echo ===== Compiling $^ =====
 	@ mkdir -p $(@D)
-	$(GC) $(CFLAGS) -c $^ -o $@
+	$(GC) $(CXXFLAGS) -c $^ -o $@
+
+$(OBJDIR)/%.co: $(SRCDIR)/%.c
+	@ echo ===== Compiling $^ =====
+	@ mkdir -p $(@D)
+	$(GC) $(CXXFLAGS) -c $^ -o $@
 
 $(OBJDIR)/%.asmo: $(SRCDIR)/%.asm
 	@ echo ===== Compiling $^ =====

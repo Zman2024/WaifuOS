@@ -10,6 +10,13 @@ namespace Kernel
 		memset<u64>(bssStart, 0x00, bssSize);
 	}
 	
+	void oneSecond()
+	{
+		static int sec = 0;
+		sec++;
+		debug("Sec: %0", sec);
+	}
+
 	global void KernelStart(BootInfo bootInfo)
 	{
 		// Clear uninitialized data (just to be sure)
@@ -29,6 +36,21 @@ namespace Kernel
 
 		gConsole.WriteLine(string(OSName) + " Initialized!", Color::Green);
 		Memory::PrintLeaks();
+
+		using namespace Audio;
+		constexpr nint count = (sizeof(Audio::Notes) / sizeof(Audio::Note));
+
+		while (true)
+		{
+			EnableSpeaker();
+			{
+				for (nint x = 0; x < count; x++)
+				{
+					Play(Notes[x], 500);
+				}
+			}
+			DisableSpeaker();
+		}
 
 		while (true) hlt;
 	}

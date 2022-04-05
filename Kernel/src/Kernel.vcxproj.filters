@@ -43,6 +43,12 @@
     <Filter Include="Source\Timers">
       <UniqueIdentifier>{d5b73245-a029-4b62-a3e4-570154a68010}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headers\Audio">
+      <UniqueIdentifier>{e6af3bec-68c1-4a0d-84ef-f10df28c46a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Audio">
+      <UniqueIdentifier>{2be688f6-263e-45c3-bf79-73d5a164e602}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KernelUtils.cpp">
@@ -116,6 +122,12 @@
     </ClCompile>
     <ClCompile Include="Timers\RTC.cpp">
       <Filter>Source\Timers</Filter>
+    </ClCompile>
+    <ClCompile Include="Audio\Speaker.cpp">
+      <Filter>Source\Audio</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\Keyboard.cpp">
+      <Filter>Source\IO</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -208,6 +220,12 @@
     </ClInclude>
     <ClInclude Include="Headers\RTC.h">
       <Filter>Headers\Timers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Speaker.h">
+      <Filter>Headers\Audio</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Keyboard.h">
+      <Filter>Headers\IO</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

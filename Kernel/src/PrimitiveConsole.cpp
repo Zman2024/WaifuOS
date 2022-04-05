@@ -170,12 +170,18 @@ void PrimitiveConsole::Backspace(int nBackspace, bool RemoveChar)
 
 void PrimitiveConsole::Clear(Color color)
 {
-	u64 fbBase = (u64)mFrameBuffer->BaseAddress;
-	for (u64 vScanline = 0; vScanline < mFrameBuffer->Height; vScanline++)
+	register uint64 fbBase = (u64)mFrameBuffer->BaseAddress;
+	register uint64 height = mFrameBuffer->Height;
+	register uint64 bytesPerScanline = u64(mFrameBuffer->PixelsPerScanline) << 2;
+	
+	register int64 speedup = u64(color) | (u64(color) << 32);
+
+	for (register u64 vScanline = 0; vScanline < height; vScanline++)
 	{
-		uint64 vScanBase = fbBase + (((u64)mFrameBuffer->PixelsPerScanline * 4) * vScanline);
-		memset<Color>((void*)vScanBase, color, (u64)mFrameBuffer->PixelsPerScanline * 4);
+		register uint64 vScanBase = fbBase + (bytesPerScanline * vScanline);
+		memset64((vptr)vScanBase, speedup, bytesPerScanline);
 	}
+
 	mCursorPosition = sPoint(0, 0);
 }
 

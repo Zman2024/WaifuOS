@@ -1,15 +1,15 @@
 #include <PIT.h>
 #include <IOBus.hpp>
 
+using namespace IO;
+
 namespace PIT
 {
 	// PIT IO ports
-	constexpr byte Data0 = 0x40;
-	constexpr byte Data1 = 0x41;
-	constexpr byte Data2 = 0x42;
+	constexpr byte Data0 = 0x40; // PIT IRQ Channel
+	constexpr byte Data1 = 0x41; // Legacy DRAM Refresh
+	constexpr byte Data2 = 0x42; // PC Speaker
 	constexpr byte Command0 = 0x43;
-
-	constexpr uint32 BaseFrequency = 1193182;
 
 	uint16 Divisor = 0x00;
 	fp64 TimeSinceInit = 0x00;
@@ -22,8 +22,8 @@ namespace PIT
 		TimeSinceInit = 0x00;
 		Divisor = 0x00;
 		CurrentTimers = 0x00;
-		SetDivisor(0x8000);
-		memset<uint64>(Timers, 0, sizeof(Timers));
+		SetDivisor(0x1000);
+		memset64(Timers, 0, sizeof(Timers));
 	}
 
 	void ProcessTimers(fp64& deltaTime)
@@ -62,7 +62,7 @@ namespace PIT
 		}
 	}
 
-	void Sleep(uint64 miliseconds)
+	void Sleepms(nint miliseconds)
 	{
 		Sleep(miliseconds / 1000.0);
 	}
@@ -75,10 +75,10 @@ namespace PIT
 	void SetDivisor(uint16 divisor)
 	{
 		Divisor = divisor;
-		IO::outb(Data0, (byte)divisor & 0xFF);
-		IO::wait();
-		IO::outb(Data0, (byte)(divisor >> 8));
-		IO::wait();
+		outb(Data0, (byte)divisor & 0xFF);
+		wait();
+		outb(Data0, (byte)(divisor >> 8));
+		wait();
 	}
 
 	uint32 GetFrequency()
@@ -144,5 +144,12 @@ namespace PIT
 			}
 		}
 		return false;
+	}
+
+	void SetChannel2(const byte mode, const uint16 freq)
+	{
+		outb(Command0, (1 << 7) | (0x3 << 4) | (mode << 1));
+		outb(Data2, (byte)freq);
+		outb(Data2, (byte)(freq >> 8));
 	}
 }

@@ -23,6 +23,7 @@
 #include <string.h>
 #include <PIT.h>
 #include <RTC.h>
+#include <Speaker.h>
 
 namespace Kernel
 {

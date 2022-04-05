@@ -1,7 +1,7 @@
-rm bin/*
-rm bin/dsk/*
-rm bin/dsk/efi/*
 rm bin/dsk/efi/boot/*
+rm bin/dsk/efi/*
+rm bin/dsk/*
+rm bin/*
 
 rm -rf obj/*
 
