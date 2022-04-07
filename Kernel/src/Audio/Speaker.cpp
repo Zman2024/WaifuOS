@@ -127,22 +127,163 @@ namespace Audio
 
 	};
 
-	Note Tetris[] = {
+	NoteSpan NotTetris[] = {
+		/* Uncomment for (not)tetris, I fear DMCA like JDH
+
+		// Main Melody
+		{ Note::E4, 400 },
+		
+		{ Note::B3, 200 },
+		{ Note::C4, 200 },
+		
+		{ Note::D4, 400 },
+		
+		{ Note::C4, 200 },
+		{ Note::B3, 200 },
+		
+		{ Note::A3, 390 }, { Note::Rest, 10 },
+		
+		{ Note::A3, 200 },
+		{ Note::C4, 200 },
+		
+		{ Note::E4, 400 },
+		
+		{ Note::D4, 200 },
+		{ Note::C4, 200 },
+		
+		{ Note::B3, 590 }, { Note::Rest, 10 },
+		
+		{ Note::C4, 200 },
+		{ Note::D4, 400 },
+		{ Note::E4, 400 },
+		{ Note::C4, 400 },
+		
+		{ Note::A3, 390 }, { Note::Rest, 10 },
+		{ Note::A3, 400 }, { Note::Rest, 600 },
+
+		{ Note::D4, 400 },
+		{ Note::F4, 200 },
+		{ Note::A4, 400 },
+		{ Note::G4, 200 },
+		{ Note::F4, 200 },
+		{ Note::E4, 400 }, { Note::Rest, 200 },
+
+		{ Note::C4, 200 },
+		{ Note::E4, 400 },
+		{ Note::D4, 200 },
+		{ Note::C4, 200 },
+		{ Note::B3, 390 }, { Note::Rest, 10 },
+		{ Note::B3, 200 },
+
+		{ Note::C4, 200 },
+		{ Note::D4, 400 },
+		{ Note::E4, 400 },
+		{ Note::C4, 400 },
+		{ Note::A3, 390 }, { Note::Rest, 10 },
+		{ Note::A3, 400 }, // { Note::Rest, 10 },
+
+		{ Note::Rest, 400 },
+		
+		// Main Melody
+		{ Note::E4, 400 },
+
+		{ Note::B3, 200 },
+		{ Note::C4, 200 },
+
+		{ Note::D4, 400 },
+
+		{ Note::C4, 200 },
+		{ Note::B3, 200 },
+
+		{ Note::A3, 390 }, { Note::Rest, 10 },
+
+		{ Note::A3, 200 },
+		{ Note::C4, 200 },
+
+		{ Note::E4, 400 },
+
+		{ Note::D4, 200 },
+		{ Note::C4, 200 },
+
+		{ Note::B3, 590 }, { Note::Rest, 10 },
+
+		{ Note::C4, 200 },
+		{ Note::D4, 400 },
+		{ Note::E4, 400 },
+		{ Note::C4, 400 },
+
+		{ Note::A3, 390 }, { Note::Rest, 10 },
+		{ Note::A3, 400 }, { Note::Rest, 600 },
+
+		{ Note::D4, 400 },
+		{ Note::F4, 200 },
+		{ Note::A4, 400 },
+		{ Note::G4, 200 },
+		{ Note::F4, 200 },
+		{ Note::E4, 400 }, { Note::Rest, 200 },
+
+		{ Note::C4, 200 },
+		{ Note::E4, 400 },
+		{ Note::D4, 200 },
+		{ Note::C4, 200 },
+		{ Note::B3, 390 }, { Note::Rest, 10 },
+		{ Note::B3, 200 },
+
+		{ Note::C4, 200 },
+		{ Note::D4, 400 },
+		{ Note::E4, 400 },
+		{ Note::C4, 400 },
+		{ Note::A3, 390 }, { Note::Rest, 10 },
+		{ Note::A3, 400 },
+
+		{ Note::Rest, 400 },
+
+		// Slower ending part
+		{ Note::E4, 800 },
+		{ Note::C4, 800 },
+
+		{ Note::D4, 800 },
+		{ Note::B3, 800 },
+
+		{ Note::C4, 800 },
+		{ Note::A3, 800 },
+
+		{ Note::Gs3, 800 },
+		{ Note::B3, 600 }, { Note::Rest, 200 },
+
+		{ Note::E4, 800 },
+		{ Note::C4, 800 },
+
+		{ Note::D4, 800 },
+		{ Note::B3, 800 },
+
+		{ Note::C4, 400 },
+		{ Note::E4, 400 },
+		{ Note::A4, 800 },
+		{ Note::Gs4, 800 },
+		
+	//	*/
 
 
+		// end note
+		{ Note::Rest, 800 },
+		{ Note::Null, 0 },
 
 	};
 
 	void EnableSpeaker()
 	{
+		PIT::SetChannel2(PIT::OperatingMode::SquareWave, (u16)Note::Rest);
 		byte temp = inb(SpeakerPort);
 		outb(SpeakerPort, temp | SpeakerBitsEnable);
+		wait();
 	}
 
 	void DisableSpeaker()
 	{
 		byte temp = inb(SpeakerPort);
 		outb(SpeakerPort, temp & (~SpeakerBitsEnable));
+		wait();
 	}
 
 	void Play(Note note)
@@ -155,7 +296,7 @@ namespace Audio
 	{
 		using namespace PIT;
 		SetChannel2(OperatingMode::SquareWave, (u16)note);
-		Sleepms(durationMs);
+		SleepMS(durationMs);
 	}
 
 	void Play(uint16 frequency)
@@ -168,14 +309,25 @@ namespace Audio
 	{
 		using namespace PIT;
 		SetChannel2(OperatingMode::SquareWave, (u16)(PIT::BaseFrequency / frequency));
-		Sleepms(durationMs);
+		SleepMS(durationMs);
+	}
+
+	void PlayTrack(NoteSpan* track)
+	{
+		EnableSpeaker();
+		while (track->Key != Note::Null)
+		{
+			Play(track->Key, track->DurationMS);
+			track++;
+		}
+		DisableSpeaker();
 	}
 
 	void Rest(nint ms)
 	{
 		using namespace PIT;
-		SetChannel2(OperatingMode::SquareWave, (u16)Note::Unhearable);
-		Sleepms(ms);
+		SetChannel2(OperatingMode::SquareWave, (u16)Note::Rest);
+		SleepMS(ms);
 	}
 
 }

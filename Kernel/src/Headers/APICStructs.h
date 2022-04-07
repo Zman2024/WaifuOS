@@ -171,22 +171,22 @@ namespace APIC
 	public:
 		volatile uint32 value;
 
-		inline uint32 Get()
+		forceinline uint32 Get()
 		{
 			uint32 volatile* ptr = &this->value;
 			return *ptr;
 		}
 
-		inline void Set(uint32 val)
+		forceinline void Set(uint32 val)
 		{
 			uint32 volatile* ptr = &this->value;
 			*ptr = val;
 		}
 
-		inline operator uint32() { return this->Get(); }
-		inline void operator =(uint32 value) { this->Set(value); }
-		inline void operator |= (uint32 value) { this->Set(this->Get() | value); }
-		inline void operator &= (uint32 value) { this->Set(this->Get() & value); }
+		forceinline operator uint32() { return this->Get(); }
+		forceinline void operator =(uint32 value) { this->Set(value); }
+		forceinline void operator |= (uint32 value) { this->Set(this->Get() | value); }
+		forceinline void operator &= (uint32 value) { this->Set(this->Get() & value); }
 	private:
 		volatile byte pad[0x10 - 4];
 	}; // might need attribute((packed)); also i could just align((0x10))
@@ -281,11 +281,11 @@ namespace APIC
 		RedirectionEntry ReadIOAPICRedirectionEntry(byte entry);
 		void WriteIOAPICRedirectionEntry(byte entry, RedirectionEntry val);
 
-		inline byte GetID() { return this->mIOApicId; }
-		inline byte GetVersion() { return this->mVersion; }
-		inline byte GetMaxRedirectionEntries() { return this->mMaxRedEntryCount; }
-		inline byte GetCurrentRedirectionEntries() { return this->mCurrentRedEntryCount; }
-		inline uint64 GetInterruptBase() { return this->mGlobalInterruptBase; }
+		forceinline byte GetID() { return this->mIOApicId; }
+		forceinline byte GetVersion() { return this->mVersion; }
+		forceinline byte GetMaxRedirectionEntries() { return this->mMaxRedEntryCount; }
+		forceinline byte GetCurrentRedirectionEntries() { return this->mCurrentRedEntryCount; }
+		forceinline uint64 GetInterruptBase() { return this->mGlobalInterruptBase; }
 
 	protected:
 		static const u32 IOApicRedirectionTableOffset = 0x10;

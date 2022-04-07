@@ -45,7 +45,7 @@ namespace cstr
 	inline char* _ToStr(int64 num)
 	{
 		// Zero out the buffer
-		memset<uint64>(strBuffer, 0, 32);
+		memset64(strBuffer, 0, 32);
 
 		char* buffer = strBuffer;
 		if (num == 0)
@@ -73,7 +73,7 @@ namespace cstr
 
 	inline char* _ToHex(uint64 num)
 	{
-		memset<uint64>(hexBuffer, 0, 32);
+		memset64(hexBuffer, 0, 32);
 		hexBuffer[0] = '0';
 		hexBuffer[1] = 'x';
 		char* buffer = hexBuffer + 2;
@@ -111,7 +111,7 @@ namespace cstr
 	char* format(const char* str, int64 p0, int64 p1, int64 p2, int64 p3, int64 p4, int64 p5, int64 p6, int64 p7, int64 p8, int64 p9)
 	{
 		u64 fBufferOffset = 0;
-		memset(formatBuffer, 0L, 512);
+		memset64(formatBuffer, 0L, 512);
 		for (u64 x = 0; str[x] != 0x00; x++)
 		{
 			bool UseHex = false;

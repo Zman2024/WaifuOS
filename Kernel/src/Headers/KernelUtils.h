@@ -24,6 +24,7 @@
 #include <PIT.h>
 #include <RTC.h>
 #include <Speaker.h>
+#include <Keyboard.h>
 
 namespace Kernel
 {
@@ -34,7 +35,7 @@ namespace Kernel
 	void InitializeKernel(const BootInfo& bootInfo);
 
 	// Use PIC / APIC
-	void InitializeIRQ();
+	void InitializeIRQ(bool forceUsePic = false);
 
 	// Init ACPI
 	void InitializeACPI(const BootInfo& bootInfo);

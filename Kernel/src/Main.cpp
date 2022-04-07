@@ -7,7 +7,7 @@ namespace Kernel
 		vptr bssStart = &_BssDataStart;
 		vptr bssEnd = &_BssDataEnd;
 		u64 bssSize = u64(bssEnd) - u64(bssStart);
-		memset<u64>(bssStart, 0x00, bssSize);
+		memset64(bssStart, 0x00, bssSize);
 	}
 	
 	void oneSecond()
@@ -37,19 +37,11 @@ namespace Kernel
 		gConsole.WriteLine(string(OSName) + " Initialized!", Color::Green);
 		Memory::PrintLeaks();
 
-		using namespace Audio;
-		constexpr nint count = (sizeof(Audio::Notes) / sizeof(Audio::Note));
+		PIT::SleepMS(1000);
 
 		while (true)
 		{
-			EnableSpeaker();
-			{
-				for (nint x = 0; x < count; x++)
-				{
-					Play(Notes[x], 500);
-				}
-			}
-			DisableSpeaker();
+			Audio::PlayTrack(Audio::NotTetris);
 		}
 
 		while (true) hlt;

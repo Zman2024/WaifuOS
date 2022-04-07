@@ -10,7 +10,7 @@ namespace PageTableManager
 	void MapMemory(void* virtualMemory, void* physMemory);
 	void MapMemory(u64 virtualMemory, u64 physMemory);
 	void SetVirtualFlag(nint address, PTFlag flag, bool value);
-	inline void SetVirtualFlag(vptr address, PTFlag flag, bool value) { SetVirtualFlag((nint)address, flag, value); }
+	forceinline void SetVirtualFlag(vptr address, PTFlag flag, bool value) { SetVirtualFlag((nint)address, flag, value); }
 }
 
 #endif

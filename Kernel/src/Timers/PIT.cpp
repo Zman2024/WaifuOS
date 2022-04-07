@@ -22,7 +22,7 @@ namespace PIT
 		TimeSinceInit = 0x00;
 		Divisor = 0x00;
 		CurrentTimers = 0x00;
-		SetDivisor(0x1000);
+		SetDivisor(1800);
 		memset64(Timers, 0, sizeof(Timers));
 	}
 
@@ -60,11 +60,6 @@ namespace PIT
 			deltaTime = TimeSinceInit - startTime;
 			hlt;
 		}
-	}
-
-	void Sleepms(nint miliseconds)
-	{
-		Sleep(miliseconds / 1000.0);
 	}
 
 	void SetFrequency(uint32 freq)

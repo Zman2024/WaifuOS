@@ -151,7 +151,7 @@ string& string::operator=(const string&& value)
 		memcpy((vptr)this, right, sizeof(string));
 
 		// stop destruction of rvalue
-		memset<nint>(right, 0x00, sizeof(string));
+		memset64(right, 0x00, sizeof(string));
 	}
 
 	return (*this);

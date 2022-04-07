@@ -25,13 +25,13 @@ namespace PageFrameAllocator
 	uint64 GetReservedRAM();
 
 	template <typename T>
-	static inline T* RequestPage()
+	static forceinline T* RequestPage()
 	{
 		return (T*)RequestPage();
 	}
 
 	template <typename T>
-	static inline T* RequestPages(u64 pages)
+	static forceinline T* RequestPages(u64 pages)
 	{
 		return (T*)RequestPages(pages);
 	}

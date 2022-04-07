@@ -31,7 +31,7 @@ namespace APIC
 		return false;
 	}
 
-	inline void SetEntry(byte irqVector)
+	forceinline void SetEntry(byte irqVector)
 	{
 		RedirectionEntry entry = irqVector;
 		SetEntry(irqVector - Interrupts::IRQ_OFFSET, entry);

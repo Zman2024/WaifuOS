@@ -27,7 +27,7 @@ namespace PageTableManager
 			if (!tempPDE.GetFlag(PTFlag::Present))
 			{
 				PDP = PageFrameAllocator::RequestPage<PageTable>();
-				memset<u64>(PDP, 0x00, PAGE_SIZE);
+				memset64(PDP, 0x00, PAGE_SIZE);
 
 				tempPDE.SetAddress((u64)PDP >> 12);
 				tempPDE.SetFlag(PTFlag::Present, true);
@@ -45,7 +45,7 @@ namespace PageTableManager
 			if (!tempPDE.GetFlag(PTFlag::Present))
 			{
 				PD = PageFrameAllocator::RequestPage<PageTable>();
-				memset<u64>(PD, 0x00, PAGE_SIZE);
+				memset64(PD, 0x00, PAGE_SIZE);
 
 				tempPDE.SetAddress((u64)PD >> 12);
 				tempPDE.SetFlag(PTFlag::Present, true);
@@ -63,7 +63,7 @@ namespace PageTableManager
 			if (!tempPDE.GetFlag(PTFlag::Present))
 			{
 				PT = PageFrameAllocator::RequestPage<PageTable>();
-				memset<u64>(PT, 0x00, PAGE_SIZE);
+				memset64(PT, 0x00, PAGE_SIZE);
 
 				tempPDE.SetAddress((u64)PT >> 12);
 				tempPDE.SetFlag(PTFlag::Present, true);
@@ -95,7 +95,7 @@ namespace PageTableManager
 			if (!tempPDE.GetFlag(PTFlag::Present))
 			{
 				PDP = PageFrameAllocator::RequestPage<PageTable>();
-				memset<u64>(PDP, 0x00, PAGE_SIZE);
+				memset64(PDP, 0x00, PAGE_SIZE);
 
 				tempPDE.SetAddress((u64)PDP >> 12);
 				tempPDE.SetFlag(PTFlag::Present, true);
@@ -113,7 +113,7 @@ namespace PageTableManager
 			if (!tempPDE.GetFlag(PTFlag::Present))
 			{
 				PD = PageFrameAllocator::RequestPage<PageTable>();
-				memset<u64>(PD, 0x00, PAGE_SIZE);
+				memset64(PD, 0x00, PAGE_SIZE);
 
 				tempPDE.SetAddress((u64)PD >> 12);
 				tempPDE.SetFlag(PTFlag::Present, true);
@@ -131,7 +131,7 @@ namespace PageTableManager
 			if (!tempPDE.GetFlag(PTFlag::Present))
 			{
 				PT = PageFrameAllocator::RequestPage<PageTable>();
-				memset<u64>(PT, 0x00, PAGE_SIZE);
+				memset64(PT, 0x00, PAGE_SIZE);
 
 				tempPDE.SetAddress((u64)PT >> 12);
 				tempPDE.SetFlag(PTFlag::Present, true);

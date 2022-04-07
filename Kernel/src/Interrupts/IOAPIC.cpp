@@ -8,7 +8,7 @@ namespace APIC
 {
 	IOAPIC::IOAPIC()
 	{
-		memset<u64>((vptr)this, 0x00, sizeof(IOAPIC));
+		memset64((vptr)this, 0x00, sizeof(IOAPIC));
 	}
 
 	IOAPIC::IOAPIC(IOAPICRecord* ioapic)

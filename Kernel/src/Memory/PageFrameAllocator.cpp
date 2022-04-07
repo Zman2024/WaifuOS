@@ -16,7 +16,7 @@ namespace PageFrameAllocator
 		PageBitmap.SizeBytes = size;
 		PageBitmap.Buffer = (byte*)buffer;
 
-		memset<u64>(buffer, 0x00, size);
+		memset64(buffer, 0x00, size);
 	}
 
 	uint64 LastPageIndex = 0;

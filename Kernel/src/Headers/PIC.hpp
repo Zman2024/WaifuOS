@@ -43,7 +43,7 @@ namespace PIC
 	void Remap();
 	void Mask(uint16 mask, bool state);
 
-	inline void Disable()
+	forceinline void Disable()
 	{
 		IO::outb(MasterData, 0xFF);
 		IO::wait();
@@ -51,7 +51,7 @@ namespace PIC
 		IO::wait();
 	}
 
-	inline void SendEIO(bool slave)
+	forceinline void SendEIO(bool slave)
 	{
 		if (slave) IO::outb(SlaveCommand, PicEoi);
 		IO::outb(MasterCommand, PicEoi);

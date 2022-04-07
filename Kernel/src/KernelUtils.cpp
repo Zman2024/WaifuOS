@@ -27,20 +27,11 @@ namespace Kernel
 		sti;
 	}
 
-	void InitializeIRQ()
+	void InitializeIRQ(bool forceUsePic)
 	{
 		debug("Initializing IRQs...");
-
-		// Add IRQ handlers to IDT
-		Interrupts::RegisterInterrupt((vptr)Interrupts::hKeyboardInt, Interrupts::Interrupt::Keyboard);
-		Interrupts::RegisterInterrupt((vptr)Interrupts::hPitTick, Interrupts::Interrupt::PIT);
-		Interrupts::RegisterInterrupt((vptr)Interrupts::hRtcTick, Interrupts::Interrupt::RTC);
-
-		// Remap and mask all ints in PIC
-		PIC::Remap();
-		PIC::Disable();
-
-		if (APIC::UsableAPIC)
+		
+		if (APIC::UsableAPIC & !forceUsePic)
 		{
 			debug("\tUsing APIC");
 
@@ -58,7 +49,7 @@ namespace Kernel
 			PIC::Mask(PicMask::Keyboard | PicMask::PIT | PicMask::RTC, true);
 		}
 
-		// start stuff that can fire IRQ ints
+		// init stuff that can fire IRQs
 		PIT::Initialize();
 		RTC::Initialize();
 
@@ -125,51 +116,43 @@ namespace Kernel
 		// Setup GIDTR
 		GlobalIDTR.Limit = 0x0FFF;
 		GlobalIDTR.Offset = (u64)GlobalIDTROffset;
-		memset<nint>((vptr)GlobalIDTR.Offset, 0x00, PAGE_SIZE);
+		memset64((vptr)GlobalIDTR.Offset, 0x00, PAGE_SIZE);
 
 		// Load global IDT
 		LoadGIDT();
 
-		debug("Registering Fault Handlers...");
+		debug("Registering Fault / Interrupt Handlers...");
+
+		// Remap and mask all ints in PIC (make sure PIC is off for now)
+		PIC::Disable();
+		PIC::Remap();
 
 		// Register exceptions
-		RegisterInterrupt((void*)hDivideByZeroFault, Interrupt::DivideByZero);
+		RegisterInterrupt((vptr)hDivideByZeroFault, Interrupt::DivideByZero);
+		RegisterInterrupt((vptr)hSingleStepFault, Interrupt::SingleStep);
+		RegisterInterrupt((vptr)hNonMaskableFault, Interrupt::NonMaskable);
+		RegisterInterrupt((vptr)hBreakpointFault, Interrupt::Breakpoint, IdtType::TrapGate);
+		RegisterInterrupt((vptr)hOverflowTrap, Interrupt::OverflowTrap, IdtType::TrapGate);
+		RegisterInterrupt((vptr)hBoundRangeFault, Interrupt::BoundRangeExceeded);
+		RegisterInterrupt((vptr)hInvalidOpcodeFault, Interrupt::InvalideOpcode);
+		RegisterInterrupt((vptr)hCoprocessorNAFault, Interrupt::CoprocessorNA);
+		RegisterInterrupt((vptr)hDoubleFault, Interrupt::DoubleFault);
+		RegisterInterrupt((vptr)hCoprocessorSegmentOverrunFault, Interrupt::CoprocessorSegmentOverrun);
+		RegisterInterrupt((vptr)hInvalidStateSegmentFault, Interrupt::InvalidStateSegment);
+		RegisterInterrupt((vptr)hSegmentMissingFault, Interrupt::SegmentMissing);
+		RegisterInterrupt((vptr)hStackFault, Interrupt::StackException);
+		RegisterInterrupt((vptr)hGeneralProtectionFault, Interrupt::GeneralProtection);
+		RegisterInterrupt((vptr)hPageFault, Interrupt::PageFault);
+		RegisterInterrupt((vptr)hCoprocessorFault, Interrupt::CoprocessorError);
+		RegisterInterrupt((vptr)hAlignmentCheck, Interrupt::AlignmentCheck);
+		RegisterInterrupt((vptr)hMachineCheck, Interrupt::MachineCheck);
+		RegisterInterrupt((vptr)hSIMDFault, Interrupt::SIMDException);
 
-		RegisterInterrupt((void*)hSingleStepFault, Interrupt::SingleStep);
+		// Add IRQ handlers to IDT
+		RegisterInterrupt((vptr)hKeyboardInt, Interrupt::Keyboard);
+		RegisterInterrupt((vptr)hPitTick, Interrupt::PIT);
+		RegisterInterrupt((vptr)hRtcTick, Interrupt::RTC);
 
-		RegisterInterrupt((void*)hNonMaskableFault, Interrupt::NonMaskable);
-
-		RegisterInterrupt((void*)hBreakpointFault, Interrupt::Breakpoint, IdtType::TrapGate);
-
-		RegisterInterrupt((void*)hOverflowTrap, Interrupt::OverflowTrap, IdtType::TrapGate);
-
-		RegisterInterrupt((void*)hBoundRangeFault, Interrupt::BoundRangeExceeded);
-
-		RegisterInterrupt((void*)hInvalidOpcodeFault, Interrupt::InvalideOpcode);
-
-		RegisterInterrupt((void*)hCoprocessorNAFault, Interrupt::CoprocessorNA);
-
-		RegisterInterrupt((void*)hDoubleFault, Interrupt::DoubleFault);
-
-		RegisterInterrupt((void*)hCoprocessorSegmentOverrunFault, Interrupt::CoprocessorSegmentOverrun);
-
-		RegisterInterrupt((void*)hInvalidStateSegmentFault, Interrupt::InvalidStateSegment);
-
-		RegisterInterrupt((void*)hSegmentMissingFault, Interrupt::SegmentMissing);
-
-		RegisterInterrupt((void*)hStackFault, Interrupt::StackException);
-
-		RegisterInterrupt((void*)hGeneralProtectionFault, Interrupt::GeneralProtection);
-
-		RegisterInterrupt((void*)hPageFault, Interrupt::PageFault);
-
-		RegisterInterrupt((void*)hCoprocessorFault, Interrupt::CoprocessorError);
-
-		RegisterInterrupt((void*)hAlignmentCheck, Interrupt::AlignmentCheck);
-
-		RegisterInterrupt((void*)hMachineCheck, Interrupt::MachineCheck);
-
-		RegisterInterrupt((void*)hSIMDFault, Interrupt::SIMDException);
 	}
 
 	void InitializeGDT()
@@ -201,7 +184,7 @@ namespace Kernel
 
 		// Initialize PageTableManager
 		PageTable* PML4 = PageFrameAllocator::RequestPage<PageTable>();
-		memset<u64>(PML4, 0x00, PAGE_SIZE);
+		memset64(PML4, 0x00, PAGE_SIZE);
 		PageTableManager::PageTableManager(PML4);
 
 		// Map all memory (this causes rainbow in qemu)
@@ -219,13 +202,13 @@ namespace Kernel
 		
 		// Enable paging (juuuust to be sure)
 		{
-			size_t cr0 = 0;
+			nint cr0 = 0;
 			asm("mov %0, %%cr0" : "=r"(cr0));
 			cr0 |= 0x80000000;
 			asm("mov %%cr0, %0" : : "r" (cr0));
 		}
 
-		// set nullptr RW and NX flags
+		// set nullptr RW, US and present flags
 		PageTableManager::SetVirtualFlag(nullptr, PTFlag::ReadWrite, false);
 		PageTableManager::SetVirtualFlag(nullptr, PTFlag::UserSuper, false);
 		PageTableManager::SetVirtualFlag(nullptr, PTFlag::Present, true);

@@ -195,7 +195,7 @@ vptr malloc(nint size)
 vptr calloc(nint size)
 {
 	vptr ptr = malloc(size);
-	if (ptr) memset<u64>(ptr, 0x00, size);
+	if (ptr) memset64(ptr, 0x00, size);
 	return ptr;
 }
 

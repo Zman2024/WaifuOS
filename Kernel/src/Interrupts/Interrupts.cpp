@@ -4,6 +4,7 @@
 #include <PIT.h>
 #include <RTC.h>
 #include <Speaker.h>
+#include <Keyboard.h>
 
 namespace Interrupts
 {
@@ -179,12 +180,7 @@ namespace Interrupts
 
 	void hKeyboardInt(InterruptFrame* frame)
 	{
-		constexpr uint16 kbPort = 0x60;
-		gConsole.Write("Key pressed ");
-
-		// special ps2 magic
-		byte scanCode = IO::inb(kbPort);
-		using namespace Audio;
+		IO::Keyboard::KeyEvent();
 
 		// End of int
 		if (APIC::InUse) APIC::EndOfInterrupt();

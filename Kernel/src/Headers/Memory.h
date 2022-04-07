@@ -48,7 +48,7 @@ template <typename T> inline void memset(void* address, T value, const uint64 nB
 
 }
 
-inline void memset64(vptr address, uint64 value, uint64 bytes)
+forceinline void memset64(vptr address, uint64 value, uint64 bytes)
 {
 	register byte remainder = bytes & 0b111;
 	register uint64 rounds = bytes >> 3; // divide by 8
@@ -68,11 +68,11 @@ inline void memset64(vptr address, uint64 value, uint64 bytes)
 
 void memcpy(vptr dest, const vptr src, uint64 nBytes);
 
-inline vptr operator new(nint size) { return malloc(size); }
-inline vptr operator new[](nint size) { return malloc(size); }
-inline void operator delete(vptr ptr) { free(ptr); }
-inline void operator delete[](vptr ptr) { free(ptr); }
-inline void operator delete(vptr ptr, nint sz) { free(ptr); }
-inline void operator delete[](vptr ptr, nint sz){ free(ptr); }
+forceinline vptr operator new(nint size) { return malloc(size); }
+forceinline vptr operator new[](nint size) { return malloc(size); }
+forceinline void operator delete(vptr ptr) { free(ptr); }
+forceinline void operator delete[](vptr ptr) { free(ptr); }
+forceinline void operator delete(vptr ptr, nint sz) { free(ptr); }
+forceinline void operator delete[](vptr ptr, nint sz){ free(ptr); }
 
 #endif

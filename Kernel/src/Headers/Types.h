@@ -4,10 +4,11 @@
 #include <stddef.h>
 #define global extern "C"
 #ifdef VISUAL_STUDIO_EDITOR
-#define attribute
 #define attribute(x) 
+#define forceinline
 #else
 #define attribute __attribute__
+#define forceinline inline __attribute__((always_inline))
 #endif
 
 constexpr auto PAGE_SIZE = 0x1000;

@@ -35,7 +35,7 @@ namespace PIT
 	void Tick();
 
 	void Sleep(fp64 seconds);
-	void Sleepms(nint miliseconds);
+	forceinline void SleepMS(nint miliseconds) { Sleep(miliseconds / 1000.0); }
 
 	void SetFrequency(uint32 freq);
 	void SetDivisor(uint16 divisor);

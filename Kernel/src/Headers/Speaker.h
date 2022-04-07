@@ -9,6 +9,9 @@ namespace Audio
 	// C0 / C#0 cannot be played
 	enum struct Note : uint16
 	{
+		Null = 0x00,
+		None = Null,
+
 		D0 =  (u16)(PIT::BaseFrequency / 18.35),
 		Ds0 = (u16)(PIT::BaseFrequency / 19.45),
 		Ef0 = Ds0,
@@ -176,17 +179,25 @@ namespace Audio
 		Bf8 = As8,
 		B8 = (u16)(PIT::BaseFrequency / 7902.13),
 
-		Unhearable = 40,
+		Rest = 40,
+	};
+
+	struct NoteSpan
+	{
+		Note Key;
+		uint16 DurationMS;
 	};
 
 	extern Note Notes[106];
-	extern Note Tetris[];
+	extern NoteSpan NotTetris[];
 
 	void EnableSpeaker();
 	void DisableSpeaker();
 
 	void Play(Note note, nint ms);
 	void Play(uint16 frequency, nint ms);
+
+	void PlayTrack(NoteSpan* track);
 
 	void Rest(nint ms);
 
