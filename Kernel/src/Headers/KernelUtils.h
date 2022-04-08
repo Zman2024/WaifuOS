@@ -25,6 +25,7 @@
 #include <RTC.h>
 #include <Speaker.h>
 #include <Keyboard.h>
+#include <asmUtils.h>
 
 namespace Kernel
 {
@@ -51,6 +52,7 @@ namespace Kernel
 
 	// Shows loading image loaded from bootloader
 	void ShowLoadingImage(const BootInfo& info);
+
 }
 
 #endif

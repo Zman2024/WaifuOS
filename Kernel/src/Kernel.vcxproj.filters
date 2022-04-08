@@ -129,6 +129,9 @@
     <ClCompile Include="IO\Keyboard.cpp">
       <Filter>Source\IO</Filter>
     </ClCompile>
+    <ClCompile Include="IO\AHCI.cpp">
+      <Filter>Source\IO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\EFI.h">
@@ -227,6 +230,12 @@
     <ClInclude Include="Headers\Keyboard.h">
       <Filter>Headers\IO</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\asmUtils.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\AHCI.hpp">
+      <Filter>Headers\IO</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Interrupts\GDT.asm">
@@ -235,6 +244,9 @@
     <None Include="..\kernel.ld" />
     <None Include="..\Makefile" />
     <None Include="string.asm">
+      <Filter>Source</Filter>
+    </None>
+    <None Include="asmUtils.asm">
       <Filter>Source</Filter>
     </None>
   </ItemGroup>

@@ -112,6 +112,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="Interrupts\LocalAPIC.cpp" />
     <ClCompile Include="Interrupts\PIC.cpp" />
     <ClCompile Include="IO\ACPI.cpp" />
+    <ClCompile Include="IO\AHCI.cpp" />
     <ClCompile Include="IO\IOBus.cpp" />
     <ClCompile Include="IO\Keyboard.cpp" />
     <ClCompile Include="IO\PCI.cpp" />
@@ -129,8 +130,10 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="Headers\ACPI.h" />
+    <ClInclude Include="Headers\AHCI.hpp" />
     <ClInclude Include="Headers\APIC.h" />
     <ClInclude Include="Headers\APICStructs.h" />
+    <ClInclude Include="Headers\asmUtils.h" />
     <ClInclude Include="Headers\BitMap.h" />
     <ClInclude Include="Headers\Colors.h" />
     <ClInclude Include="Headers\CPUIDCodes.h" />
@@ -164,6 +167,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
   <ItemGroup>
     <None Include="..\kernel.ld" />
     <None Include="..\Makefile" />
+    <None Include="asmUtils.asm" />
     <None Include="Interrupts\GDT.asm" />
     <None Include="string.asm" />
   </ItemGroup>

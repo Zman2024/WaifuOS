@@ -28,7 +28,8 @@ global vptr malloc(nint size);
 global vptr calloc(nint size);
 global void free(vptr address);
 
-template <typename T> inline void memset(void* address, T value, const uint64 nBytes)
+template <typename T> 
+inline void memset(void* address, T value, const uint64 nBytes)
 {
 	register T* tAddr = (T*)address;
 	const uint16 rem = nBytes % sizeof(T);
@@ -48,7 +49,7 @@ template <typename T> inline void memset(void* address, T value, const uint64 nB
 
 }
 
-forceinline void memset64(vptr address, uint64 value, uint64 bytes)
+forceinline void memset64(register vptr address, register uint64 value, uint64 bytes)
 {
 	register byte remainder = bytes & 0b111;
 	register uint64 rounds = bytes >> 3; // divide by 8
@@ -68,11 +69,11 @@ forceinline void memset64(vptr address, uint64 value, uint64 bytes)
 
 void memcpy(vptr dest, const vptr src, uint64 nBytes);
 
-forceinline vptr operator new(nint size) { return malloc(size); }
-forceinline vptr operator new[](nint size) { return malloc(size); }
-forceinline void operator delete(vptr ptr) { free(ptr); }
-forceinline void operator delete[](vptr ptr) { free(ptr); }
-forceinline void operator delete(vptr ptr, nint sz) { free(ptr); }
-forceinline void operator delete[](vptr ptr, nint sz){ free(ptr); }
+forceinline vptr operator new(nint size)				{ return malloc(size); }
+forceinline vptr operator new[](nint size)				{ return malloc(size); }
+forceinline void operator delete(vptr ptr)				{ free(ptr); }
+forceinline void operator delete[](vptr ptr)			{ free(ptr); }
+forceinline void operator delete(vptr ptr, nint sz)		{ free(ptr); }
+forceinline void operator delete[](vptr ptr, nint sz)	{ free(ptr); }
 
 #endif

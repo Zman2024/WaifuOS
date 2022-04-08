@@ -1,4 +1,5 @@
 #include <PCI.h>
+#include <AHCI.hpp>
 
 namespace PCI
 {
@@ -15,7 +16,27 @@ namespace PCI
 
 		// Do stuff like cache or something idk
 
-		debug("\tVendor: %x0, Device: %x1", pci->VendorID, pci->DeviceID);
+		switch (pci->Class)
+		{
+			case 0x01: // Mass Storage Controller
+				switch (pci->Subclass)
+				{
+					case 0x06:
+						switch (pci->ProgIF)
+						{
+							case 0x01:
+								debug("\tFound ACHI 1.0 Device");
+								new AHCI::AHCIDriver(pci);
+								break;
+						}
+						break;
+				}
+				break;
+
+			default: 
+				debug("\tVendor: %x0, Device: %x1", pci->VendorID, pci->DeviceID);
+				break;
+		}
 
 	}
 

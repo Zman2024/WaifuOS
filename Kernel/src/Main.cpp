@@ -2,19 +2,12 @@
 
 namespace Kernel
 {
-	inline void ClearBss(BootInfo& bootInfo)
+	forceinline void ClearBss(BootInfo& bootInfo)
 	{
 		vptr bssStart = &_BssDataStart;
 		vptr bssEnd = &_BssDataEnd;
 		u64 bssSize = u64(bssEnd) - u64(bssStart);
 		memset64(bssStart, 0x00, bssSize);
-	}
-	
-	void oneSecond()
-	{
-		static int sec = 0;
-		sec++;
-		debug("Sec: %0", sec);
 	}
 
 	global void KernelStart(BootInfo bootInfo)
@@ -36,8 +29,6 @@ namespace Kernel
 
 		gConsole.WriteLine(string(OSName) + " Initialized!", Color::Green);
 		Memory::PrintLeaks();
-
-		PIT::SleepMS(1000);
 
 		while (true)
 		{

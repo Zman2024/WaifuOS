@@ -188,7 +188,7 @@ namespace Audio
 		uint16 DurationMS;
 	};
 
-	extern Note Notes[106];
+	extern Note Notes[];
 	extern NoteSpan NotTetris[];
 
 	void EnableSpeaker();

@@ -2,7 +2,6 @@
 #ifndef H_Types
 #define H_Types
 #include <stddef.h>
-#define global extern "C"
 #ifdef VISUAL_STUDIO_EDITOR
 #define attribute(x) 
 #define forceinline
@@ -10,6 +9,9 @@
 #define attribute __attribute__
 #define forceinline inline __attribute__((always_inline))
 #endif
+
+#define global extern "C"
+#define fast register
 
 constexpr auto PAGE_SIZE = 0x1000;
 

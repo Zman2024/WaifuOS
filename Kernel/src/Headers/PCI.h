@@ -26,10 +26,8 @@ namespace PCI
 		byte BIST;
 	};
 
-	struct PCIHeader0
+	struct PCIHeader0 : public PCIDeviceHeader
 	{
-		PCIDeviceHeader Header;
-
 		uint32 BAR0;
 		uint32 BAR1;
 		uint32 BAR2;
