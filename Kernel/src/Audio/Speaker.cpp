@@ -126,9 +126,46 @@ namespace Audio
 		Note::B8,
 
 	};
+	NoteSpan NotHoshizora[] = {
+		/*
+		// Pickup before first measure
+		{Note::C5, 200},
+		{Note::D5, 200},
+		// m1
+		{Note::E5, 1600},
+		// m2
+		{Note::F5, 400},
+		{Note::E5, 400},
+		{Note::F5, 400},
+		{Note::A5, 400},
+		// m3
+		{Note::G5, 800},
+		{Note::F5, 800},
+		// m4
+		{Note::E5, 700}, {Note::Rest, 100},
+		{Note::E5, 400},
+		{Note::D5, 400},
+		// m5
+		{Note::C5, 800},
+		{Note::E5, 800},
+		// m6
+		{Note::D5, 1200},
+		{Note::A4, 400},
+		// m7
+		{Note::B4, 1200},
+		{Note::C5, 400},
+		// m8
+		{Note::D5, 1200},
+		// end
+		*/
+		{Note::Null, 0},
 
+
+
+	};
 	NoteSpan NotTetris[] = {
 		/* Uncomment for (not)tetris, I fear DMCA like JDH
+
 
 		// Main Melody
 		{ Note::E4, 400 },
