@@ -35,7 +35,7 @@ global byte _DataEnd;
 
 static void debug(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
 {
-	gConsole.WriteLine(cstr::format(str, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9), Color(0xC0C0C0));
+	gConsole.WriteLine(cstr::format(str, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9), Color(0xB0B0B0));
 }
 
 static void warn(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)

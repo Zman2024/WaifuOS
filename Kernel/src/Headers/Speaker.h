@@ -191,6 +191,7 @@ namespace Audio
 	extern Note Notes[];
 	extern NoteSpan NotTetris[];
 	extern NoteSpan NotHoshizora[];
+
 	void EnableSpeaker();
 	void DisableSpeaker();
 

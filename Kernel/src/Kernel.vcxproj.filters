@@ -149,9 +149,6 @@
     <ClInclude Include="Headers\Colors.h">
       <Filter>Headers</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\Direction.hpp">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Headers\Globals.h">
       <Filter>Headers</Filter>
     </ClInclude>
@@ -235,6 +232,9 @@
     </ClInclude>
     <ClInclude Include="Headers\AHCI.hpp">
       <Filter>Headers\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Direction.h">
+      <Filter>Headers</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

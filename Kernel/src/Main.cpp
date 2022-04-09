@@ -34,7 +34,7 @@ namespace Kernel
 		{
 			Audio::PlayTrack(Audio::NotTetris);
 		}
-
+		// lel
 		while (true) hlt;
 	}
 }

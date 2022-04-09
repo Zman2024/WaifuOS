@@ -4,7 +4,7 @@
 #include <Types.h>
 #include <Structs.h>
 #include <Colors.h>
-#include <Direction.hpp>
+#include <Direction.h>
 
 class PrimitiveConsole
 {

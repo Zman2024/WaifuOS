@@ -9,6 +9,8 @@
 
 namespace PCI
 {
+	// TODO: add all the PCI headers https://wiki.osdev.org/PCI
+
 	struct PCIDeviceHeader
 	{
 		uint16 VendorID;
@@ -21,11 +23,12 @@ namespace PCI
 		byte Subclass;
 		byte Class;
 		byte CacheLineSize;
-		byte LatencyTime;
-		byte HeaderType;
+		byte LatencyTimer;
+		byte HeaderType; // bit 7 indicates if this device has multiple functions (MF bit)
 		byte BIST;
 	};
 
+	// Standard header
 	struct PCIHeader0 : public PCIDeviceHeader
 	{
 		uint32 BAR0;
@@ -51,6 +54,44 @@ namespace PCI
 		byte MinGrant;
 		byte MaxLatency;
 
+	};
+
+	// (PCI-to-PCI bridge)
+	struct PCIHeader1 : public PCIDeviceHeader
+	{
+		uint32 BAR0;
+		uint32 BAR1;
+		
+		byte PrimaryBus;
+		byte SecondaryBus;
+		byte SubordinateBus;
+		byte SecondaryLatencyTimer;
+
+		byte IOBase;
+		byte IOLimit;
+		uint16 SecondaryStatus;
+
+		uint16 MemoryBase;
+		uint16 MemoryLimit;
+
+		uint16 PrefetchMemoryBase;
+		uint16 PrefetchMemoryLimit;
+
+		uint32 PrefetchMemoryBaseUpper;
+
+		uint32 PrefetchMemoryLimitUpper;
+
+		uint16 IOBaseUpper;
+		uint16 IOLimitUpper;
+
+		byte CapabilityPtr;
+		byte rsv0[3];
+
+		uint32 ExpROMBaseAddress;
+
+		byte InterruptLine;
+		byte InterruptPin;
+		uint16 BridgeControl;
 	};
 
 	struct DeviceConfig

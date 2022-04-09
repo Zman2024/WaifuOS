@@ -24,31 +24,40 @@ BOOTEFI := $(GNUEFI)/x86_64/bootloader/main.efi
 
 rwildcard=$(foreach d,$(wildcard $(1:=/*)),$(call rwildcard,$d,$2) $(filter $(subst *,%,$2),$d))
 
-SRC = $(call rwildcard,$(SRCDIR),*.cpp)   
+SRC = $(call rwildcard,$(SRCDIR),*.cpp)
+HPPSRC = $(call rwildcard,$(SRCDIR),*.hpp)
 CSRC = $(call rwildcard,$(SRCDIR),*.c)
 ASMSRC = $(call rwildcard,$(SRCDIR),*.asm)
 
-OBJS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.o, $(SRC))
+OBJS = $(patsubst $(SRCDIR)/%.cpp, $(OBJDIR)/%.cppo, $(SRC))
+OBJS += $(patsubst $(SRCDIR)/%.hpp, $(OBJDIR)/%.hppo, $(HPPSRC))
 OBJS += $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.co, $(CSRC))
 OBJS += $(patsubst $(SRCDIR)/%.asm, $(OBJDIR)/%.asmo, $(ASMSRC))
 DIRS = $(wildcard $(SRCDIR)/*)
 
 # int need -mgeneral-regs-only
 kernel: $(OBJS) link
-$(OBJDIR)/Interrupts/Interrupts.o: $(SRCDIR)/Interrupts/Interrupts.cpp
+$(OBJDIR)/Interrupts/Interrupts.cppo: $(SRCDIR)/Interrupts/Interrupts.cpp
 	@ echo ===== Compiling $^ =====
 	@ mkdir -p $(@D)
 	$(GC) $(INTFLAGS)
 
-$(OBJDIR)/%.o: $(SRCDIR)/%.cpp
+$(OBJDIR)/%.cppo: $(SRCDIR)/%.cpp
 	@ echo ===== Compiling $^ =====
 	@ mkdir -p $(@D)
 	$(GC) $(CXXFLAGS) -c $^ -o $@
 
+$(OBJDIR)/%.hppo: $(SRCDIR)/%.hpp
+	@ echo ===== Compiling $^ =====
+	@ mkdir -p $(@D)
+	cp $^ $^.cpp
+	$(GC) $(CXXFLAGS) -c $^.cpp -o $@
+	rm $^.cpp
+
 $(OBJDIR)/%.co: $(SRCDIR)/%.c
 	@ echo ===== Compiling $^ =====
 	@ mkdir -p $(@D)
-	$(GC) $(CXXFLAGS) -c $^ -o $@
+	$(GC) $(CFLAGS) -c $^ -o $@
 
 $(OBJDIR)/%.asmo: $(SRCDIR)/%.asm
 	@ echo ===== Compiling $^ =====

@@ -21,10 +21,10 @@ namespace PCI
 			case 0x01: // Mass Storage Controller
 				switch (pci->Subclass)
 				{
-					case 0x06:
+					case 0x06: // SATA
 						switch (pci->ProgIF)
 						{
-							case 0x01:
+							case 0x01: // ACHI 1.0 Host
 								debug("\tFound ACHI 1.0 Device");
 								new AHCI::AHCIDriver(pci);
 								break;
@@ -33,8 +33,56 @@ namespace PCI
 				}
 				break;
 
+			case 0x09: // Input Device Controller
+				switch (pci->Subclass)
+				{
+					case 0x00: // Keyboard Controller
+						debug("\tFound Keyboard Controller");
+						break;
+
+					case 0x02: // Mouse Controller
+						debug("\tFound Mouse Controller");
+						break;
+				}
+				break;
+
+			case 0x0C: // Serial Bus Controller
+				switch (pci->Subclass)
+				{
+					case 0x03: // USB Controller
+						switch (pci->ProgIF)
+						{
+							case 0x00: // UHCI Controller
+								debug("\tFound USB UHCI Controller");
+								break;
+
+							case 0x10: // OHCI Controller
+								debug("\tFound USB OHCI Controller");
+								break;
+
+							case 0x20: // EHCI (USB2) Controller
+								debug("\tFound USB ECHI Controller (USB2)");
+								break;
+
+							case 0x30: // XHCI (USB3) Controller
+								debug("\tFound USB XHCI Controller (USB3)");
+								break;
+
+							case 0x80: // Unspecified
+								debug("\tFound USB Controller (Unspecified)");
+								break;
+
+							case 0xFE: // USB Device (Not a host controller)
+								debug("\tFound USB Device");
+								break;
+
+						}
+						break;
+				}
+				break;
+
 			default: 
-				debug("\tVendor: %x0, Device: %x1", pci->VendorID, pci->DeviceID);
+				// debug("\tVendor: %x0, Device: %x1", pci->VendorID, pci->DeviceID);
 				break;
 		}
 
