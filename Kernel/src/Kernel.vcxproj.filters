@@ -129,9 +129,6 @@
     <ClCompile Include="IO\Keyboard.cpp">
       <Filter>Source\IO</Filter>
     </ClCompile>
-    <ClCompile Include="IO\AHCI.cpp">
-      <Filter>Source\IO</Filter>
-    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\EFI.h">

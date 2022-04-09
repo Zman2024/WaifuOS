@@ -47,12 +47,14 @@ $(OBJDIR)/%.cppo: $(SRCDIR)/%.cpp
 	@ mkdir -p $(@D)
 	$(GC) $(CXXFLAGS) -c $^ -o $@
 
+# this is the only why i can get it to compile hpp as cpp files
+# just... dont ask ok, im very schitzo
 $(OBJDIR)/%.hppo: $(SRCDIR)/%.hpp
 	@ echo ===== Compiling $^ =====
 	@ mkdir -p $(@D)
-	cp $^ $^.cpp
-	$(GC) $(CXXFLAGS) -c $^.cpp -o $@
-	rm $^.cpp
+	cp $^ $@.cpp
+	$(GC) $(CXXFLAGS) -c $@.cpp -o $@
+	rm $@.cpp
 
 $(OBJDIR)/%.co: $(SRCDIR)/%.c
 	@ echo ===== Compiling $^ =====

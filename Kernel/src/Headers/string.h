@@ -19,7 +19,7 @@ public:
 	string(const char* str, nint length);
 
 	forceinline string(const byte* str) : string((const char*)str) { }
-	forceinline string(const byte* str, nint length) : string((const char*)str, length) {}
+	forceinline string(const byte* str, nint length) : string((const char*)str, length) { }
 
 	string append(const string&& rvalue);
 	string append(const string& rvalue);

@@ -15,14 +15,15 @@ namespace PCI
 		if (!pci->DeviceID || pci->DeviceID == 0xFFFF) return;
 
 		// Do stuff like cache or something idk
+		fast byte lclass = pci->Class, subclass = pci->Subclass, progif = pci->ProgIF;
 
-		switch (pci->Class)
+		switch (lclass)
 		{
 			case 0x01: // Mass Storage Controller
-				switch (pci->Subclass)
+				switch (subclass)
 				{
 					case 0x06: // SATA
-						switch (pci->ProgIF)
+						switch (progif)
 						{
 							case 0x01: // ACHI 1.0 Host
 								debug("\tFound ACHI 1.0 Device");
@@ -33,8 +34,29 @@ namespace PCI
 				}
 				break;
 
+			case 0x08: // Base System Peripheral
+				switch (subclass)
+				{
+					case 0x02: // Timer
+						break;
+
+					case 0x03: // RTC Controller
+						switch (progif)
+						{
+							case 0x00: // Generic RTC
+								debug("\tFound Generic RTC");
+								break;
+
+							case 0x01: // ISA-Compatible
+								debug("\tFound ISA-Compatible RTC");
+								break;
+						}
+						break;
+				}
+				break;
+
 			case 0x09: // Input Device Controller
-				switch (pci->Subclass)
+				switch (subclass)
 				{
 					case 0x00: // Keyboard Controller
 						debug("\tFound Keyboard Controller");
@@ -47,10 +69,10 @@ namespace PCI
 				break;
 
 			case 0x0C: // Serial Bus Controller
-				switch (pci->Subclass)
+				switch (subclass)
 				{
 					case 0x03: // USB Controller
-						switch (pci->ProgIF)
+						switch (progif)
 						{
 							case 0x00: // UHCI Controller
 								debug("\tFound USB UHCI Controller");
@@ -77,6 +99,27 @@ namespace PCI
 								break;
 
 						}
+						break;
+				}
+				break;
+
+			case 0x0D: // Wireless Controller
+				switch (subclass)
+				{
+					case 0x11: // Bluetooth Controller
+						debug("\tFound Bluetooth Controller");
+						break;
+
+					case 0x12: // Broadband Controller
+						debug("\tFound Broadband Controller");
+						break;
+
+					case 0x20: // Ethernet Controller (802.1a)
+						debug("\tFound Ethernet Controller (802.1a)");
+						break;
+
+					case 0x21: // Ethernet Controller (802.1b)
+						debug("\tFound Ethernet Controller (802.1b)");
 						break;
 				}
 				break;

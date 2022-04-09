@@ -24,7 +24,7 @@ namespace Kernel
 		ShowLoadingImage(bootInfo);
 		#endif
 
-		// Initialize Hardware
+		// Initialize Hardware //
 		Kernel::InitializeKernel(bootInfo);
 
 		gConsole.WriteLine(string(OSName) + " Initialized!", Color::Green);
@@ -34,7 +34,7 @@ namespace Kernel
 		{
 			Audio::PlayTrack(Audio::NotTetris);
 		}
-		// lel
+		
 		while (true) hlt;
 	}
 }

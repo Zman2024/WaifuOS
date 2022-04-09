@@ -112,7 +112,6 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="Interrupts\LocalAPIC.cpp" />
     <ClCompile Include="Interrupts\PIC.cpp" />
     <ClCompile Include="IO\ACPI.cpp" />
-    <ClCompile Include="IO\AHCI.cpp" />
     <ClCompile Include="IO\IOBus.cpp" />
     <ClCompile Include="IO\Keyboard.cpp" />
     <ClCompile Include="IO\PCI.cpp" />
