@@ -54,6 +54,7 @@ typedef long double fp128; // sizeof(fp128) gives me 16 so... i guess?
 #define cli asm ("cli");
 #define sti asm ("sti");
 #define hlt asm ("hlt");
+#define pause asm ("pause");
 #define intcall(x) { asm ("int %0" : : "byte"((byte)x)); }
 #define OS_HLT asm ("cli"); while(true) asm ("hlt");
 #define halt asm ("cli"); while(true) asm ("hlt");

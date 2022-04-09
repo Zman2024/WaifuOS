@@ -17,7 +17,7 @@ PrimitiveConsole::PrimitiveConsole(FrameBuffer * fb, Font * font)
 	mPreviousRenderedPosition = { 0, 0 };
 	
 	SetForegroundColor(Color::White);
-	SetBackgroundColor(Color::DarkGray);
+	SetBackgroundColor(Color::VeryDarkGray);
 }
 
 void PrimitiveConsole::WriteChar(char chr)
@@ -41,11 +41,11 @@ inline void PrimitiveConsole::WriteChar(char chr, Color color)
 			return;
 
 		case '\t':
-			Write("    ");
+			Write("    ", color);
 			return;
 
 		default:
-			WriteChar(chr, color, mBackgroundColor, mCursorPosition.X, mCursorPosition.Y);
+			PutChar(chr, color, mBackgroundColor, mCursorPosition.X, mCursorPosition.Y);
 			break;
 
 	}
@@ -67,7 +67,7 @@ inline void PrimitiveConsole::WriteChar(char chr, Color color)
 	}
 }
 
-void PrimitiveConsole::WriteChar(char chr, Color fColor, Color bColor, uint xOff, uint yOff)
+void PrimitiveConsole::PutChar(char chr, Color fColor, Color bColor, uint xOff, uint yOff)
 {
 	char* fontPtr = (char*)mFont->GlyphBuffer + (chr * mFont->Header->charsize);
 	byte chrSz = mFont->Header->charsize;
@@ -125,7 +125,42 @@ void PrimitiveConsole::NewLine(uint lines)
 	{
 		// Need to scroll, but this is fine for now.
 		// Should add method ScrollDown(uint lines);
+		ScrollDown(mCursorPosition.Y - (this->mHeight - 1));
 		mCursorPosition.Y = this->mHeight - 1;
+	}
+}
+
+void PrimitiveConsole::ScrollDown()
+{
+	fast uint64 fbBase = (u64)mFrameBuffer->BaseAddress;
+	fast uint64 height = mFrameBuffer->Height;
+	fast uint64 bytesPerScanline = u64(mFrameBuffer->PixelsPerScanline) << 2;
+
+	byte charsize = mFont->Header->charsize;
+
+	for (fast u64 vScanline = 0; vScanline < height - charsize; vScanline++)
+	{
+		fast uint64 vScanBase = fbBase + (bytesPerScanline * vScanline);
+		fast uint64 vScanBaseAhead = fbBase + (bytesPerScanline * (vScanline + charsize));
+
+		memcpy((vptr)vScanBase, vScanBaseAhead, bytesPerScanline);
+	}
+
+	fast uint64 speedup = u64(mBackgroundColor) | (u64(mBackgroundColor) << 32);
+
+	for (fast u64 vScanline = height - charsize; vScanline < height; vScanline++)
+	{
+		fast uint64 vScanBase = fbBase + (bytesPerScanline * vScanline);
+		memset64((vptr)vScanBase, speedup, bytesPerScanline);
+	}
+
+}
+
+void PrimitiveConsole::ScrollDown(uint lines)
+{
+	for (uint x = 0; x < lines; x++)
+	{
+		ScrollDown();
 	}
 }
 
@@ -162,7 +197,7 @@ void PrimitiveConsole::Backspace(int nBackspace, bool RemoveChar)
 
 		if (RemoveChar)
 		{
-			WriteChar(' ', mForegroundColor, mBackgroundColor, mCursorPosition.X, mCursorPosition.Y);
+			PutChar(' ', mForegroundColor, mBackgroundColor, mCursorPosition.X, mCursorPosition.Y);
 		}
 
 	}
@@ -170,24 +205,19 @@ void PrimitiveConsole::Backspace(int nBackspace, bool RemoveChar)
 
 void PrimitiveConsole::Clear(Color color)
 {
-	register uint64 fbBase = (u64)mFrameBuffer->BaseAddress;
-	register uint64 height = mFrameBuffer->Height;
-	register uint64 bytesPerScanline = u64(mFrameBuffer->PixelsPerScanline) << 2;
+	fast uint64 fbBase = (u64)mFrameBuffer->BaseAddress;
+	fast uint64 height = mFrameBuffer->Height;
+	fast uint64 bytesPerScanline = u64(mFrameBuffer->PixelsPerScanline) << 2;
 	
-	register int64 speedup = u64(color) | (u64(color) << 32);
+	fast uint64 speedup = u64(color) | (u64(color) << 32);
 
-	for (register u64 vScanline = 0; vScanline < height; vScanline++)
+	for (fast u64 vScanline = 0; vScanline < height; vScanline++)
 	{
-		register uint64 vScanBase = fbBase + (bytesPerScanline * vScanline);
+		fast uint64 vScanBase = fbBase + (bytesPerScanline * vScanline);
 		memset64((vptr)vScanBase, speedup, bytesPerScanline);
 	}
 
 	mCursorPosition = sPoint(0, 0);
-}
-
-void PrimitiveConsole::Clear()
-{
-	Clear(mBackgroundColor);
 }
 
 #pragma region Getters & Setters

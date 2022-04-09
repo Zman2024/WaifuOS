@@ -12,6 +12,7 @@ namespace ASM
 
 	global bool CheckXSAVE();
 	global void EnableXSAVE();
+	// global void memset64(vptr destination, nint value, nint numBytes);
 }
 
 #endif

@@ -18,6 +18,7 @@ enum struct Color : uint32
 	Purple = 0xFFFF00FF,
 
 	DarkGray = 0xFF101010,
+	VeryDarkGray = 0xFF080808,
 	DarkRed = 0xFF900000,
 };
 

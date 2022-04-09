@@ -12,9 +12,10 @@ public:
 	PrimitiveConsole();
 	PrimitiveConsole(FrameBuffer* fb, Font* font);
 
+	void PutChar(char chr, Color fColor, Color bColor, uint xOff, uint yOff);
+
 	void WriteChar(char chr);
 	void WriteChar(char chr, Color color);
-	void WriteChar(char chr, Color fColor, Color bColor, uint xOff, uint yOff);
 
 	void Write(const char* str);
 	void Write(const char* str, Color color);
@@ -23,10 +24,12 @@ public:
 	void WriteLine();
 
 	void NewLine(uint lines = 1);
+	void ScrollDown();
+	void ScrollDown(uint lines);
 	void Backspace(int nBackspace = 1, bool RemoveChar = true);
 
 	void Clear(Color color);
-	void Clear();
+	forceinline void Clear() { Clear(mBackgroundColor); }
 
 	void SetCursorPosition(int64 X, int64 Y);
 	sPoint GetCursorPosition();

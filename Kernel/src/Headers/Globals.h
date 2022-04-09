@@ -28,7 +28,7 @@ static char OSName[] = "WaifuOS";
 static char OSName[] = "OS";
 #endif
 
-static byte GlobalIDTROffset[PAGE_SIZE];
+extern byte GlobalIDTROffset[];
 
 global byte _DataStart;
 global byte _DataEnd;

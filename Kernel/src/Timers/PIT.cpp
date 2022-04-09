@@ -86,6 +86,8 @@ namespace PIT
 		return Divisor;
 	}
 
+	fp64 GetTimeSinceInit() { return TimeSinceInit; }
+
 	byte AddTimer(vptr handler, fp64 intervalS)
 	{
 		if (CurrentTimers >= 0xFF) return 0;

@@ -240,7 +240,7 @@ namespace AHCI
 			{
 				if (hbaPort->cmdStatus & (HbaPxCMD_FR | HbaPxCMD_CR))
 				{
-					asm("pause");
+					pause;
 					continue;
 				}
 				break;
@@ -253,7 +253,7 @@ namespace AHCI
 			u64 timeout = 0;
 			while (hbaPort->cmdStatus & HbaPxCMD_CR)
 			{
-				asm("pause");
+				pause;
 				if (timeout++ > 0x100000) return false;
 			}
 			
@@ -265,15 +265,7 @@ namespace AHCI
 		inline bool Read(uint64 sector, uint16 sectorCount, vptr buffer)
 		{
 			u32 sectorL = sector, sectorH = sector >> 32;
-			u64 spinLock = 0;
-			{
-				while (hbaPort->TaskFileData & (AtaDevBusy | AtaDevDRQ))
-				{
-					if (spinLock++ > 1000000) return false;
-					asm("pause");
-				}
-			}
-
+			
 			hbaPort->InterruptStatus = ~((u32)0);
 			auto cmdHeader = (HBACommandHeader*)(u64(hbaPort->CommandListBase) | (u64(hbaPort->CommandListBaseUpper) << 32));
 			{
@@ -311,12 +303,22 @@ namespace AHCI
 				cmdFIS->CountHigh = (byte)(sectorCount >> 8);
 			}
 
+			u64 spinLock = 0;
+			{
+				while (hbaPort->TaskFileData & (AtaDevBusy | AtaDevDRQ))
+				{
+					if (spinLock++ > 1000000) return false;
+					pause;
+				}
+			}
+
 			hbaPort->CommandIssue = 1;
 
 			while (true)
 			{
 				if (!hbaPort->CommandIssue) return true;
 				if (hbaPort->InterruptStatus & HbaPxIS_TFES) return false;
+				pause;
 			}
 
 			// cant get here lol

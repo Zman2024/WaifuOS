@@ -49,23 +49,8 @@ inline void memset(void* address, T value, const uint64 nBytes)
 
 }
 
-forceinline void memset64(register vptr address, register uint64 value, uint64 bytes)
-{
-	register byte remainder = bytes & 0b111;
-	register uint64 rounds = bytes >> 3; // divide by 8
-	register nint indexer = 0;
-
-	while (indexer < rounds) ((u64*)address)[indexer++] = value;
-
-	if (remainder == 0) return;
-
-	indexer <<= 3;
-	rounds <<= 3;
-	rounds += remainder;
-
-	register nint indexer0 = 0;
-	while (indexer < rounds) ((byte*)address)[indexer++] = (byte)(value >> (indexer0++ << 3));
-}
+// asmUtils.asm
+global void memset64(vptr destination, nint value, nint numBytes);
 
 void memcpy(vptr dest, const vptr src, uint64 nBytes);
 

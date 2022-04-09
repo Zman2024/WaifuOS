@@ -43,6 +43,8 @@ namespace PIT
 	uint32 GetFrequency();
 	uint16 GetDivisor();
 
+	fp64 GetTimeSinceInit();
+
 	byte AddTimer(vptr handler, fp64 intervalS);
 	byte AddTimer(vptr handler, uint32 intervalMs);
 

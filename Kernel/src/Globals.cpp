@@ -2,6 +2,7 @@
 
 PrimitiveConsole gConsole = PrimitiveConsole();
 IDTR GlobalIDTR;
+byte GlobalIDTROffset[PAGE_SIZE];
 
 attribute((aligned(PAGE_SIZE))) GDT GlobalGDT = 
 {

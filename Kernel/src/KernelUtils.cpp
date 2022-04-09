@@ -90,18 +90,21 @@ namespace Kernel
 		constexpr uint16 ImageWidth = 256;
 		constexpr uint16 ImageHeight = 256;
 
-		Color* colorFB = (Color*)info.Framebuffer->BaseAddress;
-		Color* img = (Color*)(info.LoadingImage);
+		fast Color* colorFB = (Color*)info.Framebuffer->BaseAddress;
+		fast Color* img = (Color*)(info.LoadingImage);
 
-		for (u16 y = 0; y < ImageHeight; y++)
+		for (fast u16 y = 0; y < ImageHeight; y++)
 		{
-			for (u16 x = 0; x < ImageWidth; x++)
+			for (fast u16 x = 0; x < ImageWidth; x++)
 			{
+				Color pixel = img[(y * (ImageWidth)) + x];
+				if (!(u32(pixel) & 0xFF000000)) continue;
+
 				// wow this is massive, cringe. 10/10 very readable code
 				// fixed a bit, seperated things into variables, still looks cringe
-				uint64 framebufferOffsetY = u64((y + (u64)(info.Framebuffer->Height / 1.5) - (ImageHeight / 2)) * info.Framebuffer->PixelsPerScanline);
-				uint64 framebufferOffsetX = u64(x + (info.Framebuffer->Width / 2) - (ImageWidth / 2));
-				colorFB[framebufferOffsetY + framebufferOffsetX] = img[(y * (ImageWidth)) + x];
+				fast uint64 framebufferOffsetY = u64((y + (u64)(info.Framebuffer->Height / 1.5) - (ImageHeight / 2)) * info.Framebuffer->PixelsPerScanline);
+				fast uint64 framebufferOffsetX = u64(x + (info.Framebuffer->Width / 2) - (ImageWidth / 2));
+				colorFB[framebufferOffsetY + framebufferOffsetX] = pixel;
 			}
 		}
 
@@ -152,7 +155,6 @@ namespace Kernel
 		RegisterInterrupt((vptr)hKeyboardInt, Interrupt::Keyboard);
 		RegisterInterrupt((vptr)hPitTick, Interrupt::PIT);
 		RegisterInterrupt((vptr)hRtcTick, Interrupt::RTC);
-
 	}
 
 	void InitializeGDT()

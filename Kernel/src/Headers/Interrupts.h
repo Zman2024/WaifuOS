@@ -128,7 +128,7 @@ namespace Interrupts
 		};
 	};
 
-	void RegisterInterrupt(void* handlerAddress, byte inter, IdtType interruptType = IdtType::InterruptGate);
+	void RegisterInterrupt(void* handlerAddress, u16 inter, IdtType interruptType = IdtType::InterruptGate);
 
 	void LoadGIDT();
 

@@ -8,7 +8,7 @@
 
 namespace Interrupts
 {
-	void RegisterInterrupt(void* handlerAddress, byte inter, IdtType interruptType)
+	void RegisterInterrupt(void* handlerAddress, u16 inter, IdtType interruptType)
 	{
 		IDTDescEntry* intDescEntry = (IDTDescEntry*)(GlobalIDTR.Offset + inter * sizeof(IDTDescEntry));
 		intDescEntry->SetOffset((u64)handlerAddress);
@@ -22,7 +22,7 @@ namespace Interrupts
 		asm ("lidt %0" : : "m" (GlobalIDTR));
 	}
 
-	void PanicScreen()
+	forceinline void PanicScreen()
 	{
 		cli;
 		gConsole.Clear(Color::DarkRed);
@@ -146,7 +146,6 @@ namespace Interrupts
 
 		gConsole.WriteLine(cstr::ToString(addr, true));
 
-		spin(0x100000);
 		halt;
 	}
 
@@ -207,8 +206,9 @@ namespace Interrupts
 	void hStub(InterruptFrame* frame)
 	{
 		debug("Interrupt stub called");
-		if (APIC::InUse) APIC::EndOfInterrupt();
-		else PIC::SendEIO(false);
+		halt;
+		// if (APIC::InUse) APIC::EndOfInterrupt();
+		// else PIC::SendEIO(false);
 	}
 
 }

@@ -30,10 +30,7 @@ namespace Kernel
 		gConsole.WriteLine(string(OSName) + " Initialized!", Color::Green);
 		Memory::PrintLeaks();
 
-		while (true)
-		{
-			Audio::PlayTrack(Audio::NotTetris);
-		}
+		while (true) Audio::PlayTrack(Audio::NotTetris);
 		
 		while (true) hlt;
 	}
