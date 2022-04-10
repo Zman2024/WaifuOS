@@ -6,7 +6,6 @@
 enum struct IdtType : byte
 {
 	InterruptGate = 0b10001110,
-	CallGate = 0b10001100,
 	TrapGate = 0b10001111,
 };
 
@@ -21,7 +20,7 @@ struct IDTDescEntry
 	uint16 Offset1;
 
 	uint32 Offset2;
-	uint32 Ignore;
+	uint32 rsv0;
 
 	void SetOffset(uint64 offset);
 	uint64 GetOffset();

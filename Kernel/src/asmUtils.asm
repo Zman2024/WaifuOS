@@ -81,19 +81,15 @@ ret
 memset64:
 	mov rax, p1
 	mov rcx, p2
-	shr rcx, 3  ; divide by 8
-	push rcx
-	sub p2, rcx ; the remainder
+	shr rcx, 3    ; divide by 8
+	and p2, 0b111 ; the remainder
 	rep stosq 	; store value into buffer
-	pop rcx
 
-	add p0, rcx
-	cmp p2, p2
+	test p2, p2
 	.byteLoop:
 	jz .end
-		mov [p0], al
+		stosb
 		ror rax, 8
-		inc p0
 		dec p2
 	jmp .byteLoop
 	.end:

@@ -17,7 +17,7 @@ BUILDDIR = bin
 CXXFLAGS = -g -ffreestanding -fshort-wchar -mno-red-zone -O0 -fno-exceptions -fno-rtti -masm=intel -fpermissive -w -I$(SRCDIR)/Headers
 CFLAGS = -g -ffreestanding -fno-exceptions -fshort-wchar -O0 -fno-rtti -I$(SRCDIR)/Headers
 INTFLAGS = -g -fpermissive -w -mno-red-zone -mgeneral-regs-only -ffreestanding -masm=intel -I$(SRCDIR)/Headers -c $^ -o $@
-ASMFLAGS = 
+ASMFLAGS = -f elf64 -g
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 
 BOOTEFI := $(GNUEFI)/x86_64/bootloader/main.efi
@@ -64,7 +64,7 @@ $(OBJDIR)/%.co: $(SRCDIR)/%.c
 $(OBJDIR)/%.asmo: $(SRCDIR)/%.asm
 	@ echo ===== Compiling $^ =====
 	@ mkdir -p $(@D)
-	$(ASMC) $(ASMFLAGS) $^ -f elf64 -o $@
+	$(ASMC) $(ASMFLAGS) $^ -o $@
 
 link:
 	@ echo ===== Linking =====

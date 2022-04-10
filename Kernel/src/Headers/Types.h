@@ -2,23 +2,11 @@
 #ifndef H_Types
 #define H_Types
 #include <stddef.h>
-#ifdef VISUAL_STUDIO_EDITOR
-#define attribute(x) 
-#define forceinline
-#else
-#define attribute __attribute__
-#define forceinline inline __attribute__((always_inline))
-#endif
 
-#define global extern "C"
-#define fast register
+// Typedefs //
 
-constexpr auto PAGE_SIZE = 0x1000;
-
+typedef size_t nint; // Architecture native integer (native int)
 typedef void* vptr;
-
-// Architecture native integer (native int)
-typedef size_t nint;
 
 typedef signed char sbyte;
 typedef signed char int8;
@@ -50,6 +38,34 @@ typedef float fp32;
 typedef double fp64;
 typedef long double fp128; // sizeof(fp128) gives me 16 so... i guess?
 
+typedef uint32 Color32;
+
+// Global Constants //
+constexpr auto PAGE_SIZE = 0x1000; // The size of a physical page
+
+// Macros //
+#ifdef VISUAL_STUDIO_EDITOR
+#define attribute(x) 
+#define forceinline
+#define asm(x)
+#define cli
+#define sti
+#define hlt
+#define pause
+#define intcall(x)
+#define OS_HLT
+#define halt
+#define cpuid(level, a, b, c, d)
+#define spin(x)
+#define global extern "C"
+#define fast
+#else
+#define attribute __attribute__
+#define forceinline inline __attribute__((always_inline))
+
+#define global extern "C"
+#define fast register
+
 #define asm __asm__ volatile 
 #define cli asm ("cli");
 #define sti asm ("sti");
@@ -66,4 +82,5 @@ typedef long double fp128; // sizeof(fp128) gives me 16 so... i guess?
 
 // #define cpuid(code, eax, ebx, ecx, edx) asm ("cpuid" : "=eax"(eax), "=ebx"(ebx), "=ecx"(ecx), "=edx"(edx) : "eax"(code) : "memory")
 #define spin(x) for(volatile uint64 y = 0; x > y; y++)
+#endif
 #endif

@@ -90,15 +90,16 @@ namespace Kernel
 		constexpr uint16 ImageWidth = 256;
 		constexpr uint16 ImageHeight = 256;
 
-		fast Color* colorFB = (Color*)info.Framebuffer->BaseAddress;
-		fast Color* img = (Color*)(info.LoadingImage);
+		fast Color32* colorFB = (Color32*)info.Framebuffer->BaseAddress;
+		fast Color32* img = (Color32*)(info.LoadingImage);
 
 		for (fast u16 y = 0; y < ImageHeight; y++)
 		{
 			for (fast u16 x = 0; x < ImageWidth; x++)
 			{
-				Color pixel = img[(y * (ImageWidth)) + x];
-				if (!(u32(pixel) & 0xFF000000)) continue;
+				Color32 pixel = img[(y * (ImageWidth)) + x];
+				byte alpha = (pixel & 0xFF000000) >> 24;
+				if (!alpha) continue;
 
 				// wow this is massive, cringe. 10/10 very readable code
 				// fixed a bit, seperated things into variables, still looks cringe
@@ -109,6 +110,8 @@ namespace Kernel
 		}
 
 	}
+
+	global nint GlobalInterruptTable[];
 
 	void InitializeExceptions()
 	{
@@ -126,13 +129,15 @@ namespace Kernel
 
 		debug("Registering Fault / Interrupt Handlers...");
 
+		RegisterInterruptStubs();
+
 		// Remap and mask all ints in PIC (make sure PIC is off for now)
 		PIC::Disable();
 		PIC::Remap();
 
 		// Register exceptions
 		RegisterInterrupt((vptr)hDivideByZeroFault, Interrupt::DivideByZero);
-		RegisterInterrupt((vptr)hSingleStepFault, Interrupt::SingleStep);
+		RegisterInterrupt((vptr)hDebug, Interrupt::Debug);
 		RegisterInterrupt((vptr)hNonMaskableFault, Interrupt::NonMaskable);
 		RegisterInterrupt((vptr)hBreakpointFault, Interrupt::Breakpoint, IdtType::TrapGate);
 		RegisterInterrupt((vptr)hOverflowTrap, Interrupt::OverflowTrap, IdtType::TrapGate);
@@ -150,6 +155,8 @@ namespace Kernel
 		RegisterInterrupt((vptr)hAlignmentCheck, Interrupt::AlignmentCheck);
 		RegisterInterrupt((vptr)hMachineCheck, Interrupt::MachineCheck);
 		RegisterInterrupt((vptr)hSIMDFault, Interrupt::SIMDException);
+
+		RegisterInterrupt((vptr)hStub, 0x69);
 
 		// Add IRQ handlers to IDT
 		RegisterInterrupt((vptr)hKeyboardInt, Interrupt::Keyboard);

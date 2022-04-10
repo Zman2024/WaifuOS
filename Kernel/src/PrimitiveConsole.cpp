@@ -25,7 +25,7 @@ void PrimitiveConsole::WriteChar(char chr)
 	WriteChar(chr, mForegroundColor);
 }
 
-inline void PrimitiveConsole::WriteChar(char chr, Color color)
+inline void PrimitiveConsole::WriteChar(char chr, Color32 color)
 {
 	switch (chr)
 	{
@@ -67,7 +67,7 @@ inline void PrimitiveConsole::WriteChar(char chr, Color color)
 	}
 }
 
-void PrimitiveConsole::PutChar(char chr, Color fColor, Color bColor, uint xOff, uint yOff)
+void PrimitiveConsole::PutChar(char chr, Color32 fColor, Color32 bColor, uint xOff, uint yOff)
 {
 	char* fontPtr = (char*)mFont->GlyphBuffer + (chr * mFont->Header->charsize);
 	byte chrSz = mFont->Header->charsize;
@@ -95,7 +95,7 @@ void PrimitiveConsole::Write(const char * str)
 	Write(str, mForegroundColor);
 }
 
-inline void PrimitiveConsole::Write(const char * str, Color color)
+inline void PrimitiveConsole::Write(const char * str, Color32 color)
 {
 	for (uint64 index = 0; str[index]; index++)
 		WriteChar(str[index], color);
@@ -106,7 +106,7 @@ void PrimitiveConsole::WriteLine(const char * str)
 	WriteLine(str, mForegroundColor);
 }
 
-inline void PrimitiveConsole::WriteLine(const char * str, Color color)
+inline void PrimitiveConsole::WriteLine(const char * str, Color32 color)
 {
 	Write(str, color);
 	NewLine();
@@ -203,7 +203,7 @@ void PrimitiveConsole::Backspace(int nBackspace, bool RemoveChar)
 	}
 }
 
-void PrimitiveConsole::Clear(Color color)
+void PrimitiveConsole::Clear(Color32 color)
 {
 	fast uint64 fbBase = (u64)mFrameBuffer->BaseAddress;
 	fast uint64 height = mFrameBuffer->Height;
@@ -234,22 +234,22 @@ sPoint PrimitiveConsole::GetCursorPosition()
 	return mCursorPosition;
 }
 
-void PrimitiveConsole::SetBackgroundColor(Color color)
+void PrimitiveConsole::SetBackgroundColor(Color32 color)
 {
 	mBackgroundColor = color;
 }
 
-void PrimitiveConsole::SetForegroundColor(Color color)
+void PrimitiveConsole::SetForegroundColor(Color32 color)
 {
 	mForegroundColor = color;
 }
 
-Color PrimitiveConsole::GetForegroundColor()
+Color32 PrimitiveConsole::GetForegroundColor()
 {
 	return mForegroundColor;
 }
 
-Color PrimitiveConsole::GetBackgroundColor()
+Color32 PrimitiveConsole::GetBackgroundColor()
 {
 	return mBackgroundColor;
 }
@@ -270,12 +270,15 @@ void PrimitiveConsole::UpdateCursor()
 {
 	sPoint pos = ConvertScaledToUnscaled(mCursorPosition.X, mCursorPosition.Y);
 
+	byte yCharSize = mFont->Header->charsize;
+	byte xCharSize = yCharSize >> 1;
+
 	if (HasDrawnCursor)
 	{
 		sPoint oldPos = ConvertScaledToUnscaled(mPreviousRenderedPosition.X, mPreviousRenderedPosition.Y);
-		for (uint64 y = 0; y < 16; y++)
+		for (uint64 y = 0; y < yCharSize; y++)
 		{
-			for (uint64 x = 0; x < 8; x++)
+			for (uint64 x = 0; x < xCharSize; x++)
 			{
 				byte bite = ((y * 8) + x) / 8;
 				if (mCursorBuffer[bite] & (0b10000000 >> (x % 8)))	// Only replace the pixels we overwrote
@@ -365,20 +368,20 @@ sPoint PrimitiveConsole::ConvertUncaledToScaled(int64 X, int64 Y)
 	return sPoint(X / (mFont->Header->charsize >> 1), Y / mFont->Header->charsize);
 }
 
-void PrimitiveConsole::WritePixel(int64 posX, int64 posY, Color color)
+void PrimitiveConsole::WritePixel(int64 posX, int64 posY, Color32 color)
 {
 	if ((posX >= mFrameBuffer->PixelsPerScanline) | (posX < 0)) return;
 	if ((posY >= mFrameBuffer->Height) | (posY < 0)) return;
 
-	Color* buff = (Color*)mFrameBuffer->BaseAddress + posX + (posY * mFrameBuffer->PixelsPerScanline);
+	Color32* buff = (Color32*)mFrameBuffer->BaseAddress + posX + (posY * mFrameBuffer->PixelsPerScanline);
 	*buff = color;
 }
 
-Color PrimitiveConsole::ReadPixel(int64 posX, int64 posY)
+Color32 PrimitiveConsole::ReadPixel(int64 posX, int64 posY)
 {
 	if ((posX >= mFrameBuffer->PixelsPerScanline) | (posX < 0)) return Color::Black;
 	if ((posY >= mFrameBuffer->Height) | (posY < 0)) return Color::Black;
-	Color* ptr = (Color*)mFrameBuffer->BaseAddress;
+	Color32* ptr = (Color32*)mFrameBuffer->BaseAddress;
 	return ptr [posX + (posY * mFrameBuffer->PixelsPerScanline)];
 
 }

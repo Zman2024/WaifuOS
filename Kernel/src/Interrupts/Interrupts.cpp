@@ -8,176 +8,179 @@
 
 namespace Interrupts
 {
-	void RegisterInterrupt(void* handlerAddress, u16 inter, IdtType interruptType)
+
+	global RegisterState* GetRegisterDump();
+	global nint GlobalHandlerStubTable[];
+	global nint GlobalInterruptTable[];
+	nint GlobalInterruptTable[0xFF];
+
+	inline PrimitiveConsole& Console = gConsole;
+
+	void RegisterInterruptStubs()
 	{
-		IDTDescEntry* intDescEntry = (IDTDescEntry*)(GlobalIDTR.Offset + inter * sizeof(IDTDescEntry));
-		intDescEntry->SetOffset((u64)handlerAddress);
-		intDescEntry->TypeAttribs = interruptType;
-		intDescEntry->Ignore = 0x00;
-		intDescEntry->Selector = 0x08;
+		IDTDescEntry* intDescEntry = (IDTDescEntry*)(GlobalIDTR.Offset);
+		for (int x = 0; x < 0xFF; x++)
+		{
+			intDescEntry[x].Selector = 0x08;
+			intDescEntry[x].SetOffset((nint)GlobalHandlerStubTable[x]);
+
+			GlobalInterruptTable[x] = (nint)hStub;
+		}
+		memset64(GlobalInterruptTable, 0x00, 0xFF * sizeof(nint));
 	}
 
-	void LoadGIDT()
+	void RegisterInterrupt(vptr handlerAddress, u16 inter, IdtType interruptType)
 	{
-		asm ("lidt %0" : : "m" (GlobalIDTR));
+		IDTDescEntry* intDescEntry = (IDTDescEntry*)(GlobalIDTR.Offset + inter * sizeof(IDTDescEntry));
+		GlobalInterruptTable[inter] = (nint)handlerAddress;
+		intDescEntry->TypeAttribs = interruptType;
 	}
 
 	forceinline void PanicScreen()
 	{
-		cli;
 		gConsole.Clear(Color::DarkRed);
 		gConsole.SetBackgroundColor(Color::DarkRed);
-		gConsole.SetForegroundColor(Color(0xFFDDDDDD));
+		gConsole.SetForegroundColor(Color32(0xFFDDDDDD));
 	}
 
-	void hDivideByZeroFault(InterruptFrame* frame)
+	void hDivideByZeroFault()
 	{
 		PanicScreen();
-		gConsole.WriteLine("ERROR: DIVIDE BY ZERO FAULT!");
-		halt;
-
-		// bro just in case
-		halt;
+		Console.WriteLine("ERROR: DIVIDE BY ZERO FAULT!");
 	}
 
-	void hSingleStepFault(InterruptFrame* frame)
+	void hDebug()
+	{
+		Console.WriteLine("Debug int called");
+	}
+
+	void hNonMaskableFault()
+	{
+		Console.WriteLine("NMI");
+	}
+
+	void hBreakpointFault()
 	{
 		PanicScreen();
-		gConsole.WriteLine("Single Step");
-		halt;
+		Console.WriteLine("Breakpoint");
 	}
 
-	void hNonMaskableFault(InterruptFrame* frame)
+	void hOverflowTrap()
 	{
 		PanicScreen();
-		gConsole.WriteLine("NMI");
+		Console.WriteLine("Overflow trap");
 		halt;
 	}
 
-	void hBreakpointFault(InterruptFrame* frame)
-	{
-		//PanicScreen();
-		gConsole.WriteLine("Breakpoint");
-		halt;
-	}
-
-	void hOverflowTrap(InterruptFrame* frame)
+	void hBoundRangeFault()
 	{
 		PanicScreen();
-		gConsole.WriteLine("Overflow trap");
+		Console.WriteLine("Bound Range");
 		halt;
 	}
 
-	void hBoundRangeFault(InterruptFrame* frame)
+	void hInvalidOpcodeFault()
 	{
 		PanicScreen();
-		gConsole.WriteLine("Bound Range");
+		Console.Write("Invalid Opcode at address: ???");
 		halt;
 	}
 
-	void hInvalidOpcodeFault(InterruptFrame* frame)
+	void hCoprocessorNAFault()
 	{
 		PanicScreen();
-		gConsole.Write("Invalid Opcode at address: ");
-		gConsole.WriteLine(cstr::ToString(frame->ip, true));
+		Console.WriteLine("Coprocessor NA");
 		halt;
 	}
 
-	void hCoprocessorNAFault(InterruptFrame* frame)
+	void hDoubleFault(nint code)
+	{
+		Console.Clear(Color::Red);
+		Console.SetBackgroundColor(Color::Red);
+		Console.SetForegroundColor(Color::White);
+		Console.WriteLine("ERROR: DOUBLE FAULT!");
+		halt;
+	}
+
+	void hCoprocessorSegmentOverrunFault()
 	{
 		PanicScreen();
-		gConsole.WriteLine("Coprocessor NA");
+		Console.WriteLine("Segment Overrun!");
 		halt;
 	}
 
-	void hDoubleFault(InterruptFrame* frame)
-	{
-		gConsole.Clear(Color::Red);
-		gConsole.SetBackgroundColor(Color::Red);
-		gConsole.SetForegroundColor(Color::White);
-		gConsole.WriteLine("ERROR: DOUBLE FAULT!");
-		halt;
-	}
-
-	void hCoprocessorSegmentOverrunFault(InterruptFrame* frame)
+	void hInvalidStateSegmentFault(nint code)
 	{
 		PanicScreen();
-		gConsole.WriteLine("Segment Overrun!");
+		Console.WriteLine("Invalid State Segment!");
 		halt;
 	}
 
-	void hInvalidStateSegmentFault(InterruptFrame* frame)
+	void hSegmentMissingFault(nint code)
 	{
 		PanicScreen();
-		gConsole.WriteLine("Invalid State Segment!");
+		Console.WriteLine("Segment Missing!");
 		halt;
 	}
 
-	void hSegmentMissingFault(InterruptFrame* frame)
+	void hStackFault(nint code)
 	{
 		PanicScreen();
-		gConsole.WriteLine("Segment Missing!");
+		Console.WriteLine("Stack Exception!");
 		halt;
 	}
 
-	void hStackFault(InterruptFrame* frame)
+	void hGeneralProtectionFault(nint code)
 	{
 		PanicScreen();
-		gConsole.WriteLine("Stack Exception!");
+		Console.WriteLine("ERROR: GENERAL PROTECTION FAULT!");
 		halt;
 	}
 
-	void hGeneralProtectionFault(InterruptFrame* frame)
+	void hPageFault(nint code)
 	{
 		PanicScreen();
-		gConsole.WriteLine("ERROR: GENERAL PROTECTION FAULT!");
-		halt;
-	}
-
-	void hPageFault(InterruptFrame* frame)
-	{
-		PanicScreen();
-		gConsole.WriteLine("ERROR: PAGE FAULT!");
-		gConsole.Write("ATTEMPTED TO ACCESS ADDRESS: ");
+		Console.WriteLine("ERROR: PAGE FAULT!");
+		Console.Write("ATTEMPTED TO ACCESS ADDRESS: ");
 
 		uint64 addr = 0;
 		// cr2 contains the page fault linear address (PFLA)
 		asm ("mov %0, %%cr2" : "=r" (addr) );
 
-		gConsole.WriteLine(cstr::ToString(addr, true));
-
+		Console.WriteLine(cstr::ToString(addr, true));
+		Console.Write(cstr::format("Error Code: %x0", code));
 		halt;
 	}
 
-	void hCoprocessorFault(InterruptFrame* frame)
+	void hCoprocessorFault()
 	{
 		PanicScreen();
-		gConsole.WriteLine("ERROR: COPROCESSOR FAULT!");
+		Console.WriteLine("ERROR: COPROCESSOR FAULT!");
 		halt;
 	}
 
-	void hAlignmentCheck(InterruptFrame* frame)
+	void hAlignmentCheck(nint code)
 	{
 		PanicScreen();
-		gConsole.WriteLine("Alignment Check");
+		Console.WriteLine("Alignment Check");
 		halt;
 	}
 
-	void hMachineCheck(InterruptFrame* frame)
+	void hMachineCheck()
 	{
 		PanicScreen();
-		gConsole.WriteLine("Machine Check");
+		Console.WriteLine("Machine Check");
 		halt;
 	}
 
-	void hSIMDFault(InterruptFrame* frame)
+	void hSIMDFault()
 	{
 		PanicScreen();
-		gConsole.WriteLine("SIMD Exception");
+		Console.WriteLine("SIMD Exception");
 		halt;
 	}
 
-	void hKeyboardInt(InterruptFrame* frame)
+	void hKeyboardInt()
 	{
 		IO::Keyboard::KeyEvent();
 
@@ -187,14 +190,14 @@ namespace Interrupts
 
 	}
 
-	void hPitTick(InterruptFrame* frame)
+	void hPitTick()
 	{
 		PIT::Tick();
 		if (APIC::InUse) APIC::EndOfInterrupt();
 		else PIC::SendEIO(false);
 	}
 
-	void hRtcTick(InterruptFrame* frame)
+	void hRtcTick()
 	{
 		RTC::Tick();
 
@@ -203,9 +206,20 @@ namespace Interrupts
 		else PIC::SendEIO(false);
 	}
 
-	void hStub(InterruptFrame* frame)
+	void hStub()
 	{
-		debug("Interrupt stub called");
+		auto regs = GetRegisterDump();
+		PanicScreen();
+
+		debug("rax: %x0 \nrbx: %x1 \nrcx: %x2 \nrdx: %x3 \n", regs->rax, regs->rbx, regs->rcx, regs->rdx);
+
+		debug("rsi: %x0 \nrdi: %x1 \n", regs->rsi, regs->rdi);
+
+		debug("r8: %x0 \nr9: %x1 \nr10: %x2 \nr11: %x3 \nr12: %x4 \nr13: %x5 \nr14: %x6 \nr15: %x7 \n",
+			regs->r8, regs->r9, regs->r10, regs->r11, regs->r12, regs->r13, regs->r14, regs->r15);
+
+		debug("rflags: %x0", regs->rflags);
+
 		halt;
 		// if (APIC::InUse) APIC::EndOfInterrupt();
 		// else PIC::SendEIO(false);

@@ -1,1 +1,1 @@
-ffmpeg -i (image) -vf format=bgra -f rawvideo (something).raw
+ffmpeg -i (image) -vf format=bgra -f rawvideo loadingicon.raw

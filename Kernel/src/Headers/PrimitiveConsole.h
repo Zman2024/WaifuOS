@@ -12,15 +12,15 @@ public:
 	PrimitiveConsole();
 	PrimitiveConsole(FrameBuffer* fb, Font* font);
 
-	void PutChar(char chr, Color fColor, Color bColor, uint xOff, uint yOff);
+	void PutChar(char chr, Color32 fColor, Color32 bColor, uint xOff, uint yOff);
 
 	void WriteChar(char chr);
-	void WriteChar(char chr, Color color);
+	void WriteChar(char chr, Color32 color);
 
 	void Write(const char* str);
-	void Write(const char* str, Color color);
+	void Write(const char* str, Color32 color);
 	void WriteLine(const char* str);
-	void WriteLine(const char* str, Color color);
+	void WriteLine(const char* str, Color32 color);
 	void WriteLine();
 
 	void NewLine(uint lines = 1);
@@ -28,17 +28,17 @@ public:
 	void ScrollDown(uint lines);
 	void Backspace(int nBackspace = 1, bool RemoveChar = true);
 
-	void Clear(Color color);
+	void Clear(Color32 color);
 	forceinline void Clear() { Clear(mBackgroundColor); }
 
 	void SetCursorPosition(int64 X, int64 Y);
 	sPoint GetCursorPosition();
 
-	void SetBackgroundColor(Color color);
-	void SetForegroundColor(Color color);
+	void SetBackgroundColor(Color32 color);
+	void SetForegroundColor(Color32 color);
 
-	Color GetForegroundColor();
-	Color GetBackgroundColor();
+	Color32 GetForegroundColor();
+	Color32 GetBackgroundColor();
 
 	void SetFont(Font* font);
 	Font GetFont();
@@ -47,8 +47,8 @@ public:
 	void MoveCursor(Direction dir);
 
 protected:
-	void WritePixel(int64 posX, int64 posY, Color color);
-	Color ReadPixel(int64 posX, int64 posY);
+	void WritePixel(int64 posX, int64 posY, Color32 color);
+	Color32 ReadPixel(int64 posX, int64 posY);
 
 	sPoint ConvertScaledToUnscaled(int64 X, int64 Y);
 	sPoint ConvertUncaledToScaled(int64 X, int64 Y);
@@ -60,8 +60,8 @@ protected:
 	sPoint mCursorPosition = { 0, 0 };
 	sPoint mPreviousRenderedPosition = { 0, 0 };
 	bool HasDrawnCursor = false;
-	Color mForegroundColor = Color::White;
-	Color mBackgroundColor = Color::DarkGray;
+	Color32 mForegroundColor = Color::White;
+	Color32 mBackgroundColor = Color::DarkGray;
 
 	byte mCursorBuffer[16] =
 	{
@@ -83,7 +83,7 @@ protected:
 		0b11111111, //0b11111111,
 	};
 
-	Color mPreviousCursorBuffer[128];
+	Color32 mPreviousCursorBuffer[128];
 
 };
 #endif

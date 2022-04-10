@@ -168,9 +168,12 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <None Include="..\Makefile" />
     <None Include="asmUtils.asm" />
     <None Include="Interrupts\GDT.asm" />
+    <None Include="Interrupts\Handlers.asm" />
+    <None Include="Interrupts\Interrupts.asm" />
     <None Include="string.asm" />
   </ItemGroup>
   <ItemGroup>
+    <Text Include="..\how-to-convert-image-to-compat-raw.txt" />
     <Text Include="..\stuff for apic.txt" />
   </ItemGroup>
   <Import Project="$(VCTargetsPath)\Microsoft.Cpp.targets" />

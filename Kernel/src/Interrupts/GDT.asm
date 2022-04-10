@@ -1,5 +1,7 @@
 [bits 64]
 
+global LoadGDT
+
 ; rdi = first param
 LoadGDT: 
 	lgdt [rdi]
@@ -16,5 +18,3 @@ LoadGDT:
 	push rax
 	push rdi
 retfq
-
-global LoadGDT

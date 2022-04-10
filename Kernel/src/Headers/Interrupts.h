@@ -20,11 +20,33 @@ namespace Interrupts
 
 	struct InterruptFrame
 	{
-		size_t ip;
-		size_t cs;
-		size_t flags;
-		size_t sp;
-		size_t ss;
+		nint ip;
+		nint cs;
+		nint flags;
+		nint sp;
+		nint ss;
+	};
+
+	struct RegisterState
+	{
+		nint rax;
+		nint rbx;
+		nint rcx;
+		nint rdx;
+
+		nint rsi;
+		nint rdi;
+
+		nint r8;
+		nint r9;
+		nint r10;
+		nint r11;
+		nint r12;
+		nint r13;
+		nint r14;
+		nint r15;
+
+		nint rflags;
 	};
 
 	/* From: https://wiki.osdev.org/Interrupt_Vector_Table#CPU_Interrupt_Layout
@@ -83,7 +105,7 @@ namespace Interrupts
 		{
 			/* CPU Exception Table */
 			DivideByZero = 0x00,
-			SingleStep = 0x01,
+			Debug = 0x01,
 			NonMaskable = 0x02,
 			Breakpoint = 0x03,
 			OverflowTrap = 0x04,
@@ -128,34 +150,35 @@ namespace Interrupts
 		};
 	};
 
-	void RegisterInterrupt(void* handlerAddress, u16 inter, IdtType interruptType = IdtType::InterruptGate);
+	forceinline void LoadGIDT() { asm("lidt %0" : : "m" (GlobalIDTR)); }
 
-	void LoadGIDT();
+	void RegisterInterruptStubs();
+	void RegisterInterrupt(vptr handlerAddress, u16 inter, IdtType interruptType = IdtType::InterruptGate);
 
-	_isr_ void hDivideByZeroFault(InterruptFrame* frame);
-	_isr_ void hSingleStepFault(InterruptFrame* frame);
-	_isr_ void hNonMaskableFault(InterruptFrame* frame);
-	_isr_ void hBreakpointFault(InterruptFrame* frame);
-	_isr_ void hOverflowTrap(InterruptFrame* frame);
-	_isr_ void hBoundRangeFault(InterruptFrame* frame);
-	_isr_ void hInvalidOpcodeFault(InterruptFrame* frame);
-	_isr_ void hCoprocessorNAFault(InterruptFrame* frame);
-	_isr_ void hDoubleFault(InterruptFrame* frame);
-	_isr_ void hCoprocessorSegmentOverrunFault(InterruptFrame* frame);
-	_isr_ void hInvalidStateSegmentFault(InterruptFrame* frame);
-	_isr_ void hSegmentMissingFault(InterruptFrame* frame);
-	_isr_ void hStackFault(InterruptFrame* frame);
-	_isr_ void hGeneralProtectionFault(InterruptFrame* frame);
-	_isr_ void hPageFault(InterruptFrame* frame);
-	_isr_ void hCoprocessorFault(InterruptFrame* frame);
-	_isr_ void hAlignmentCheck(InterruptFrame* frame);
-	_isr_ void hMachineCheck(InterruptFrame* frame);
-	_isr_ void hSIMDFault(InterruptFrame* frame);
-	_isr_ void hKeyboardInt(InterruptFrame* frame);
-	_isr_ void hPitTick(InterruptFrame* frame);
-	_isr_ void hRtcTick(InterruptFrame* frame);
+	void hDivideByZeroFault();
+	void hDebug();
+	void hNonMaskableFault();
+	void hBreakpointFault();
+	void hOverflowTrap();
+	void hBoundRangeFault();
+	void hInvalidOpcodeFault();
+	void hCoprocessorNAFault();
+	void hDoubleFault(nint code);
+	void hCoprocessorSegmentOverrunFault();
+	void hInvalidStateSegmentFault(nint code);
+	void hSegmentMissingFault(nint code);
+	void hStackFault(nint code);
+	void hGeneralProtectionFault(nint code);
+	void hPageFault(nint code);
+	void hCoprocessorFault();
+	void hAlignmentCheck(nint code);
+	void hMachineCheck();
+	void hSIMDFault();
+	void hKeyboardInt();
+	void hPitTick();
+	void hRtcTick();
 
-	_isr_ void hStub(InterruptFrame* frame);
+	void hStub();
 
 }
 #undef _isr_
