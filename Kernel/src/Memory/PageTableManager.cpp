@@ -84,13 +84,13 @@ namespace PageTableManager
 		PT->Entries[indexer.Pi] = tempPDE;
 	}
 
-	void MapMemory(u64 virtualMemory, u64 physMemory)
+	void MapMemory(fast u64 virtualMemory, fast u64 physMemory)
 	{
 		PageMapIndexer indexer = PageMapIndexer(virtualMemory);
-		PageDirectoryEntry tempPDE;
+		fast PageDirectoryEntry tempPDE;
 
 		tempPDE = PML4->Entries[indexer.PDPi];
-		PageTable* PDP;
+		fast PageTable* PDP;
 		{
 			if (!tempPDE.GetFlag(PTFlag::Present))
 			{
@@ -108,7 +108,7 @@ namespace PageTableManager
 		}
 
 		tempPDE = PDP->Entries[indexer.PDi];
-		PageTable* PD;
+		fast PageTable* PD;
 		{
 			if (!tempPDE.GetFlag(PTFlag::Present))
 			{
@@ -126,7 +126,7 @@ namespace PageTableManager
 		}
 
 		tempPDE = PD->Entries[indexer.PTi];
-		PageTable* PT;
+		fast PageTable* PT;
 		{
 			if (!tempPDE.GetFlag(PTFlag::Present))
 			{

@@ -71,9 +71,6 @@
     <ClCompile Include="Memory\Memory.cpp">
       <Filter>Source\Memory</Filter>
     </ClCompile>
-    <ClCompile Include="Memory\Paging.cpp">
-      <Filter>Source\Memory\Paging</Filter>
-    </ClCompile>
     <ClCompile Include="Memory\PageFrameAllocator.cpp">
       <Filter>Source\Memory\Paging</Filter>
     </ClCompile>
