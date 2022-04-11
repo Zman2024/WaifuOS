@@ -46,6 +46,11 @@ public:
 	void UpdateCursor();
 	void MoveCursor(Direction dir);
 
+	void EnableCursor();
+	void DisableCursor();
+
+	forceinline bool GetCursorEnabled() { return CursorEnabled; }
+
 protected:
 	void WritePixel(int64 posX, int64 posY, Color32 color);
 	Color32 ReadPixel(int64 posX, int64 posY);
@@ -60,6 +65,7 @@ protected:
 	sPoint mCursorPosition = { 0, 0 };
 	sPoint mPreviousRenderedPosition = { 0, 0 };
 	bool HasDrawnCursor = false;
+	bool CursorEnabled = false;
 	Color32 mForegroundColor = Color::White;
 	Color32 mBackgroundColor = Color::DarkGray;
 

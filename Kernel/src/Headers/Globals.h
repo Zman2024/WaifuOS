@@ -33,19 +33,44 @@ extern byte GlobalIDTROffset[];
 global byte _DataStart;
 global byte _DataEnd;
 
+forceinline void printf(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
+{
+	bool state = gConsole.GetCursorEnabled();
+	if (state) gConsole.DisableCursor();
+	gConsole.Write(cstr::format(str, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9));
+	if (state) gConsole.EnableCursor();
+}
+
+forceinline void printlnf(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
+{
+	bool state = gConsole.GetCursorEnabled();
+	if (state) gConsole.DisableCursor();
+	gConsole.WriteLine(cstr::format(str, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9));
+	if (state) gConsole.EnableCursor();
+}
+
 static void debug(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
 {
+	bool state = gConsole.GetCursorEnabled();
+	if (state) gConsole.DisableCursor();
 	gConsole.WriteLine(cstr::format(str, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9), Color32(0xB0B0B0));
+	if (state) gConsole.EnableCursor();
 }
 
 static void warn(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
 {
+	bool state = gConsole.GetCursorEnabled();
+	if (state) gConsole.DisableCursor();
 	gConsole.WriteLine(cstr::format(str, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9), Color::Yellow);
+	if (state) gConsole.EnableCursor();
 }
 
 static void error(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
 {
+	bool state = gConsole.GetCursorEnabled();
+	if (state) gConsole.DisableCursor();
 	gConsole.WriteLine(cstr::format(str, p0, p1, p2, p3, p4, p5, p6, p7, p8, p9), Color::Red);
+	if (state) gConsole.EnableCursor();
 }
 
 #endif

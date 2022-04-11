@@ -9,33 +9,34 @@ global GlobalHandlerStubTable
 
 section .text
 
+%macro StandardHandler 1
+	mov rax, [GlobalInterruptTable + (%1 << 3)]
+	test rax, rax
+	jz .ret
+	call rax
+.ret:
+%endmacro
+
 %macro ErrorHandlerStub 1
 IntStub%1:
 	call DumpGeneralRegisters
-	pop rdi ; the error code
 	call SaveSIMD
-	mov rcx, %1
-	call StandardHandler
+	pop rdi
+	;mov edi, [rsp] ; the error code
+	;add rsp, 4
+	StandardHandler %1
 	call RestoreSIMD
 iretq
 %endmacro
 
 %macro HandlerStub 1
 IntStub%1:
+	call DumpGeneralRegisters
 	call SaveSIMD
-	mov rcx, %1
-	call StandardHandler
+	StandardHandler %1
 	call RestoreSIMD
 iretq
 %endmacro
-
-StandardHandler:
-	shl rcx, 3
-	mov rax, [GlobalInterruptTable + rcx]
-	test rax, rax
-	jz .ret
-	jmp rax
-.ret: ret
 
 
 

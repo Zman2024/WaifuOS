@@ -27,10 +27,10 @@ namespace Kernel
 		// Initialize Hardware //
 		Kernel::InitializeKernel(bootInfo);
 
-		// asm("int 0x69");
-
 		gConsole.WriteLine(string(OSName) + " Initialized!", Color::Green);
 		Memory::PrintLeaks();
+
+		gConsole.EnableCursor();
 
 		while (true) hlt;
 	}

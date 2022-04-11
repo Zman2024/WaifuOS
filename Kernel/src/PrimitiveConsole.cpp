@@ -12,6 +12,7 @@ PrimitiveConsole::PrimitiveConsole(FrameBuffer * fb, Font * font)
 	this->mHeight = (fb->Height / font->Header->charsize);
 
 	HasDrawnCursor = false;
+	CursorEnabled = false;
 
 	mCursorPosition = { 0, 0 };
 	mPreviousRenderedPosition = { 0, 0 };
@@ -44,15 +45,14 @@ inline void PrimitiveConsole::WriteChar(char chr, Color32 color)
 			Write("    ", color);
 			return;
 
-		default:
-			PutChar(chr, color, mBackgroundColor, mCursorPosition.X, mCursorPosition.Y);
-			break;
-
 	}
+
+	sPoint originalPos = mCursorPosition;
 
 	// Increase cursor position by 1
 	byte chrSz = mFont->Header->charsize;
 	byte chrSz2 = mFont->Header->charsize >> 1;
+	bool shouldScroll = false;
 
 	mCursorPosition.X += 1;
 	if (mCursorPosition.X >= mWidth)
@@ -63,8 +63,14 @@ inline void PrimitiveConsole::WriteChar(char chr, Color32 color)
 		if (mCursorPosition.Y > this->mHeight - 1)
 		{
 			mCursorPosition.Y = this->mHeight - 1;
+			shouldScroll = true;
 		}
 	}
+
+	UpdateCursor();
+	
+	PutChar(chr, color, mBackgroundColor, originalPos.X, originalPos.Y);
+	if (shouldScroll) ScrollDown();
 }
 
 void PrimitiveConsole::PutChar(char chr, Color32 fColor, Color32 bColor, uint xOff, uint yOff)
@@ -121,13 +127,17 @@ void PrimitiveConsole::NewLine(uint lines)
 {
 	mCursorPosition.X = 0;
 	mCursorPosition.Y += lines;
+	
+	bool wasEnabled = CursorEnabled;
+	if (CursorEnabled) DisableCursor();
+
 	if (mCursorPosition.Y > this->mHeight - 1)
 	{
-		// Need to scroll, but this is fine for now.
-		// Should add method ScrollDown(uint lines);
 		ScrollDown(mCursorPosition.Y - (this->mHeight - 1));
 		mCursorPosition.Y = this->mHeight - 1;
 	}
+
+	if (wasEnabled) EnableCursor();
 }
 
 void PrimitiveConsole::ScrollDown()
@@ -201,6 +211,7 @@ void PrimitiveConsole::Backspace(int nBackspace, bool RemoveChar)
 		}
 
 	}
+	UpdateCursor();
 }
 
 void PrimitiveConsole::Clear(Color32 color)
@@ -268,6 +279,8 @@ Font PrimitiveConsole::GetFont()
 
 void PrimitiveConsole::UpdateCursor()
 {
+	if (!CursorEnabled) return;
+
 	sPoint pos = ConvertScaledToUnscaled(mCursorPosition.X, mCursorPosition.Y);
 
 	byte yCharSize = mFont->Header->charsize;
@@ -308,6 +321,40 @@ void PrimitiveConsole::UpdateCursor()
 
 	HasDrawnCursor = true;
 
+}
+
+void PrimitiveConsole::EnableCursor()
+{
+	CursorEnabled = true;
+	HasDrawnCursor = false;
+	UpdateCursor();
+}
+
+void PrimitiveConsole::DisableCursor()
+{
+	sPoint pos = ConvertScaledToUnscaled(mCursorPosition.X, mCursorPosition.Y);
+
+	byte yCharSize = mFont->Header->charsize;
+	byte xCharSize = yCharSize >> 1;
+
+	if (HasDrawnCursor)
+	{
+		sPoint oldPos = ConvertScaledToUnscaled(mPreviousRenderedPosition.X, mPreviousRenderedPosition.Y);
+		for (uint64 y = 0; y < yCharSize; y++)
+		{
+			for (uint64 x = 0; x < xCharSize; x++)
+			{
+				byte bite = ((y * 8) + x) / 8;
+				if (mCursorBuffer[bite] & (0b10000000 >> (x % 8)))	// Only replace the pixels we overwrote
+				{
+					WritePixel(oldPos.X + x, oldPos.Y + y, mPreviousCursorBuffer[x + (y * 8)]);
+				}
+			}
+		}
+	}
+
+	CursorEnabled = false;
+	HasDrawnCursor = false;
 }
 
 void PrimitiveConsole::MoveCursor(Direction dir)

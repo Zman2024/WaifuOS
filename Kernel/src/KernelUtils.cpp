@@ -156,8 +156,6 @@ namespace Kernel
 		RegisterInterrupt((vptr)hMachineCheck, Interrupt::MachineCheck);
 		RegisterInterrupt((vptr)hSIMDFault, Interrupt::SIMDException);
 
-		RegisterInterrupt((vptr)hStub, 0x69);
-
 		// Add IRQ handlers to IDT
 		RegisterInterrupt((vptr)hKeyboardInt, Interrupt::Keyboard);
 		RegisterInterrupt((vptr)hPitTick, Interrupt::PIT);

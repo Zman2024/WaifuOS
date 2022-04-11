@@ -251,8 +251,6 @@
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\stuff for apic.txt" />
-    <Text Include="..\how-to-convert-image-to-compat-raw.txt">
-      <Filter>Source</Filter>
-    </Text>
+    <Text Include="..\how-to-convert-image-to-compat-raw.txt" />
   </ItemGroup>
 </Project>
