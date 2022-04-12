@@ -50,22 +50,22 @@ GetRegisterDump:
 ret
 
 DumpGeneralRegisters:
-	mov [RegisterState.rax], rax
-	mov [RegisterState.rbx], rbx
-	mov [RegisterState.rcx], rcx
-	mov [RegisterState.rdx], rdx
+	mov [RegisterState.rax],	rax
+	mov [RegisterState.rbx],	rbx
+	mov [RegisterState.rcx],	rcx
+	mov [RegisterState.rdx],	rdx
 
-	mov [RegisterState.rsi], rsi
-	mov [RegisterState.rdi], rdi
+	mov [RegisterState.rsi],	rsi
+	mov [RegisterState.rdi],	rdi
 
-	mov [RegisterState.r8], r8
-	mov [RegisterState.r9], r9
-	mov [RegisterState.r10], r10
-	mov [RegisterState.r11], r11
-	mov [RegisterState.r12], r12
-	mov [RegisterState.r13], r13
-	mov [RegisterState.r14], r14
-	mov [RegisterState.r15], r15
+	mov [RegisterState.r8],		r8
+	mov [RegisterState.r9],		r9
+	mov [RegisterState.r10],	r10
+	mov [RegisterState.r11],	r11
+	mov [RegisterState.r12],	r12
+	mov [RegisterState.r13],	r13
+	mov [RegisterState.r14],	r14
+	mov [RegisterState.r15],	r15
 
 	; get rflags
 	pushfq
@@ -76,16 +76,16 @@ DumpGeneralRegisters:
 ret
 
 SaveSIMD:
-	vmovdqu [Y0State], ymm0
-	vmovdqu [Y1State], ymm1
-	vmovdqu [Y2State], ymm2
-	vmovdqu [Y3State], ymm3
-	vmovdqu [Y4State], ymm4
-	vmovdqu [Y5State], ymm5
-	vmovdqu [Y6State], ymm6
-	vmovdqu [Y7State], ymm7
-	vmovdqu [Y8State], ymm8
-	vmovdqu [Y9State], ymm9
+	vmovdqu [Y0State],	ymm0
+	vmovdqu [Y1State],	ymm1
+	vmovdqu [Y2State],	ymm2
+	vmovdqu [Y3State],	ymm3
+	vmovdqu [Y4State],	ymm4
+	vmovdqu [Y5State],	ymm5
+	vmovdqu [Y6State],	ymm6
+	vmovdqu [Y7State],	ymm7
+	vmovdqu [Y8State],	ymm8
+	vmovdqu [Y9State],	ymm9
 	vmovdqu [Y10State], ymm10
 	vmovdqu [Y11State], ymm11
 	vmovdqu [Y12State], ymm12

@@ -1,15 +1,16 @@
 [bits 64]
-
 extern SaveSIMD
 extern RestoreSIMD
 extern DumpGeneralRegisters
 extern GlobalInterruptTable
+extern GetRegisterDump
 
 global GlobalHandlerStubTable
 
 section .text
 
 %macro StandardHandler 1
+	mov rdi, %1
 	mov rax, [GlobalInterruptTable + (%1 << 3)]
 	test rax, rax
 	jz .ret
@@ -21,9 +22,7 @@ section .text
 IntStub%1:
 	call DumpGeneralRegisters
 	call SaveSIMD
-	pop rdi
-	;mov edi, [rsp] ; the error code
-	;add rsp, 4
+	pop rsi
 	StandardHandler %1
 	call RestoreSIMD
 iretq

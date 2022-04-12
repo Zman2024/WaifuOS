@@ -14,10 +14,10 @@ BUILDDIR = bin
 # Ok GCC 4.8+ if you wont let me turn off -fpermissive warnings then I'll
 # disable ALL warnings. and that definetly won't cause more issues than just
 # allowing me to do what i want... riiiight?
-CXXFLAGS = -g -ffreestanding -fshort-wchar -mno-red-zone -O0 -fno-exceptions -fno-rtti -masm=intel -fpermissive -w -I$(SRCDIR)/Headers
-CFLAGS = -g -ffreestanding -fno-exceptions -fshort-wchar -O0 -fno-rtti -I$(SRCDIR)/Headers
-INTFLAGS = -g -fpermissive -w -mno-red-zone -mgeneral-regs-only -ffreestanding -masm=intel -I$(SRCDIR)/Headers -c $^ -o $@
-ASMFLAGS = -f elf64 -g
+CXXFLAGS = -g -ffreestanding -fshort-wchar -pipe -mno-red-zone -O0 -fno-exceptions -fno-rtti -masm=intel -fpermissive -w -I$(SRCDIR)/Headers -c 
+CFLAGS = -g -ffreestanding -fno-exceptions -fshort-wchar -O0 -fno-rtti -I$(SRCDIR)/Headers -c 
+INTFLAGS = $(CXXFLAGS) # -g -fpermissive -w -mno-red-zone -mgeneral-regs-only -ffreestanding -masm=intel -I$(SRCDIR)/Headers -c 
+ASMFLAGS = -f elf64 -g 
 LDFLAGS = -T $(LDS) -static -Bsymbolic -nostdlib
 
 BOOTEFI := $(GNUEFI)/x86_64/bootloader/main.efi
@@ -35,17 +35,11 @@ OBJS += $(patsubst $(SRCDIR)/%.c, $(OBJDIR)/%.co, $(CSRC))
 OBJS += $(patsubst $(SRCDIR)/%.asm, $(OBJDIR)/%.asmo, $(ASMSRC))
 DIRS = $(wildcard $(SRCDIR)/*)
 
-# int need -mgeneral-regs-only
 kernel: $(OBJS) link
-$(OBJDIR)/Interrupts/Interrupts.cppo: $(SRCDIR)/Interrupts/Interrupts.cpp
-	@ echo ===== Compiling $^ =====
-	@ mkdir -p $(@D)
-	$(GC) $(INTFLAGS)
-
 $(OBJDIR)/%.cppo: $(SRCDIR)/%.cpp
 	@ echo ===== Compiling $^ =====
 	@ mkdir -p $(@D)
-	$(GC) $(CXXFLAGS) -c $^ -o $@
+	$(GC) $(CXXFLAGS) $^ -o $@
 
 # this is the only why i can get it to compile hpp as cpp files
 # just... dont ask ok, im very schitzo
@@ -53,13 +47,13 @@ $(OBJDIR)/%.hppo: $(SRCDIR)/%.hpp
 	@ echo ===== Compiling $^ =====
 	@ mkdir -p $(@D)
 	cp $^ $@.cpp
-	$(GC) $(CXXFLAGS) -c $@.cpp -o $@
+	$(GC) $(CXXFLAGS) $@.cpp -o $@
 	rm $@.cpp
 
 $(OBJDIR)/%.co: $(SRCDIR)/%.c
 	@ echo ===== Compiling $^ =====
 	@ mkdir -p $(@D)
-	$(GC) $(CFLAGS) -c $^ -o $@
+	$(GC) $(CFLAGS) $^ -o $@
 
 $(OBJDIR)/%.asmo: $(SRCDIR)/%.asm
 	@ echo ===== Compiling $^ =====

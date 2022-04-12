@@ -163,22 +163,22 @@ namespace Interrupts
 	void hBoundRangeFault();
 	void hInvalidOpcodeFault();
 	void hCoprocessorNAFault();
-	void hDoubleFault(nint code);
+	void hDoubleFault(nint intr, nint code);
 	void hCoprocessorSegmentOverrunFault();
-	void hInvalidStateSegmentFault(nint code);
-	void hSegmentMissingFault(nint code);
-	void hStackFault(nint code);
-	void hGeneralProtectionFault(nint code);
-	void hPageFault(nint code);
+	void hInvalidStateSegmentFault(nint intr, nint code);
+	void hSegmentMissingFault(nint intr, nint code);
+	void hStackFault(nint intr, nint code);
+	void hGeneralProtectionFault(nint intr, nint code);
+	void hPageFault(nint intr, nint code);
 	void hCoprocessorFault();
-	void hAlignmentCheck(nint code);
+	void hAlignmentCheck(nint intr, nint code);
 	void hMachineCheck();
 	void hSIMDFault();
 	void hKeyboardInt();
 	void hPitTick();
 	void hRtcTick();
 
-	void hStub();
+	void hStub(nint intr);
 
 }
 #undef _isr_

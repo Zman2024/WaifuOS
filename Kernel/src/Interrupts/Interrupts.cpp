@@ -62,6 +62,7 @@ namespace Interrupts
 	{
 		PanicScreen();
 		Console.WriteLine("ERROR: DIVIDE BY ZERO FAULT!");
+		PrintRegisterDump();
 	}
 
 	void hDebug()
@@ -78,12 +79,15 @@ namespace Interrupts
 	{
 		PanicScreen();
 		Console.WriteLine("Breakpoint");
+		PrintRegisterDump();
+		halt;
 	}
 
 	void hOverflowTrap()
 	{
 		PanicScreen();
 		Console.WriteLine("Overflow trap");
+		PrintRegisterDump();
 		halt;
 	}
 
@@ -91,6 +95,7 @@ namespace Interrupts
 	{
 		PanicScreen();
 		Console.WriteLine("Bound Range");
+		PrintRegisterDump();
 		halt;
 	}
 
@@ -98,6 +103,7 @@ namespace Interrupts
 	{
 		PanicScreen();
 		Console.Write("Invalid Opcode at address: ???");
+		PrintRegisterDump();
 		halt;
 	}
 
@@ -105,15 +111,17 @@ namespace Interrupts
 	{
 		PanicScreen();
 		Console.WriteLine("Coprocessor NA");
+		PrintRegisterDump();
 		halt;
 	}
 
-	void hDoubleFault(nint code)
+	void hDoubleFault(nint intr, nint code)
 	{
 		Console.Clear(Color::Red);
 		Console.SetBackgroundColor(Color::Red);
 		Console.SetForegroundColor(Color::White);
 		Console.WriteLine("ERROR: DOUBLE FAULT!");
+		PrintRegisterDump();
 		halt;
 	}
 
@@ -121,77 +129,88 @@ namespace Interrupts
 	{
 		PanicScreen();
 		Console.WriteLine("Segment Overrun!");
+		PrintRegisterDump();
 		halt;
 	}
 
-	void hInvalidStateSegmentFault(nint code)
+	void hInvalidStateSegmentFault(nint intr, nint code)
 	{
 		PanicScreen();
 		printlnf("Invalid State Segment!\nCode: %x0", code);
+		PrintRegisterDump();
 		halt;
 	}
 
-	void hSegmentMissingFault(nint code)
+	void hSegmentMissingFault(nint intr, nint code)
 	{
 		PanicScreen();
 		printlnf("Segment Missing!\nCode: %x0", code);
+		PrintRegisterDump();
 		halt;
 	}
 
-	void hStackFault(nint code)
+	void hStackFault(nint intr, nint code)
 	{
 		PanicScreen();
 		printlnf("Stack Exception!\nCode: %x0", code);
+		PrintRegisterDump();
 		halt;
 	}
 
-	void hGeneralProtectionFault(nint code)
+	void hGeneralProtectionFault(nint intr, nint code)
 	{
 		PanicScreen();
 		printlnf("ERROR: GENERAL PROTECTION FAULT!\nCode: %x0", code);
-		// halt;
+		PrintRegisterDump();
+		halt;
 	}
 
-	void hPageFault(nint code)
+	void hPageFault(nint intr, nint code)
 	{
 		PanicScreen();
-		Console.WriteLine("ERROR: PAGE FAULT!");
-		Console.Write("ATTEMPTED TO ACCESS ADDRESS: ");
 
 		uint64 addr = 0;
 		// cr2 contains the page fault linear address (PFLA)
 		asm ("mov %0, %%cr2" : "=r" (addr) );
 
-		Console.WriteLine(cstr::ToString(addr, true));
-		Console.Write(cstr::format("Error Code: %x0", code));
+		printlnf("ERROR: PAGE FAULT!");
+		printlnf("ATTEMPTED TO ACCESS ADDRESS: %x0", addr);
+
+		printlnf("Error Code: %x0", code);
+
+		PrintRegisterDump();
 		halt;
 	}
 
 	void hCoprocessorFault()
 	{
 		PanicScreen();
-		Console.WriteLine("ERROR: COPROCESSOR FAULT!");
+		Console.WriteLine("ERROR: COPROCESSOR FAULT!\n");
+		PrintRegisterDump();
 		halt;
 	}
 
-	void hAlignmentCheck(nint code)
+	void hAlignmentCheck(nint intr, nint code)
 	{
 		PanicScreen();
-		printlnf("Alignment Check\nCode: %x0", code);
+		printlnf("Alignment Check \nCode: %x0\n", code);
+		PrintRegisterDump();
 		halt;
 	}
 
 	void hMachineCheck()
 	{
 		PanicScreen();
-		Console.WriteLine("Machine Check");
+		Console.WriteLine("Machine Check\n");
+		PrintRegisterDump();
 		halt;
 	}
 
 	void hSIMDFault()
 	{
 		PanicScreen();
-		Console.WriteLine("SIMD Exception");
+		Console.WriteLine("SIMD Exception\n");
+		PrintRegisterDump();
 		halt;
 	}
 
@@ -221,15 +240,9 @@ namespace Interrupts
 		else PIC::SendEIO(false);
 	}
 
-	void hStub()
+	void hStub(nint intr)
 	{
-		debug("Stub Called!");
-		// PanicScreen();
-		// PrintRegisterDump();
-
-		// halt;
-		// if (APIC::InUse) APIC::EndOfInterrupt();
-		// else PIC::SendEIO(false);
+		warn("[WARNING]: An interrupt without a handler was called! Interrupt: %x0", intr);
 	}
 
 }
