@@ -31,5 +31,13 @@ SECTIONS
 	}
 	_BssDataEnd = .;
 
+	.init_array : ALIGN(0x1000)
+	{
+		_ctorStart = .;
+		*(.ctors)
+		*(.init_array)
+		_ctorEnd = .;
+	}
+
 	_KernelEnd = .;
 }

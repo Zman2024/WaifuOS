@@ -22,6 +22,9 @@ global byte _KernelEnd;
 global byte _BssDataStart;
 global byte _BssDataEnd;
 
+global uint64 _ctorStart;
+global uint64 _ctorEnd;
+
 #ifndef NO_ANIME
 static char OSName[] = "WaifuOS";
 #else

@@ -115,6 +115,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="IO\IOBus.cpp" />
     <ClCompile Include="IO\Keyboard.cpp" />
     <ClCompile Include="IO\PCI.cpp" />
+    <ClCompile Include="IO\XHCI.cpp" />
     <ClCompile Include="KernelUtils.cpp" />
     <ClCompile Include="Main.cpp" />
     <ClCompile Include="Memory\Memory.cpp" />
@@ -122,6 +123,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="Memory\PageMapIndexer.cpp" />
     <ClCompile Include="Memory\PageTableManager.cpp" />
     <ClCompile Include="PrimitiveConsole.cpp" />
+    <ClCompile Include="Scheduling\Scheduling.cpp" />
     <ClCompile Include="string.cpp" />
     <ClCompile Include="Timers\PIT.cpp" />
     <ClCompile Include="Timers\RTC.cpp" />
@@ -146,6 +148,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\Keyboard.h" />
     <ClInclude Include="Headers\LocalAPIC.h" />
     <ClInclude Include="Headers\Memory.h" />
+    <ClInclude Include="Headers\MMIO.hpp" />
     <ClInclude Include="Headers\PageFrameAllocator.h" />
     <ClInclude Include="Headers\PageMapIndexer.h" />
     <ClInclude Include="Headers\PageTableManager.h" />
@@ -156,11 +159,14 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\PrimitiveConsole.h" />
     <ClInclude Include="Headers\cstr.h" />
     <ClInclude Include="Headers\RTC.h" />
+    <ClInclude Include="Headers\Scheduling.h" />
     <ClInclude Include="Headers\Speaker.h" />
     <ClInclude Include="Headers\string.h" />
     <ClInclude Include="Headers\Structs.h" />
+    <ClInclude Include="Headers\Synchronization.hpp" />
     <ClInclude Include="Headers\Types.h" />
     <ClInclude Include="Headers\KernelUtils.h" />
+    <ClInclude Include="Headers\XHCI.h" />
   </ItemGroup>
   <ItemGroup>
     <None Include="..\kernel.ld" />
@@ -170,6 +176,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <None Include="Interrupts\Handlers.asm" />
     <None Include="Interrupts\Interrupts.asm" />
     <None Include="string.asm" />
+    <None Include="Synchronization\Synchronization.asm" />
   </ItemGroup>
   <ItemGroup>
     <Text Include="..\how-to-convert-image-to-compat-raw.txt" />

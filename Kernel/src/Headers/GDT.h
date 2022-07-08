@@ -9,28 +9,98 @@ struct GDTDescriptor
 	uint64 Offset;
 } attribute((packed));
 
-struct GDTEntry
+// https://wiki.osdev.org/Global_Descriptor_Table#Segment_Descriptor
+struct AccessByte
+{
+	inline AccessByte(byte value) { *(byte*)this = value; }
+
+	byte Accessed : 1;
+	byte ReadWrite : 1;
+	byte Direction : 1;
+	byte Executable : 1;
+	byte DescriptorType : 1; // must be 1 for code / data segment descriptor
+	byte PrivilegeLevel : 2;
+	byte Present : 1;
+	
+} attribute((packed));
+
+// https://wiki.osdev.org/Global_Descriptor_Table#Segment_Descriptor
+struct SegmentDescriptor
 {
 	uint16 Limit0;
 	uint16 Base0;
 
 	byte Base1;
-	byte AccessByte;
+	AccessByte Access;
 	byte Limit1Flags;
 	byte Base2;
+
+	inline void SetBase(uint32 base)
+	{
+		Base0 = base & 0xFFFF;
+
+		base >>= 16;
+		Base1 = base & 0xFF;
+
+		base >>= 8;
+		Base2 = base & 0xFF;
+	}
+
+} attribute((packed));
+
+// https://wiki.osdev.org/Global_Descriptor_Table#System_Segment_Descriptor 
+struct SystemAccessByte
+{
+	inline SystemAccessByte(byte value) { *(byte*)this = value; }
+
+	byte SystemDescriptorType : 4;
+	byte DescriptorType : 1;	// must be 0 for System Segment Descriptor
+	byte PrivilegeLevel : 2;
+	byte Present : 1;
+
+} attribute((packed));
+
+// https://wiki.osdev.org/Global_Descriptor_Table#Long_Mode_System_Segment_Descriptor
+struct SystemSegmentDescriptor
+{
+	uint16 Limit0;
+	uint16 Base0;
+
+	byte Base1;
+	SystemAccessByte Access;
+	byte Limit1Flags;
+	byte Base2;
+
+	uint32 Base3;
+	uint32 rsv0;
+
+	inline void SetBase(uint64 base)
+	{
+		Base0 = base & 0xFFFF;
+
+		base >>= 16;
+		Base1 = base & 0xFF;
+
+		base >>= 8;
+		Base2 = base & 0xFF;
+
+		base >>= 8;
+		Base3 = base & 0xFFFFFFFF;
+	}
+
 } attribute((packed));
 
 struct GDT
 {
-	GDTEntry KernelNull;
-	GDTEntry KernelCode;
-	GDTEntry KernelData;
+	SegmentDescriptor KernelNull;
+	SegmentDescriptor KernelCode;
+	SegmentDescriptor KernelData;
 
-	GDTEntry UserNull;
-	GDTEntry UserCode;
-	GDTEntry UserData;
+	SegmentDescriptor UserCode;
+	SegmentDescriptor UserData;
+	SystemSegmentDescriptor TaskSS;
 
-} attribute((packed)) attribute((aligned(PAGE_SIZE)));
+} attribute((packed)) attribute((aligned(0x10)));
 
 global void LoadGDT(GDTDescriptor* desc);
 

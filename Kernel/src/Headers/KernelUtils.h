@@ -26,6 +26,7 @@
 #include <Speaker.h>
 #include <Keyboard.h>
 #include <asmUtils.h>
+#include <Scheduling.h>
 
 namespace Kernel
 {

@@ -45,6 +45,18 @@
     <Filter Include="Source\Audio">
       <UniqueIdentifier>{2be688f6-263e-45c3-bf79-73d5a164e602}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Synchronization">
+      <UniqueIdentifier>{53dff4eb-7433-4f92-afa9-3a125c026a6a}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Synchronization">
+      <UniqueIdentifier>{0ca32322-95e9-42ee-907d-10dbeb0cc385}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\Scheduling">
+      <UniqueIdentifier>{bc3f4fa1-a4e2-4843-a764-e5b10475f5a1}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Scheduling">
+      <UniqueIdentifier>{c24116a6-ad83-4eb1-a843-df9617218935}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KernelUtils.cpp">
@@ -121,6 +133,12 @@
     </ClCompile>
     <ClCompile Include="IO\Keyboard.cpp">
       <Filter>Source\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\XHCI.cpp">
+      <Filter>Source\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Scheduling\Scheduling.cpp">
+      <Filter>Source\Scheduling</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -226,6 +244,18 @@
     <ClInclude Include="Headers\Direction.h">
       <Filter>Headers</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\MMIO.hpp">
+      <Filter>Headers\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\XHCI.h">
+      <Filter>Headers\IO</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Synchronization.hpp">
+      <Filter>Headers\Synchronization</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\Scheduling.h">
+      <Filter>Headers\Scheduling</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Interrupts\GDT.asm">
@@ -244,6 +274,9 @@
     </None>
     <None Include="Interrupts\Handlers.asm">
       <Filter>Source\Interrupts</Filter>
+    </None>
+    <None Include="Synchronization\Synchronization.asm">
+      <Filter>Source\Synchronization</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>
