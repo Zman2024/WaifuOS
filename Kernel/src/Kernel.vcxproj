@@ -118,6 +118,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="IO\XHCI.cpp" />
     <ClCompile Include="KernelUtils.cpp" />
     <ClCompile Include="Main.cpp" />
+    <ClCompile Include="Memory\List.cpp" />
     <ClCompile Include="Memory\Memory.cpp" />
     <ClCompile Include="Memory\PageFrameAllocator.cpp" />
     <ClCompile Include="Memory\PageMapIndexer.cpp" />
@@ -146,6 +147,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\IOAPIC.h" />
     <ClInclude Include="Headers\IOBus.hpp" />
     <ClInclude Include="Headers\Keyboard.h" />
+    <ClInclude Include="Headers\List.h" />
     <ClInclude Include="Headers\LocalAPIC.h" />
     <ClInclude Include="Headers\Memory.h" />
     <ClInclude Include="Headers\MMIO.hpp" />

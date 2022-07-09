@@ -5,7 +5,7 @@
 
 struct BitMap
 {
-	size_t SizeBytes;
+	nint SizeBytes;
 	byte* Buffer;
 	bool operator[] (uint64 index);
 	bool Set(uint64 index, bool value);

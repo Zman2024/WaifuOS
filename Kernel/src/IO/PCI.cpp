@@ -89,7 +89,7 @@ namespace PCI
 
 							case 0x30: // XHCI (USB3) Controller
 								debug("\tFound USB XHCI Controller (USB3)");
-								new USB::XHCIDriver(pci);
+								//new USB::XHCIDriver(pci);
 								break;
 
 							case 0x80: // Unspecified

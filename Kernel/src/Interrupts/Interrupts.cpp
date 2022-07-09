@@ -24,7 +24,7 @@ namespace Interrupts
 			intDescEntry[x].Selector = 0x08;
 			intDescEntry[x].TypeAttribs = IdtType::InterruptGate;
 			intDescEntry[x].SetOffset((nint)GlobalHandlerStubTable[x]);
-
+			intDescEntry[x].IST = 0x00;
 			GlobalInterruptTable[x] = (nint)hStub;
 		}
 	}
@@ -44,7 +44,7 @@ namespace Interrupts
 		gConsole.SetForegroundColor(Color32(0xFFDDDDDD));
 	}
 
-	forceinline void PrintRegisterDump()
+	forceinline void PrintRegisterDump(InterruptFrame* frame)
 	{
 		auto regs = GetRegisterDump();
 
@@ -52,17 +52,23 @@ namespace Interrupts
 
 		printlnf("rsi: %x0 \nrdi: %x1 \n", regs->rsi, regs->rdi);
 
+		printlnf("rsp: %x0 \nrbp: %x1 \n", frame->rsp, regs->rbp);
+
 		printlnf("r8: %x0 \nr9: %x1 \nr10: %x2 \nr11: %x3 \nr12: %x4 \nr13: %x5 \nr14: %x6 \nr15: %x7 \n",
 			regs->r8, regs->r9, regs->r10, regs->r11, regs->r12, regs->r13, regs->r14, regs->r15);
 
-		printlnf("rflags: %x0", regs->rflags);
+		printlnf("rip: %x0 \n", frame->rip);
+
+		printlnf("cs: %x0 \nss: %x1 \n", frame->cs, frame->ss);
+
+		printlnf("rflags: %x0", frame->rflags);
 	}
 
-	void hDivideByZeroFault()
+	void hDivideByZeroFault(nint code, InterruptFrame* frame)
 	{
 		PanicScreen();
 		Console.WriteLine("ERROR: DIVIDE BY ZERO FAULT!");
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 	}
 
 	void hDebug()
@@ -70,102 +76,102 @@ namespace Interrupts
 		Console.WriteLine("Debug int called");
 	}
 
-	void hNonMaskableFault()
+	void hNonMaskableInterrupt(nint code, InterruptFrame* frame)
 	{
-		Console.WriteLine("NMI");
+		warn("NMI");
 	}
 
-	void hBreakpointFault()
+	void hBreakpointFault(nint code, InterruptFrame* frame)
 	{
 		PanicScreen();
 		Console.WriteLine("Breakpoint");
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hOverflowTrap()
+	void hOverflowTrap(nint code, InterruptFrame* frame)
 	{
 		PanicScreen();
 		Console.WriteLine("Overflow trap");
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hBoundRangeFault()
+	void hBoundRangeFault(nint code, InterruptFrame* frame)
 	{
 		PanicScreen();
 		Console.WriteLine("Bound Range");
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hInvalidOpcodeFault()
+	void hInvalidOpcodeFault(nint code, InterruptFrame* frame)
 	{
 		PanicScreen();
-		Console.Write("Invalid Opcode at address: ???");
-		PrintRegisterDump();
+		Console.WriteLine("Invalid Opcode at address: %x0", frame->rip);
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hCoprocessorNAFault()
+	void hCoprocessorNAFault(nint code, InterruptFrame* frame)
 	{
 		PanicScreen();
 		Console.WriteLine("Coprocessor NA");
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hDoubleFault(nint intr, nint code)
+	void hDoubleFault(nint intr, InterruptFrame* frame, nint code)
 	{
 		Console.Clear(Color::Red);
 		Console.SetBackgroundColor(Color::Red);
 		Console.SetForegroundColor(Color::White);
 		Console.WriteLine("ERROR: DOUBLE FAULT!");
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hCoprocessorSegmentOverrunFault()
+	void hCoprocessorSegmentOverrunFault(nint code, InterruptFrame* frame)
 	{
 		PanicScreen();
 		Console.WriteLine("Segment Overrun!");
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hInvalidStateSegmentFault(nint intr, nint code)
+	void hInvalidStateSegmentFault(nint intr, InterruptFrame* frame, nint code)
 	{
 		PanicScreen();
 		printlnf("Invalid State Segment!\nCode: %x0", code);
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hSegmentMissingFault(nint intr, nint code)
+	void hSegmentMissingFault(nint intr, InterruptFrame* frame, nint code)
 	{
 		PanicScreen();
 		printlnf("Segment Missing!\nCode: %x0", code);
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hStackFault(nint intr, nint code)
+	void hStackFault(nint intr, InterruptFrame* frame, nint code)
 	{
 		PanicScreen();
 		printlnf("Stack Exception!\nCode: %x0", code);
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hGeneralProtectionFault(nint intr, nint code)
+	void hGeneralProtectionFault(nint intr, InterruptFrame* frame, nint code)
 	{
 		PanicScreen();
 		printlnf("ERROR: GENERAL PROTECTION FAULT!\nCode: %x0", code);
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hPageFault(nint intr, nint code)
+	void hPageFault(nint intr, InterruptFrame* frame, nint code)
 	{
 		PanicScreen();
 
@@ -178,39 +184,39 @@ namespace Interrupts
 
 		printlnf("Error Code: %x0", code);
 
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hCoprocessorFault()
+	void hCoprocessorFault(nint intr, InterruptFrame* frame)
 	{
 		PanicScreen();
 		Console.WriteLine("ERROR: COPROCESSOR FAULT!\n");
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hAlignmentCheck(nint intr, nint code)
+	void hAlignmentCheck(nint intr, InterruptFrame* frame, nint code)
 	{
 		PanicScreen();
 		printlnf("Alignment Check \nCode: %x0\n", code);
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hMachineCheck()
+	void hMachineCheck(nint intr, InterruptFrame* frame)
 	{
 		PanicScreen();
 		Console.WriteLine("Machine Check\n");
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 
-	void hSIMDFault()
+	void hSIMDFault(nint intr, InterruptFrame* frame)
 	{
 		PanicScreen();
 		Console.WriteLine("SIMD Exception\n");
-		PrintRegisterDump();
+		PrintRegisterDump(frame);
 		halt;
 	}
 

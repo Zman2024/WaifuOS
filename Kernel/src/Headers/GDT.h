@@ -74,6 +74,11 @@ struct SystemSegmentDescriptor
 	uint32 Base3;
 	uint32 rsv0;
 
+	forceinline void SetBase(vptr base)
+	{
+		SetBase((u64)base);
+	}
+
 	inline void SetBase(uint64 base)
 	{
 		Base0 = base & 0xFFFF;
@@ -86,6 +91,19 @@ struct SystemSegmentDescriptor
 
 		base >>= 8;
 		Base3 = base & 0xFFFFFFFF;
+	}
+
+	inline void SetLimit(uint32 limit)
+	{
+		limit &= 0xFFFFF;
+		Limit0 = limit & 0xFFFF;
+		limit >>= 16;
+
+		// extract top 4 bits (flags)
+		byte flags = Limit1Flags & 0xF0;
+
+		Limit1Flags = limit & 0xF;
+		Limit1Flags |= flags; // restore flags
 	}
 
 } attribute((packed));

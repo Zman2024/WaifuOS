@@ -138,7 +138,7 @@ namespace Kernel
 		// Register exceptions
 		RegisterInterrupt((vptr)hDivideByZeroFault, Interrupt::DivideByZero);
 		RegisterInterrupt((vptr)hDebug, Interrupt::Debug);
-		RegisterInterrupt((vptr)hNonMaskableFault, Interrupt::NonMaskable);
+		RegisterInterrupt((vptr)hNonMaskableInterrupt, Interrupt::NonMaskable);
 		RegisterInterrupt((vptr)hBreakpointFault, Interrupt::Breakpoint, IdtType::TrapGate);
 		RegisterInterrupt((vptr)hOverflowTrap, Interrupt::OverflowTrap, IdtType::TrapGate);
 		RegisterInterrupt((vptr)hBoundRangeFault, Interrupt::BoundRangeExceeded);
@@ -166,10 +166,22 @@ namespace Kernel
 	{
 		debug("Loading Global Descriptor Table (GDT)...");
 		// Create and load GDT
+
+		GlobalGDT.TaskSS.Access.Present = 1;
+		GlobalGDT.TaskSS.Access.PrivilegeLevel = 0;
+		GlobalGDT.TaskSS.Access.DescriptorType = 0;
+		GlobalGDT.TaskSS.Access.SystemDescriptorType = 0x9;
+		GlobalGDT.TaskSS.SetLimit(sizeof(TaskStateSegment) - 1); // this needs to change if i want to use an IOPB (sizeof(tss) + 32)
+		GlobalGDT.TaskSS.SetBase(&gTSS);
+
 		GDTDescriptor desc{};
 		desc.Size = sizeof(GDT) - 1;
 		desc.Offset = (u64)&GlobalGDT;
+
+
 		LoadGDT(&desc);
+		nint tssIndex = (u64)(u64(&GlobalGDT.TaskSS) - u64(&GlobalGDT));
+		LoadTSS(tssIndex);
 	}
 
 	void InitializePaging(const BootInfo& bootInfo)

@@ -140,6 +140,9 @@
     <ClCompile Include="Scheduling\Scheduling.cpp">
       <Filter>Source\Scheduling</Filter>
     </ClCompile>
+    <ClCompile Include="Memory\List.cpp">
+      <Filter>Source\Memory</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\EFI.h">
@@ -255,6 +258,9 @@
     </ClInclude>
     <ClInclude Include="Headers\Scheduling.h">
       <Filter>Headers\Scheduling</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\List.h">
+      <Filter>Headers\Memory</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

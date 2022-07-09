@@ -28,8 +28,8 @@ namespace APIC
 	void ParseMADT(MADTHeader* madt)
 	{
 		debug("APIC Table: ");
-		u64 MaxAddress = madt->Length + u64(madt);
-		BaseRecord* currentRecord = (BaseRecord*)((u64)madt + sizeof(MADTHeader));
+		u64 maxAddress = madt->Length + u64(madt);
+		BaseRecord* currentRecord = (BaseRecord*)(u64(madt) + sizeof(MADTHeader));
 		u64 lApicPhysAddress = u64(madt->LapicAddress);
 
 		IOAPICsCount = 0x00;
@@ -37,7 +37,7 @@ namespace APIC
 		IRQOverridesCount = 0x00;
 		LocalAPICRecordsCount = 0x00;
 
-		while ((u64)currentRecord < MaxAddress)
+		while ((u64)currentRecord < maxAddress)
 		{
 			switch (currentRecord->Type)
 			{

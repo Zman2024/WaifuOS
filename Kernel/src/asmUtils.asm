@@ -24,6 +24,7 @@ global GetRDRAND
 global CheckXSAVE
 global EnableXSAVE
 global memset64
+global LoadTSS
 
 CPUID.ECX.XSAVE equ 1 << 26
 CR4.OSXSAVE equ 1 << 18
@@ -69,6 +70,14 @@ ret
 
 TestAVX:
 	vpxor ymm0, ymm0, ymm0
+ret
+
+; Scheduling.h
+; rdi: tss offset in GDT
+LoadTSS:
+	mov rax, rdi
+	and rax, 0xFFFF
+	ltr ax
 ret
 
 GetRDRAND:

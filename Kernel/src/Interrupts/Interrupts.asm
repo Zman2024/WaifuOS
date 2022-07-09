@@ -3,6 +3,7 @@ global SaveSIMD
 global RestoreSIMD
 global DumpGeneralRegisters
 global GetRegisterDump
+global RestoreGeneralRegisters
 
 section .data
 
@@ -32,6 +33,8 @@ RegisterState:
 	.rsi: dq 0
 	.rdi: dq 0
 
+	.rbp: dq 0
+
 	.r8: dq 0
 	.r9: dq 0
 	.r10: dq 0
@@ -41,7 +44,10 @@ RegisterState:
 	.r14: dq 0
 	.r15: dq 0
 
-	.rflags: dq 0
+	.ds: dq 0
+	.es: dq 0
+	.fs: dq 0
+	.gs: dq 0
 
 section .text
 
@@ -58,6 +64,8 @@ DumpGeneralRegisters:
 	mov [RegisterState.rsi],	rsi
 	mov [RegisterState.rdi],	rdi
 
+	mov [RegisterState.rbp],	rbp
+
 	mov [RegisterState.r8],		r8
 	mov [RegisterState.r9],		r9
 	mov [RegisterState.r10],	r10
@@ -67,12 +75,49 @@ DumpGeneralRegisters:
 	mov [RegisterState.r14],	r14
 	mov [RegisterState.r15],	r15
 
-	; get rflags
-	pushfq
-	pop rax
-	mov [RegisterState.rflags], rax
+	; segment registers (cs and ss saved by CPU)
+	mov rax, ds
+	mov [RegisterState.ds], rax
+	mov rax, es
+	mov [RegisterState.es], rax
+	mov rax, fs
+	mov [RegisterState.fs], rax
+	mov rax, gs
+	mov [RegisterState.gs], rax
 	
 	lea rax, [RegisterState]
+ret
+
+RestoreGeneralRegisters:
+	
+	; segment registers (cs and ss restored by CPU (iretq))
+	mov rax, [RegisterState.ds]
+	mov ds, rax
+	mov rax, [RegisterState.es]
+	mov es, rax
+	mov rax, [RegisterState.fs]
+	mov fs, rax
+	mov rax, [RegisterState.gs]
+	mov gs, rax
+
+	mov rax,	[RegisterState.rax]
+	mov rbx,	[RegisterState.rbx]
+	mov rcx,	[RegisterState.rcx]
+	mov rdx,	[RegisterState.rdx]
+
+	mov rsi,	[RegisterState.rsi]
+	mov rdi,	[RegisterState.rdi]
+
+	mov rbp,	[RegisterState.rbp]
+
+	mov r8,		[RegisterState.r8]
+	mov r9,		[RegisterState.r9]
+	mov r10,	[RegisterState.r10]
+	mov r11,	[RegisterState.r11]
+	mov r12,	[RegisterState.r12]
+	mov r13,	[RegisterState.r13]
+	mov r14,	[RegisterState.r14]
+	mov r15,	[RegisterState.r15]
 ret
 
 SaveSIMD:

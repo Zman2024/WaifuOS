@@ -27,6 +27,9 @@ namespace Memory
 	void PrintLeaks()
 	{
 		static bool sayMessage = true;
+
+		debug("========== Current Memory Allocations ==========");
+
 		if (sayMessage)
 		{
 			debug("Note: Alloc #0 is not a 'leak' it's there intentionally.");
@@ -34,8 +37,14 @@ namespace Memory
 		}
 
 		SegmentHeader* pos = heapBase;
+		if (!pos)
+		{
+			error("SOMETHING HAS GONE VERY WRONG (heapBase = nullptr?)");
+			OS_HLT;
+		}
+
 		nint nAllocs = 0;
-		while (pos)
+		while (pos && pos >= heapBase && pos <= heapEnd)
 		{
 			if (!pos->Free)
 			{
@@ -60,6 +69,7 @@ namespace Memory
 		for (nint x = 0; x < pages; x++)
 		{
 			PageTableManager::MapMemory((vptr)temp, PageFrameAllocator::RequestPage());
+			memset64((vptr)temp, 0x00, PAGE_SIZE);
 			temp += PAGE_SIZE;
 		}
 
@@ -95,6 +105,7 @@ namespace Memory
 		for (nint x = 0; x < pageCount; x++)
 		{
 			PageTableManager::MapMemory(heapEnd, PageFrameAllocator::RequestPage());
+			memset64(heapEnd, 0x00, PAGE_SIZE);
 			heapEnd = nint(heapEnd) + PAGE_SIZE;
 		}
 
@@ -201,13 +212,14 @@ vptr calloc(nint size)
 
 void free(vptr address)
 {
-	if (!HeapInitialized)
+	if (!HeapInitialized || !address)
 	{
 		// cause nullptr pagefult
 		asm("mov %%cr2, %0" : : "a" (nullptr));
 		intcall(0x0E);
 		return nullptr;
 	}
+
 	SegmentHeader* seg = (SegmentHeader*)address - 1;
 	seg->Free = true;
 	seg->CombineForward();

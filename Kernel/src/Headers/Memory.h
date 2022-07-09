@@ -7,10 +7,10 @@ namespace Memory
 {
 	struct SegmentHeader
 	{
-		nint Length;
-		SegmentHeader* Next;
-		SegmentHeader* Previous;
-		bool Free;
+		nint Length = 0x00;
+		SegmentHeader* Next = nullptr;
+		SegmentHeader* Previous = nullptr;
+		bool Free = false;
 
 		void CombineForward();
 		void CombineBackward();

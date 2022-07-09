@@ -2,12 +2,6 @@
 #ifndef H_Interrupts
 #define H_Interrupts
 
-// intelicock:tm: fix
-#ifdef VISUAL_STUDIO_EDITOR
-#define _isr_ 
-#else
-#define _isr_ __attribute__ ((interrupt)) 
-#endif
 #include <Types.h>
 #include <Globals.h>
 #include <cstr.h>
@@ -20,10 +14,10 @@ namespace Interrupts
 
 	struct InterruptFrame
 	{
-		nint ip;
+		nint rip;
 		nint cs;
-		nint flags;
-		nint sp;
+		nint rflags;
+		nint rsp;
 		nint ss;
 	};
 
@@ -37,6 +31,8 @@ namespace Interrupts
 		nint rsi;
 		nint rdi;
 
+		nint rbp;
+
 		nint r8;
 		nint r9;
 		nint r10;
@@ -46,7 +42,10 @@ namespace Interrupts
 		nint r14;
 		nint r15;
 
-		nint rflags;
+		nint ds;
+		nint es;
+		nint fs;
+		nint gs;
 	};
 
 	/* From: https://wiki.osdev.org/Interrupt_Vector_Table#CPU_Interrupt_Layout
@@ -155,25 +154,25 @@ namespace Interrupts
 	void RegisterInterruptStubs();
 	void RegisterInterrupt(vptr handlerAddress, u16 inter, IdtType interruptType = IdtType::InterruptGate);
 
-	void hDivideByZeroFault();
+	void hDivideByZeroFault(nint code, InterruptFrame* frame);
 	void hDebug();
-	void hNonMaskableFault();
-	void hBreakpointFault();
-	void hOverflowTrap();
-	void hBoundRangeFault();
-	void hInvalidOpcodeFault();
-	void hCoprocessorNAFault();
-	void hDoubleFault(nint intr, nint code);
-	void hCoprocessorSegmentOverrunFault();
-	void hInvalidStateSegmentFault(nint intr, nint code);
-	void hSegmentMissingFault(nint intr, nint code);
-	void hStackFault(nint intr, nint code);
-	void hGeneralProtectionFault(nint intr, nint code);
-	void hPageFault(nint intr, nint code);
-	void hCoprocessorFault();
-	void hAlignmentCheck(nint intr, nint code);
-	void hMachineCheck();
-	void hSIMDFault();
+	void hNonMaskableInterrupt(nint code, InterruptFrame* frame);
+	void hBreakpointFault(nint code, InterruptFrame* frame);
+	void hOverflowTrap(nint code, InterruptFrame* frame);
+	void hBoundRangeFault(nint code, InterruptFrame* frame);
+	void hInvalidOpcodeFault(nint code, InterruptFrame* frame);
+	void hCoprocessorNAFault(nint code, InterruptFrame* frame);
+	void hDoubleFault(nint intr, InterruptFrame* frame, nint code);
+	void hCoprocessorSegmentOverrunFault(nint code, InterruptFrame* frame);
+	void hInvalidStateSegmentFault(nint intr, InterruptFrame* frame, nint code);
+	void hSegmentMissingFault(nint intr, InterruptFrame* frame, nint code);
+	void hStackFault(nint intr, InterruptFrame* frame, nint code);
+	void hGeneralProtectionFault(nint intr, InterruptFrame* frame, nint code);
+	void hPageFault(nint intr, InterruptFrame* frame, nint code);
+	void hCoprocessorFault(nint code, InterruptFrame* frame);
+	void hAlignmentCheck(nint intr, InterruptFrame* frame, nint code);
+	void hMachineCheck(nint code, InterruptFrame* frame);
+	void hSIMDFault(nint code, InterruptFrame* frame);
 	void hKeyboardInt();
 	void hPitTick();
 	void hRtcTick();
@@ -181,5 +180,4 @@ namespace Interrupts
 	void hStub(nint intr);
 
 }
-#undef _isr_
 #endif

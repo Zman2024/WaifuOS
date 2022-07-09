@@ -4,6 +4,7 @@ extern RestoreSIMD
 extern DumpGeneralRegisters
 extern GlobalInterruptTable
 extern GetRegisterDump
+extern RestoreGeneralRegisters
 
 global GlobalHandlerStubTable
 
@@ -11,6 +12,7 @@ section .text
 
 %macro StandardHandler 1
 	mov rdi, %1
+	mov rsi, rsp
 	mov rax, [GlobalInterruptTable + (%1 << 3)]
 	test rax, rax
 	jz .ret
@@ -22,9 +24,10 @@ section .text
 IntStub%1:
 	call DumpGeneralRegisters
 	call SaveSIMD
-	pop rsi
+	pop rdx
 	StandardHandler %1
 	call RestoreSIMD
+	call RestoreGeneralRegisters
 iretq
 %endmacro
 
@@ -34,6 +37,7 @@ IntStub%1:
 	call SaveSIMD
 	StandardHandler %1
 	call RestoreSIMD
+	call RestoreGeneralRegisters
 iretq
 %endmacro
 

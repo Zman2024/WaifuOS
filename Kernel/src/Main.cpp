@@ -1,4 +1,5 @@
 #include <KernelUtils.h>
+#include <List.h>
 
 namespace Kernel
 {
@@ -47,9 +48,11 @@ namespace Kernel
 
 		gConsole.WriteLine(string(OSName) + " Initialized!", Color::Green);
 		Memory::PrintLeaks();
-
 		gConsole.EnableCursor();
 
-		while (true) hlt;
+		while (true)
+		{
+			hlt;
+		}
 	}
 }
