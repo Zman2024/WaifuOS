@@ -14,39 +14,66 @@ namespace Interrupts
 
 	struct InterruptFrame
 	{
-		nint rip;
-		nint cs;
-		nint rflags;
-		nint rsp;
-		nint ss;
+		nint rip = 0x00;
+		nint cs = 0x00;
+		nint rflags = 0x00;
+		nint rsp = 0x00;
+		nint ss = 0x00;
 	};
 
 	struct RegisterState
 	{
-		nint rax;
-		nint rbx;
-		nint rcx;
-		nint rdx;
+		nint rax = 0;
+		nint rbx = 0;
+		nint rcx = 0;
+		nint rdx = 0;
 
-		nint rsi;
-		nint rdi;
+		nint rsi = 0;
+		nint rdi = 0;
 
-		nint rbp;
+		nint rbp = 0;
 
-		nint r8;
-		nint r9;
-		nint r10;
-		nint r11;
-		nint r12;
-		nint r13;
-		nint r14;
-		nint r15;
+		nint r8 = 0;
+		nint r9 = 0;
+		nint r10 = 0;
+		nint r11 = 0;
+		nint r12 = 0;
+		nint r13 = 0;
+		nint r14 = 0;
+		nint r15 = 0;
 
-		nint ds;
-		nint es;
-		nint fs;
-		nint gs;
-	};
+		nint ds = 0;
+		nint es = 0;
+		nint fs = 0;
+		nint gs = 0;
+
+		fp64 mm0 = 0;
+		fp64 mm1 = 0;
+		fp64 mm2 = 0;
+		fp64 mm3 = 0;
+		fp64 mm4 = 0;
+		fp64 mm5 = 0;
+		fp64 mm6 = 0;
+		fp64 mm7 = 0;
+
+		fp64 ymm0[4] = { 0, 0, 0, 0 };
+		fp64 ymm1[4] = { 0, 0, 0, 0 };
+		fp64 ymm2[4] = { 0, 0, 0, 0 };
+		fp64 ymm3[4] = { 0, 0, 0, 0 };
+		fp64 ymm4[4] = { 0, 0, 0, 0 };
+		fp64 ymm5[4] = { 0, 0, 0, 0 };
+		fp64 ymm6[4] = { 0, 0, 0, 0 };
+		fp64 ymm7[4] = { 0, 0, 0, 0 };
+		fp64 ymm8[4] = { 0, 0, 0, 0 };
+		fp64 ymm9[4] = { 0, 0, 0, 0 };
+		fp64 ymm10[4] = { 0, 0, 0, 0 };
+		fp64 ymm11[4] = { 0, 0, 0, 0 };
+		fp64 ymm12[4] = { 0, 0, 0, 0 };
+		fp64 ymm13[4] = { 0, 0, 0, 0 };
+		fp64 ymm14[4] = { 0, 0, 0, 0 };
+		fp64 ymm15[4] = { 0, 0, 0, 0 };
+
+	} attribute((packed));
 
 	/* From: https://wiki.osdev.org/Interrupt_Vector_Table#CPU_Interrupt_Layout
 	| INT #     | Description
@@ -174,7 +201,7 @@ namespace Interrupts
 	void hMachineCheck(nint code, InterruptFrame* frame);
 	void hSIMDFault(nint code, InterruptFrame* frame);
 	void hKeyboardInt();
-	void hPitTick();
+	void hPitTick(nint intr, InterruptFrame* frame);
 	void hRtcTick();
 
 	void hStub(nint intr);

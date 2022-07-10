@@ -3,6 +3,8 @@
 #define H_Scheduling
 #include <Types.h>
 #include <BitMap.h>
+#include <Interrupts.h>
+#include <List.h>
 
 struct TaskStateSegment
 {
@@ -30,6 +32,35 @@ struct TaskStateSegment
 };
 
 global TaskStateSegment gTSS;
-global void LoadTSS(size_t entryOffset); // defined in asmUtils.asm
+global void LoadTSS(nint entryOffset); // defined in asmUtils.asm
+
+struct Thread
+{
+	inline Thread() {  }
+
+	inline Thread(nint id)
+	{
+		ProcessID = id;
+	}
+
+	nint ProcessID;
+	bool Running = false;
+	vptr StackBaseAddress = nullptr;
+	Interrupts::RegisterState Registers;
+	Interrupts::InterruptFrame InterruptFrame;
+};
+
+// Retarded robbin scheduler
+namespace Scheduler
+{
+	extern bool Running;
+	void Start();
+	global void Yield();
+	void TaskSwitch(Interrupts::RegisterState* registers, Interrupts::InterruptFrame* frame);
+	nint CreateThread(void(*main)(nint));
+	nint GetThreadCount();
+	nint GetThreadsCreated();
+	void TaskEnded();
+}
 
 #endif // !H_Scheduling

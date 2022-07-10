@@ -1,5 +1,6 @@
 #include <KernelUtils.h>
-#include <List.h>
+#include <Synchronization.hpp>
+#include <Scheduling.h>
 
 namespace Kernel
 {
@@ -26,6 +27,24 @@ namespace Kernel
 
 	}
 
+	Mutex mut = Mutex();
+	void mutexFunc(nint ID)
+	{
+		mut.Lock();
+		debug("Mutex Thread #%0", ID);
+		Scheduler::Yield();
+		mut.Unlock();
+	}
+
+	SpinLock lock = SpinLock();
+	void spinLockFunc(nint ID)
+	{
+		lock.Aquire();
+		debug("SpinLock Thread #%0", ID);
+		Scheduler::Yield();
+		lock.Free();
+	}
+
 	global void KernelStart(BootInfo bootInfo)
 	{
 		// Clear uninitialized data (just to be sure)
@@ -42,7 +61,7 @@ namespace Kernel
 		// Show loading image
 		ShowLoadingImage(bootInfo);
 		#endif
-
+		
 		// Initialize Hardware //
 		Kernel::InitializeKernel(bootInfo);
 
@@ -50,9 +69,16 @@ namespace Kernel
 		Memory::PrintLeaks();
 		gConsole.EnableCursor();
 
-		while (true)
+		Scheduler::Start();
+
+		while (Scheduler::CreateThread(mutexFunc) < 0x1000)
 		{
-			hlt;
+			pause;
 		}
+		while (Scheduler::CreateThread(spinLockFunc) < 0x1000)
+		{
+			pause;
+		}
+		while (true) hlt;
 	}
 }

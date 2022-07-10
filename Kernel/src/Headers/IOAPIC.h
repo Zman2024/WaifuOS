@@ -40,9 +40,9 @@ namespace APIC
 	inline void InitializeIOAPIC()
 	{
 		IOAPICsCount = 0x00;
-		for (byte x = 0; x < IOAPICRecordsCount; x++)
+		for (byte x = 0; x < IOAPICRecords->GetCount(); x++)
 		{
-			auto record = IOAPICRecords[x];
+			auto record = IOAPICRecords->Get(x);
 			IOAPICs[x] = IOAPIC(record);
 			IOAPICsCount++;
 		}

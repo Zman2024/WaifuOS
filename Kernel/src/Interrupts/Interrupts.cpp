@@ -5,6 +5,7 @@
 #include <RTC.h>
 #include <Speaker.h>
 #include <Keyboard.h>
+#include <Scheduling.h>
 
 namespace Interrupts
 {
@@ -56,12 +57,15 @@ namespace Interrupts
 
 		printlnf("r8: %x0 \nr9: %x1 \nr10: %x2 \nr11: %x3 \nr12: %x4 \nr13: %x5 \nr14: %x6 \nr15: %x7 \n",
 			regs->r8, regs->r9, regs->r10, regs->r11, regs->r12, regs->r13, regs->r14, regs->r15);
-
+		
 		printlnf("rip: %x0 \n", frame->rip);
 
-		printlnf("cs: %x0 \nss: %x1 \n", frame->cs, frame->ss);
+		printlnf("cs: %x0 \nss: %x1 \nds: %x2 \nes: %x3", frame->cs, frame->ss);
 
-		printlnf("rflags: %x0", frame->rflags);
+		printlnf("rflags: %x0 \n", frame->rflags);
+
+		printlnf("Threads: %0 \nThreads Since Boot: %1", Scheduler::GetThreadCount(), Scheduler::GetThreadsCreated());
+
 	}
 
 	void hDivideByZeroFault(nint code, InterruptFrame* frame)
@@ -108,7 +112,7 @@ namespace Interrupts
 	void hInvalidOpcodeFault(nint code, InterruptFrame* frame)
 	{
 		PanicScreen();
-		Console.WriteLine("Invalid Opcode at address: %x0", frame->rip);
+		printlnf("Invalid Opcode at address: %x0", frame->rip);
 		PrintRegisterDump(frame);
 		halt;
 	}
@@ -230,8 +234,16 @@ namespace Interrupts
 
 	}
 
-	void hPitTick()
+	void hPitTick(nint intr, InterruptFrame* frame)
 	{
+		if (Scheduler::Running)
+		{
+			Scheduler::TaskSwitch(GetRegisterDump(), frame);
+			if (APIC::InUse) APIC::EndOfInterrupt();
+			else PIC::SendEIO(false);
+			return;
+		}
+
 		PIT::Tick();
 		if (APIC::InUse) APIC::EndOfInterrupt();
 		else PIC::SendEIO(false);

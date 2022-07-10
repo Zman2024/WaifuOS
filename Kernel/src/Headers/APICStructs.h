@@ -4,6 +4,7 @@
 #include <ACPI.h>
 #include <Types.h>
 #include <Globals.h>
+#include <List.h>
 
 // Contains the structs that the LocalAPIC / IOAPIC use
 // APIC code can be found in APIC.h and APIC.cpp
@@ -311,6 +312,7 @@ namespace APIC
 
 	// Local APIC ptr
 	extern LocalAPIC* LAPIC;
+
 	// Physical address of the LAPIC
 	extern LocalAPIC* PhysicalLAPIC;
 
@@ -322,11 +324,11 @@ namespace APIC
 	extern IRQRemapRecord* IRQOverrides[];
 	extern uint16 IRQOverridesCount;
 
-	extern LAPICRecord* LocalAPICRecords[];
-	extern uint16 LocalAPICRecordsCount;
+	//extern uint16 LocalAPICRecordsCount;
+	extern List<LAPICRecord*>* LocalAPICRecords;
 
-	extern byte IOAPICRecordsCount;
-	extern IOAPICRecord* IOAPICRecords[];
+	//extern byte IOAPICRecordsCount;
+	extern List<IOAPICRecord*>* IOAPICRecords;
 
 	// When true, the APIC is found and usable
 	extern bool UsableAPIC;

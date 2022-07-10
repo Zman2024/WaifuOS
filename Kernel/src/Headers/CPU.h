@@ -1,3 +1,6 @@
+#pragma once
+#ifndef H_CPU
+#define H_CPU
 #include <Types.h>
 
 enum struct CPUIDCodes : uint32
@@ -65,3 +68,42 @@ enum struct CPUIDCodes : uint32
 	EDX_IA64 = 1 << 30,
 	EDX_PBE = 0b10000000000000000000000000000000
 };
+
+namespace FLAGS
+{
+	enum : nint
+	{
+		CF = 0b1,				// Carry Flag
+		RSV0 = CF << 1,
+		PF = RSV0 << 1,			// Parity Flag
+		RSV1 = PF << 1,
+		AF = RSV1 << 1,			// Adjust Flag
+		RSV2 = AF << 1,
+		ZF = RSV2 << 1,			// Zero Flag
+		SF = ZF << 1,			// Sign Flag
+		TF = SF << 1,			// Trap Flag
+		IF = TF << 1,			// Interrupt Flag
+		DF = IF << 1,			// Direction Flag
+		OF = DF << 1,			// Overflow Flag
+		IOPL0 = OF << 1,		// IO Privelige Level Bit 0
+		IOPL1 = IOPL0 << 1,		// IO Privelige Level Bit 1
+		NT = IOPL1 << 1,		// Nested Task Flag
+		RSV3 = NT << 1,
+
+		// ===== EFLAGS =====
+
+		RF = 0x10000,			// Resume Flag
+		VM = RF << 1,			// Virtual 8086 Mode
+		AC = VM << 1,			// Alignment Check
+		VIF = AC << 1,			// Virtual Interrupt Flag
+		VIP = VIF << 1,			// Virtual Interrupt Pending
+		ID = VIP << 1,			// CPUID Allowed Flag
+
+		// ===== RFLAGS =====
+
+		/* none cause all reserved */
+
+	};
+}
+
+#endif // !H_CPU

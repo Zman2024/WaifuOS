@@ -22,7 +22,7 @@ namespace PIT
 		TimeSinceInit = 0x00;
 		Divisor = 0x00;
 		CurrentTimers = 0x00;
-		SetDivisor(1800);
+		SetFrequency(100);
 		memset64(Timers, 0, sizeof(Timers));
 	}
 

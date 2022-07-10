@@ -1,8 +1,9 @@
 [bits 64]
 global SpinLockAquire
 global SpinLockFree
-global SemaphoreSignal
-global SemaphoreWait
+global MutexLock
+global MutexUnlock
+extern Yield
 
 SpinLockAquire:
 	lock bts dword [rdi], 0
@@ -18,8 +19,16 @@ SpinLockFree:
 	mov dword [rdi], 0
 ret
 
-SemaphoreWait:
+MutexLock:
+	lock bts dword [rdi], 0
+	jc .yield
 ret
+  .yield:
+	call Yield
+	test dword [rdi], 1
+	jnz .yield
+jmp MutexLock
 
-SemaphoreSignal:
+MutexUnlock:
+	mov dword [rdi], 0
 ret

@@ -57,6 +57,9 @@
     <Filter Include="Headers\Scheduling">
       <UniqueIdentifier>{c24116a6-ad83-4eb1-a843-df9617218935}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Headers\Hardware">
+      <UniqueIdentifier>{da96d153-5349-406d-8252-e6ba951a75fa}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KernelUtils.cpp">
@@ -196,9 +199,6 @@
     <ClInclude Include="Headers\Interrupts.h">
       <Filter>Headers\Interrupts</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\CPUIDCodes.h">
-      <Filter>Headers</Filter>
-    </ClInclude>
     <ClInclude Include="Headers\ACPI.h">
       <Filter>Headers\IO</Filter>
     </ClInclude>
@@ -261,6 +261,9 @@
     </ClInclude>
     <ClInclude Include="Headers\List.h">
       <Filter>Headers\Memory</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\CPU.h">
+      <Filter>Headers\Hardware</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

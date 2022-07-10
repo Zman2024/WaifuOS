@@ -3,6 +3,7 @@
 #include <PageTableManager.h>
 #include <PageFrameAllocator.h>
 #include <Globals.h>
+#include <Synchronization.hpp>
 
 namespace Memory
 {
@@ -161,6 +162,7 @@ namespace Memory
 
 using namespace Memory;
 
+SpinLock memoryLock = SpinLock();
 vptr malloc(nint size)
 {
 	if (!HeapInitialized) return nullptr;
@@ -177,6 +179,8 @@ vptr malloc(nint size)
 		return nullptr;
 	}
 	
+	memoryLock.Aquire();
+
 	SegmentHeader* seg = heapBase;
 
 	while (true)
@@ -187,11 +191,13 @@ vptr malloc(nint size)
 			{
 				seg->Split(size);
 				seg->Free = false;
+				memoryLock.Free();
 				return seg + 1;
 			}
 			if (seg->Length == size)
 			{
 				seg->Free = false;
+				memoryLock.Free();
 				return seg + 1;
 			}
 		}
@@ -200,6 +206,8 @@ vptr malloc(nint size)
 	}
 
 	ExpandHeap(size);
+
+	memoryLock.Free();
 	return malloc(size);
 }
 
@@ -220,10 +228,12 @@ void free(vptr address)
 		return nullptr;
 	}
 
+	memoryLock.Aquire();
 	SegmentHeader* seg = (SegmentHeader*)address - 1;
 	seg->Free = true;
 	seg->CombineForward();
 	seg->CombineBackward();
+	memoryLock.Free();
 }
 
 void memcpy(vptr dest, const vptr src, uint64 nBytes)

@@ -9,7 +9,7 @@ global void SpinLockFree(uint32* lock);
 struct SpinLock
 {
 
-	inline SpinLock()
+	forceinline SpinLock()
 	{
 		Lock = 0x00;
 	}
@@ -21,6 +21,22 @@ struct SpinLock
 private:
 	volatile uint32 Lock;
 
+};
+
+
+global void MutexLock(uint32* lock);
+global void MutexUnlock(uint32* lock);
+
+struct Mutex
+{
+	forceinline Mutex() { mLock = 0x00; }
+
+	forceinline void Lock() { MutexLock(&mLock); }
+	forceinline void Unlock() { MutexUnlock(&mLock); }
+	forceinline bool GetState() { return this->mLock != 0; }
+
+private:
+	volatile uint32 mLock;
 };
 
 #endif // !H_Synchronization

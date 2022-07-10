@@ -21,4 +21,4 @@ start qemu-system-x86_64 ^
  -s ^
  -S
 
-start C:/Windows/SysNative/wsl.exe gdb bin/kernel.elf
+:: start C:/Windows/SysNative/wsl.exe gdb bin/kernel.elf

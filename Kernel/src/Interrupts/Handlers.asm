@@ -1,10 +1,8 @@
 [bits 64]
-extern SaveSIMD
-extern RestoreSIMD
-extern DumpGeneralRegisters
-extern GlobalInterruptTable
+extern SaveAllRegisters
+extern RestoreAllRegisters
 extern GetRegisterDump
-extern RestoreGeneralRegisters
+extern GlobalInterruptTable
 
 global GlobalHandlerStubTable
 
@@ -22,22 +20,19 @@ section .text
 
 %macro ErrorHandlerStub 1
 IntStub%1:
-	call DumpGeneralRegisters
-	call SaveSIMD
+	call SaveAllRegisters
 	pop rdx
 	StandardHandler %1
-	call RestoreSIMD
-	call RestoreGeneralRegisters
+	call RestoreAllRegisters
 iretq
 %endmacro
 
 %macro HandlerStub 1
 IntStub%1:
-	call DumpGeneralRegisters
-	call SaveSIMD
+	cli
+	call SaveAllRegisters
 	StandardHandler %1
-	call RestoreSIMD
-	call RestoreGeneralRegisters
+	call RestoreAllRegisters
 iretq
 %endmacro
 

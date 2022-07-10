@@ -17,7 +17,7 @@
 #include <PCI.h>
 #include <APIC.h>
 #include <IOAPIC.h>
-#include <CPUIDCodes.h>
+#include <CPU.h>
 #include <PIC.hpp>
 #include <IOBus.hpp>
 #include <string.h>

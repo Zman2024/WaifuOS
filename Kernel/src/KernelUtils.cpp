@@ -16,7 +16,7 @@ namespace Kernel
 		InitializePaging(bootInfo);
 
 		// malloc / free enabled
-		Memory::InitializeHeap(0x100000000000L, 0x1000);
+		Memory::InitializeHeap(0x100000000000L, 0x10000); // ~4 GB
 
 		// ACPI / PCI
 		InitializeACPI(bootInfo);
@@ -231,6 +231,11 @@ namespace Kernel
 		PageTableManager::SetVirtualFlag(nullptr, PTFlag::ReadWrite, false);
 		PageTableManager::SetVirtualFlag(nullptr, PTFlag::UserSuper, false);
 		PageTableManager::SetVirtualFlag(nullptr, PTFlag::Present, true);
+
+		// nullpr - PAGE_SIZE moment
+		PageTableManager::SetVirtualFlag((vptr)(~nint(nullptr) - PAGE_SIZE), PTFlag::ReadWrite, false);
+		PageTableManager::SetVirtualFlag((vptr)(~nint(nullptr) - PAGE_SIZE), PTFlag::UserSuper, false);
+		PageTableManager::SetVirtualFlag((vptr)(~nint(nullptr) - PAGE_SIZE), PTFlag::Present, true);
 
 		// Load PML4 into control3
 		asm("mov %%cr3, %0" : : "r" (PML4));

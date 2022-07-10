@@ -137,7 +137,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\asmUtils.h" />
     <ClInclude Include="Headers\BitMap.h" />
     <ClInclude Include="Headers\Colors.h" />
-    <ClInclude Include="Headers\CPUIDCodes.h" />
+    <ClInclude Include="Headers\CPU.h" />
     <ClInclude Include="Headers\Direction.h" />
     <ClInclude Include="Headers\EFI.h" />
     <ClInclude Include="Headers\GDT.h" />

@@ -15,14 +15,14 @@ namespace APIC
 	uint16 IOAPICsCount = 0x00;
 	IOAPIC IOAPICs[0x10];
 
-	IRQRemapRecord* IRQOverrides[0xFF];
 	uint16 IRQOverridesCount = 0x00;
+	IRQRemapRecord* IRQOverrides[0xFF];
 
-	LAPICRecord* LocalAPICRecords[0xFF];
-	uint16 LocalAPICRecordsCount = 0x00;
+	// uint16 LocalAPICRecordsCount = 0x00;
+	List<LAPICRecord*>* LocalAPICRecords = nullptr;
 
-	byte IOAPICRecordsCount = 0x00;
-	IOAPICRecord* IOAPICRecords[0xFF];
+	// byte IOAPICRecordsCount = 0x00;
+	List<IOAPICRecord*>* IOAPICRecords = nullptr;
 
 
 	void ParseMADT(MADTHeader* madt)
@@ -32,10 +32,12 @@ namespace APIC
 		BaseRecord* currentRecord = (BaseRecord*)(u64(madt) + sizeof(MADTHeader));
 		u64 lApicPhysAddress = u64(madt->LapicAddress);
 
+		// LocalAPICRecordsCount = 0x00;
+		// IOAPICRecordsCount = 0x00;
 		IOAPICsCount = 0x00;
-		IOAPICRecordsCount = 0x00;
 		IRQOverridesCount = 0x00;
-		LocalAPICRecordsCount = 0x00;
+		if (!IOAPICRecords) IOAPICRecords = new List<IOAPICRecord*>();
+		if (!LocalAPICRecords) LocalAPICRecords = new List<LAPICRecord*>();
 
 		while ((u64)currentRecord < maxAddress)
 		{
@@ -44,14 +46,14 @@ namespace APIC
 				case RecordType::LAPIC:
 				{
 					LAPICRecord* lapic = (LAPICRecord*)currentRecord;
-					LocalAPICRecords[LocalAPICRecordsCount++] = lapic;
+					LocalAPICRecords->Add(lapic);
 					break;
 				}
 
 				case RecordType::IOAPIC:
 				{
 					IOAPICRecord* ioapic = (IOAPICRecord*)currentRecord;
-					IOAPICRecords[IOAPICRecordsCount++] = ioapic;
+					IOAPICRecords->Add(ioapic);
 					break;
 				}
 

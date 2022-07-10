@@ -1,28 +1,9 @@
 [bits 64]
-global SaveSIMD
-global RestoreSIMD
-global DumpGeneralRegisters
+global SaveAllRegisters
+global RestoreAllRegisters
 global GetRegisterDump
-global RestoreGeneralRegisters
 
 section .data
-
-Y0State:  do 0.0, 0.0
-Y1State:  do 0.0, 0.0
-Y2State:  do 0.0, 0.0
-Y3State:  do 0.0, 0.0
-Y4State:  do 0.0, 0.0
-Y5State:  do 0.0, 0.0
-Y6State:  do 0.0, 0.0
-Y7State:  do 0.0, 0.0
-Y8State:  do 0.0, 0.0
-Y9State:  do 0.0, 0.0
-Y10State: do 0.0, 0.0
-Y11State: do 0.0, 0.0
-Y12State: do 0.0, 0.0
-Y13State: do 0.0, 0.0
-Y14State: do 0.0, 0.0
-Y15State: do 0.0, 0.0
 
 RegisterState:
 	.rax: dq 0
@@ -49,13 +30,39 @@ RegisterState:
 	.fs: dq 0
 	.gs: dq 0
 
+	.mm0: dq 0
+	.mm1: dq 0
+	.mm2: dq 0
+	.mm3: dq 0
+	.mm4: dq 0
+	.mm5: dq 0
+	.mm6: dq 0
+	.mm7: dq 0
+
+	.ymm0:  do 0.0, 0.0
+	.ymm1:  do 0.0, 0.0
+	.ymm2:  do 0.0, 0.0
+	.ymm3:  do 0.0, 0.0
+	.ymm4:  do 0.0, 0.0
+	.ymm5:  do 0.0, 0.0
+	.ymm6:  do 0.0, 0.0
+	.ymm7:  do 0.0, 0.0
+	.ymm8:  do 0.0, 0.0
+	.ymm9:  do 0.0, 0.0
+	.ymm10: do 0.0, 0.0
+	.ymm11: do 0.0, 0.0
+	.ymm12: do 0.0, 0.0
+	.ymm13: do 0.0, 0.0
+	.ymm14: do 0.0, 0.0
+	.ymm15: do 0.0, 0.0
+
 section .text
 
 GetRegisterDump:
 	lea rax, [RegisterState]
 ret
 
-DumpGeneralRegisters:
+SaveAllRegisters:
 	mov [RegisterState.rax],	rax
 	mov [RegisterState.rbx],	rbx
 	mov [RegisterState.rcx],	rcx
@@ -85,10 +92,34 @@ DumpGeneralRegisters:
 	mov rax, gs
 	mov [RegisterState.gs], rax
 	
-	lea rax, [RegisterState]
+	movq [RegisterState.mm0], mm0
+	movq [RegisterState.mm1], mm1
+	movq [RegisterState.mm2], mm2
+	movq [RegisterState.mm3], mm3
+	movq [RegisterState.mm4], mm4
+	movq [RegisterState.mm5], mm5
+	movq [RegisterState.mm6], mm6
+	movq [RegisterState.mm7], mm7
+
+	vmovdqu [RegisterState.ymm0],	ymm0
+	vmovdqu [RegisterState.ymm1],	ymm1
+	vmovdqu [RegisterState.ymm2],	ymm2
+	vmovdqu [RegisterState.ymm3],	ymm3
+	vmovdqu [RegisterState.ymm4],	ymm4
+	vmovdqu [RegisterState.ymm5],	ymm5
+	vmovdqu [RegisterState.ymm6],	ymm6
+	vmovdqu [RegisterState.ymm7],	ymm7
+	vmovdqu [RegisterState.ymm8],	ymm8
+	vmovdqu [RegisterState.ymm9],	ymm9
+	vmovdqu [RegisterState.ymm10], ymm10
+	vmovdqu [RegisterState.ymm11], ymm11
+	vmovdqu [RegisterState.ymm12], ymm12
+	vmovdqu [RegisterState.ymm13], ymm13
+	vmovdqu [RegisterState.ymm14], ymm14
+	vmovdqu [RegisterState.ymm15], ymm15
 ret
 
-RestoreGeneralRegisters:
+RestoreAllRegisters:
 	
 	; segment registers (cs and ss restored by CPU (iretq))
 	mov rax, [RegisterState.ds]
@@ -118,42 +149,31 @@ RestoreGeneralRegisters:
 	mov r13,	[RegisterState.r13]
 	mov r14,	[RegisterState.r14]
 	mov r15,	[RegisterState.r15]
-ret
 
-SaveSIMD:
-	vmovdqu [Y0State],	ymm0
-	vmovdqu [Y1State],	ymm1
-	vmovdqu [Y2State],	ymm2
-	vmovdqu [Y3State],	ymm3
-	vmovdqu [Y4State],	ymm4
-	vmovdqu [Y5State],	ymm5
-	vmovdqu [Y6State],	ymm6
-	vmovdqu [Y7State],	ymm7
-	vmovdqu [Y8State],	ymm8
-	vmovdqu [Y9State],	ymm9
-	vmovdqu [Y10State], ymm10
-	vmovdqu [Y11State], ymm11
-	vmovdqu [Y12State], ymm12
-	vmovdqu [Y13State], ymm13
-	vmovdqu [Y14State], ymm14
-	vmovdqu [Y15State], ymm15
-ret
+	movq mm0, [RegisterState.mm0]
+	movq mm1, [RegisterState.mm1]
+	movq mm2, [RegisterState.mm2]
+	movq mm3, [RegisterState.mm3]
+	movq mm4, [RegisterState.mm4]
+	movq mm5, [RegisterState.mm5]
+	movq mm6, [RegisterState.mm6]
+	movq mm7, [RegisterState.mm7]
 
-RestoreSIMD:
-	vmovdqu ymm0,  [Y0State]
-	vmovdqu ymm1,  [Y1State]
-	vmovdqu ymm2,  [Y2State]
-	vmovdqu ymm3,  [Y3State]
-	vmovdqu ymm4,  [Y4State]
-	vmovdqu ymm5,  [Y5State]
-	vmovdqu ymm6,  [Y6State]
-	vmovdqu ymm7,  [Y7State]
-	vmovdqu ymm8,  [Y8State]
-	vmovdqu ymm9,  [Y9State]
-	vmovdqu ymm10, [Y10State]
-	vmovdqu ymm11, [Y11State]
-	vmovdqu ymm12, [Y12State]
-	vmovdqu ymm13, [Y13State]
-	vmovdqu ymm14, [Y14State]
-	vmovdqu ymm15, [Y15State]
+	vmovdqu ymm0,  [RegisterState.ymm0]
+	vmovdqu ymm1,  [RegisterState.ymm1]
+	vmovdqu ymm2,  [RegisterState.ymm2]
+	vmovdqu ymm3,  [RegisterState.ymm3]
+	vmovdqu ymm4,  [RegisterState.ymm4]
+	vmovdqu ymm5,  [RegisterState.ymm5]
+	vmovdqu ymm6,  [RegisterState.ymm6]
+	vmovdqu ymm7,  [RegisterState.ymm7]
+	vmovdqu ymm8,  [RegisterState.ymm8]
+	vmovdqu ymm9,  [RegisterState.ymm9]
+	vmovdqu ymm10, [RegisterState.ymm10]
+	vmovdqu ymm11, [RegisterState.ymm11]
+	vmovdqu ymm12, [RegisterState.ymm12]
+	vmovdqu ymm13, [RegisterState.ymm13]
+	vmovdqu ymm14, [RegisterState.ymm14]
+	vmovdqu ymm15, [RegisterState.ymm15]
+
 ret
