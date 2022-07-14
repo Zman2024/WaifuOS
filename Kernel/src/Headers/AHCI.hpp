@@ -378,11 +378,6 @@ namespace AHCI
 			{
 				auto port = mPorts[x]; 
 				port->Configure();
-				port->Buffer = PageFrameAllocator::RequestPage<byte>();
-				memset64(port->Buffer, 0x00, PAGE_SIZE);
-				port->Read(0, 4, port->Buffer);
-
-				debug("\tDrive contents: " + string(port->Buffer));
 			}
 
 		}

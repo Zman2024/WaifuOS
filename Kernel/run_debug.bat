@@ -4,7 +4,7 @@ set OSNAME=WaifuOS
 set BUILDDIR=bin
 set OVMFDIR=../OVMFbin
 
-start qemu-system-x86_64 ^
+qemu-system-x86_64 ^
  -device qemu-xhci ^
  -machine q35 ^
  -rtc base=localtime ^

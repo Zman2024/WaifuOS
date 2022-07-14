@@ -1,6 +1,7 @@
 #include <Scheduling.h>
 #include <Memory.h>
 #include <PageFrameAllocator.h>
+#include <PageTableManager.h>
 #include <CPU.h>
 #include <PIT.h>
 #include <Synchronization.hpp>
@@ -13,129 +14,166 @@ using namespace Interrupts;
 namespace Scheduler
 {
 	bool Running = false;
-	bool deletingThread = false;
-	List<Thread*>* Threads = nullptr;
-	nint nextThreadID = 1;
-	nint currentThreadIndex = 0;
-	nint threadsCreatedSinceBoot = 0;
+	int64 YieldedTime = 0;
 
-	SpinLock taskEndSpinlock = SpinLock();
+	nint NextThreadID = 0;
+
+	List<Thread*> ReadyQueue;
+	Thread* CurrentThread = nullptr;
+
+	forceinline nint GetTimeQuantum()
+	{
+		nint count = ReadyQueue.GetCount() + 1;
+		return 200 / count;
+	}
+
+	void hTaskYield(nint _, InterruptFrame * frame);
+
+	void hStartScheduler(nint _, InterruptFrame * frame)
+	{
+		RegisterInterrupt((vptr)hTaskYield, Interrupt::TaskYield);
+
+		CurrentThread = new Thread(NextThreadID++);
+		CurrentThread->CurrentTimeQuantum = GetTimeQuantum();
+		CurrentThread->StackBaseAddress = nullptr;
+		CurrentThread->InterruptFrame = *frame;
+		CurrentThread->Registers = *GetRegisterDump();
+		CurrentThread->ThreadID = 0x00;
+		CurrentThread->SetName("Kernel");
+
+		RegisterInterrupt((vptr)hPitScheduler, Interrupt::PIT);
+	}
 
 	void Start()
 	{
-		cli;
-		Threads = new List<Thread*>(20);
-		Threads->Add(new Thread(0x00));
-		Running = true;
-		deletingThread = false;
-		currentThreadIndex = 0;
-		nextThreadID = 1;
-		threadsCreatedSinceBoot = 1;
+		if (Running) return;
+		asm("pushfq");
+		{
+			cli;
+			debug("Starting Scheduler...");
 
-		Yield();
+			Running = false;
+			ReadyQueue = List<Thread*>();
 
-		// Increase retarded robbin task switch frequency
-		PIT::SetDivisor(100);
+			RegisterInterrupt((vptr)hStartScheduler, Interrupt::TaskYield);
+
+			// start stuff (i dont wanna manually iretq in asm)
+			Yield();
+
+			PIT::SetFrequency(200);
+			Running = true;
+			debug("Started Scheduler!");
+		}
+		asm("popfq");
 	}
 
-	void Yield()
+	void TimerInterrupt(RegisterState* registers, InterruptFrame* frame)
 	{
-		if (!Running || !Threads) return;
-		sti;
-		intcall(Interrupt::PIT);
+		if (!Running || ReadyQueue.GetCount() <= 0) return;
+
+		if (!CurrentThread)
+		{
+			TaskSwitchOnEnd(registers, frame);
+			return;
+		}
+
+		nint timeMs = (1.0 / PIT::GetFrequency()) * 1000;
+		if (!timeMs) timeMs = 1;
+		CurrentThread->CurrentTimeQuantum -= timeMs;
+
+		if (CurrentThread->CurrentTimeQuantum <= 0)
+			TaskSwitch(registers, frame);
+
+	}
+
+	void hTaskYield(nint _, InterruptFrame * frame)
+	{
+		if (!Running || !CurrentThread) return;
+		YieldedTime += CurrentThread->CurrentTimeQuantum;
+		CurrentThread->CurrentTimeQuantum = 0x00;
+		TaskSwitch(GetRegisterDump(), frame);
+	}
+
+	void TaskSwitchOnEnd(RegisterState* registers, InterruptFrame* frame)
+	{
+		CurrentThread = ReadyQueue.Get(0);
+		ReadyQueue.RemoveAt(0);
+
+		frame[0] = CurrentThread->InterruptFrame;
+		registers[0] = CurrentThread->Registers;
+		CurrentThread->CurrentTimeQuantum = GetTimeQuantum();
 	}
 
 	void TaskSwitch(RegisterState* registers, InterruptFrame* frame)
 	{
-		if (!Running || !Threads) return;
-		cli;
+		CurrentThread->InterruptFrame = *frame;
+		CurrentThread->Registers = *registers;
+		CurrentThread->CurrentTimeQuantum = 0x00;
 
-		auto currentThread = Threads->Get(currentThreadIndex);
-		if (!currentThread) intcall(Interrupt::MachineCheck); // idk
-		if (deletingThread)
-		{
-			*registers = currentThread->Registers;
-			*frame = currentThread->InterruptFrame;
-			currentThread->Running = true;
-			deletingThread = false;
-			taskEndSpinlock.Free();
-			return;
-		}
+		ReadyQueue.Add(CurrentThread);
+		CurrentThread = ReadyQueue.Get(0);
+		ReadyQueue.RemoveAt(0);
 
-		currentThread->Registers = *registers;
-		currentThread->InterruptFrame = *frame;
-		currentThread->Running = false;
-
-		if (++currentThreadIndex >= Threads->GetCount())
-			currentThreadIndex = 0;
-
-		currentThread = Threads->Get(currentThreadIndex);
-		
-		*registers = currentThread->Registers;
-		*frame = currentThread->InterruptFrame;
-		currentThread->Running = true;
+		frame[0] = CurrentThread->InterruptFrame;
+		registers[0] = CurrentThread->Registers;
+		CurrentThread->CurrentTimeQuantum = GetTimeQuantum();
 	}
 
-	nint CreateThread(void(*main)(nint))
+	nint CreateThread(void(*entry0)(nint), const char* title)
 	{
-		cli;
-		auto thread = new Thread(nextThreadID++);
-		
-		// 32kb stack to start with
-		thread->StackBaseAddress = malloc(0x8000);
+		if (!Running) return;
 
-		// well... 32kb - 4b
-		uint32* threadStack = (uint32*)(((byte*)thread->StackBaseAddress) + PAGE_SIZE - 0x4);
-		
-		// because return address goes here
-		threadStack[0] = (uint32)TaskEnded;
+		uint32* stack = (u32*)calloc(PAGE_SIZE * 4);
 
-		// Create thread
-		thread->Running = false;
-		thread->InterruptFrame.rflags = FLAGS::RSV0 | FLAGS::IF;
-		thread->InterruptFrame.rsp = (nint)(threadStack);
-		thread->InterruptFrame.rip = (nint)(vptr)main;
-		thread->Registers.rbp = (nint)(threadStack + 1);
-		thread->InterruptFrame.cs = 0x08;
-		thread->InterruptFrame.ss = 0x10;
-		thread->Registers.rdi = thread->ProcessID;
-		Threads->Add(thread);
+		Thread* newThread = new Thread(NextThreadID++);
+		newThread->CurrentTimeQuantum = GetTimeQuantum();
+		newThread->StackBaseAddress = stack;
+		newThread->SetName(title);
 
-		++threadsCreatedSinceBoot;
+		stack += PAGE_SIZE - 3;
+		stack[0] = (u32)ThreadExit;
 
-		sti;
-		return thread->ProcessID;
+		newThread->InterruptFrame.cs = 0x08;
+		newThread->InterruptFrame.ss = 0x10;
+		newThread->InterruptFrame.rflags = FLAGS::IF | FLAGS::RSV0;
+		newThread->InterruptFrame.rip = (nint)entry0;
+		newThread->InterruptFrame.rsp = (nint)stack;
+
+		newThread->Registers.rbp = nint(stack + 1);
+		newThread->Registers.ds = 0x10;
+		newThread->Registers.es = 0x10;
+		newThread->Registers.fs = 0x10;
+		newThread->Registers.gs = 0x10;
+		newThread->Registers.rdi = newThread->ThreadID;
+
+		ReadyQueue.Add(newThread);
+
 	}
 
 	nint GetThreadCount()
 	{
-		if (!Threads) return 0;
-		return Threads->GetCount();
+		return ReadyQueue.GetCount() + 1;
 	}
 
 	nint GetThreadsCreated()
 	{
-		return threadsCreatedSinceBoot;
+		return NextThreadID;
 	}
 
-	void TaskEnded()
+	Thread* GetCurrentThread()
 	{
-		if (!Running || !Threads) intcall(Interrupt::MachineCheck);
+		return CurrentThread;
+	}
+
+	void ThreadExit()
+	{
 		cli;
-		taskEndSpinlock.Aquire();
+		free(CurrentThread->StackBaseAddress);
+		delete CurrentThread;
+		CurrentThread = nullptr;
+		sti;
 
-		auto currentThread = Threads->Get(currentThreadIndex);
-		if (!currentThread) intcall(Interrupt::MachineCheck); // idk
-
-		Threads->RemoveAt(currentThreadIndex--);
-		delete currentThread;
-		free(currentThread->StackBaseAddress);
-		deletingThread = true;
-
-		intcall(Interrupt::PIT);
-
-		// shouldn't get here
-		intcall(Interrupt::MachineCheck);
+		while (true) hlt;
 	}
 
 }

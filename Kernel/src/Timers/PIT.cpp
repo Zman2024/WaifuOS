@@ -69,11 +69,14 @@ namespace PIT
 
 	void SetDivisor(uint16 divisor)
 	{
+		asm("pushfq");
+		cli;
 		Divisor = divisor;
 		outb(Data0, (byte)divisor & 0xFF);
 		wait();
 		outb(Data0, (byte)(divisor >> 8));
 		wait();
+		asm("popfq");
 	}
 
 	uint32 GetFrequency()

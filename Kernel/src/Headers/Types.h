@@ -44,6 +44,8 @@ typedef uint32 Color32;
 constexpr auto PAGE_SIZE = 0x1000; // The size of a physical page
 
 // Macros //
+#define QEMU_WINDOWS_BUILD // only if this is being built for QEMU
+
 #ifdef VISUAL_STUDIO_EDITOR
 #define attribute(x) 
 #define forceinline
@@ -55,7 +57,7 @@ constexpr auto PAGE_SIZE = 0x1000; // The size of a physical page
 #define intcall(x)
 #define OS_HLT
 #define halt
-#define cpuid(level, a, b, c, d)
+#define cpuid(code, a, b, c, d)
 #define spin(x)
 #define global extern "C"
 #define fast
@@ -74,10 +76,10 @@ constexpr auto PAGE_SIZE = 0x1000; // The size of a physical page
 #define intcall(x) { asm ("int %0" : : "byte"((byte)x)); }
 #define OS_HLT asm ("cli"); while(true) asm ("hlt");
 #define halt asm ("cli"); while(true) asm ("hlt");
-#define cpuid(level, a, b, c, d)			\
+#define cpuid(code, a, b, c, d)			\
   asm ("cpuid\n\t"					\
 	   : "=a" (a), "=b" (b), "=c" (c), "=d" (d)	\
-	   : "0" (level)	\
+	   : "a" (code), "b"(b), "c"(c), "d"(d)	\
 	   : "memory")
 
 // #define cpuid(code, eax, ebx, ecx, edx) asm ("cpuid" : "=eax"(eax), "=ebx"(ebx), "=ecx"(ecx), "=edx"(edx) : "eax"(code) : "memory")

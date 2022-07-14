@@ -168,6 +168,13 @@ void PrimitiveConsole::ScrollDown()
 
 void PrimitiveConsole::ScrollDown(uint lines)
 {
+	if (lines == 0) return;
+	if (lines >= this->mHeight)
+	{
+		Clear();
+		return;
+	}
+
 	for (uint x = 0; x < lines; x++)
 	{
 		ScrollDown();

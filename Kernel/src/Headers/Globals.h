@@ -36,7 +36,7 @@ extern byte GlobalIDTROffset[];
 global byte _DataStart;
 global byte _DataEnd;
 
-forceinline void printf(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
+forceinline void print(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
 {
 	bool state = gConsole.GetCursorEnabled();
 	if (state) gConsole.DisableCursor();
@@ -44,7 +44,7 @@ forceinline void printf(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 
 	if (state) gConsole.EnableCursor();
 }
 
-forceinline void printlnf(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
+forceinline void println(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
 {
 	bool state = gConsole.GetCursorEnabled();
 	if (state) gConsole.DisableCursor();

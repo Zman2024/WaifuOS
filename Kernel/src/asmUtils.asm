@@ -18,59 +18,11 @@
 %define p2 rdx
 %define p3 rdx
 
-global EnableAVX
-global TestAVX
-global GetRDRAND
-global CheckXSAVE
-global EnableXSAVE
 global memset64
+global memcpy
+global GetRDRAND
 global LoadTSS
-
-CPUID.ECX.XSAVE equ 1 << 26
-CR4.OSXSAVE equ 1 << 18
-
-EnableAVX:
-	push rax
-	push rcx
-	push rdx
-	
-	xor rcx, rcx
-	xgetbv ;Load XCR0 register
-	or rax, 0b0111 ;Set AVX, SSE, X87 bits
-	xsetbv ;Save back to XCR0
-
-	pop rdx
-	pop rcx
-	pop rax
-ret
-
-CheckXSAVE:
-	push rbx
-	push rcx
-	push rdx
-
-	  mov eax, 1
-	  cpuid
-	  xor rax, rax
-	  test ecx, CPUID.ECX.XSAVE
-	  setnz al
-
-	pop rdx
-	pop rcx
-	pop rbx
-ret
-
-
-EnableXSAVE:
-	mov rax, cr4
-	or rax, CR4.OSXSAVE
-	mov cr4, rax
-ret
-
-
-TestAVX:
-	vpxor ymm0, ymm0, ymm0
-ret
+global repmovsb
 
 ; Scheduling.h
 ; rdi: tss offset in GDT
@@ -88,6 +40,7 @@ ret
 ; p1 / rsi: uint64 value
 ; p2 / rdx: uint64 nBytes
 memset64:
+	push rcx
 	mov rax, p1
 	mov rcx, p2
 	shr rcx, 3    ; divide by 8
@@ -102,4 +55,30 @@ memset64:
 		dec p2
 	jmp .byteLoop
 	.end:
+	pop rcx
 ret
+
+; p0 / rdi: void* destination
+; p1 / rsi: void* src
+; p2 / rdx: nint n
+memcpy:
+	cld
+	mov rcx, p2
+	shr rcx, 3	; divide by 8
+	and p2, 0b111 ; remainder
+	rep movsq	; mega fast boi
+	
+	; the rest
+	mov rcx, p2
+	rep movsb
+ret
+
+; p0 / rdi: void* destination
+; p1 / rsi: void* src
+; p2 / rdx: nint n
+repmovsb:
+	cld
+	mov rcx, p2
+	rep movsb	; mega fast boi
+ret
+

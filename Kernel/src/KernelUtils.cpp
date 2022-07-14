@@ -6,11 +6,18 @@ namespace Kernel
 	{
 		cli;
 
+		#ifdef QEMU_WINDOWS_BUILD
+		warn("================ QEMU WINDOWS BUILD ================");
+		#endif
+
 		// Do GDT stuff
 		InitializeGDT();
 
 		// Basic Interrupts / CPU exceptions
 		InitializeExceptions();
+
+		// Enable Features like AVX, OSXSAVE etc.
+		EnableHardwareFeatures();
 
 		// Paging / Memory Mapping
 		InitializePaging(bootInfo);
@@ -18,11 +25,16 @@ namespace Kernel
 		// malloc / free enabled
 		Memory::InitializeHeap(0x100000000000L, 0x10000); // ~4 GB
 
+		// OH NONONONO I HAVE DEPENDENCY LOOPS AAAAAAAAAAAAAAAAAA HELP //
+
 		// ACPI / PCI
 		InitializeACPI(bootInfo);
 
 		// IRQs
 		InitializeIRQ();
+
+		// Scheduling
+		Scheduler::Start();
 
 		sti;
 	}
@@ -75,7 +87,7 @@ namespace Kernel
 
 		MCFGHeader* mcfg = (MCFGHeader*)FindTable(xsdt, "MCFG");
 		if (mcfg) PCI::EnumeratePCI(mcfg);
-		else warn("MCFG NOT FOUND!");
+		else warn("MCFG NOT FOUND! CANNOT USE PCI DEVICES!");
 
 	}
 
@@ -83,7 +95,7 @@ namespace Kernel
 	{
 		if (!info.LoadingImage)
 		{
-			gConsole.WriteLine("ERROR LOADING BOOT IMAGE!", Color::Red);
+			error("ERROR LOADING BOOT IMAGE!");
 			return;
 		}
 
@@ -160,6 +172,7 @@ namespace Kernel
 		RegisterInterrupt((vptr)hKeyboardInt, Interrupt::Keyboard);
 		RegisterInterrupt((vptr)hPitTick, Interrupt::PIT);
 		RegisterInterrupt((vptr)hRtcTick, Interrupt::RTC);
+
 	}
 
 	void InitializeGDT()
@@ -177,11 +190,101 @@ namespace Kernel
 		GDTDescriptor desc{};
 		desc.Size = sizeof(GDT) - 1;
 		desc.Offset = (u64)&GlobalGDT;
-
-
 		LoadGDT(&desc);
+
 		nint tssIndex = (u64)(u64(&GlobalGDT.TaskSS) - u64(&GlobalGDT));
+		gTSS.IOMapBase = 0x10;
 		LoadTSS(tssIndex);
+	}
+
+	void EnableHardwareFeatures()
+	{
+		/*
+			OK, so qemu is really stupid on bindows ben and "doesn't support AVX"
+			which doesn't make sense because qemu will still execute AVX instructions
+			without raising any #UD or crashing. HOWEVER it WILL freeze if i try and
+			use OSXSAVE instructions like xgetbv and xsetbv, and the cpuid for AVX support
+			will be false. In other words, i cant write a proper implementation for
+			AVX that works with both QEMU on windows and real hardware
+		*/
+
+		debug("Enabling CPU Features...");
+
+		// Check Features //
+
+		CPU::GetFeatures();
+		#ifndef QEMU_WINDOWS_BUILD
+		if (!CPU::Features::SSE4_2)
+		{
+			error("CPU DOES NOT SUPPORT SSE4_2! CANNOT RUN OS!");
+			OS_HLT;
+		}
+		if (!CPU::Features::AVX)
+		{
+			error("CPU DOES NOT SUPPORT AVX! CANNOT RUN OS!");
+			OS_HLT;
+		}
+		if (!CPU::Features::AVX2)
+		{
+			error("CPU DOES NOT SUPPORT AVX2! CANNOT RUN OS!");
+			OS_HLT;
+		}
+		#endif
+
+		// Enable Features //
+
+		nint cr0 = 0;
+		{
+			asm("mov %0, %%cr0" : "=r"(cr0));
+			cr0 &= ~(ControlRegister::CR0::EM);
+			cr0 |= ControlRegister::CR0::MP;
+			asm("mov %%cr0, %0" : : "r"(cr0));
+		}
+
+		nint cr4 = 0;
+		{
+			asm("mov %0, %%cr4" : "=r"(cr4));
+			cr4 |= ControlRegister::CR4::OSFXSR;
+			cr4 |= ControlRegister::CR4::OSXMMEXCPT;
+			asm("mov %%cr4, %0" : : "r"(cr4));
+
+			#ifndef QEMU_WINDOWS_BUILD
+			
+			CPU::GetFeatures();
+
+			if (CPU::Features::AVX)
+			{
+				cr4 |= ControlRegister::CR4::OSXSAVE;
+				asm("mov %%cr4, %0" : : "r"(cr4));
+
+				uint32 xcr0 = CPU::GetXCR0();
+				xcr0 |= ControlRegister::XCR0::X87;
+				xcr0 |= ControlRegister::XCR0::AVX;
+				xcr0 |= ControlRegister::XCR0::SSE;
+				CPU::SetXCR0(xcr0);
+			}
+			#endif
+		}
+
+		CPU::GetFeatures();
+
+		if (!CPU::Features::AES)
+			warn("\tCPU Does not support AES!");
+
+		if (!CPU::Features::VAES)
+			warn("\tCPU Does not support VAES!");
+
+		if (!CPU::Features::RDRAND)
+			warn("\tCPU Does not support RDRAND!");
+
+		if (!CPU::Features::RDSEED)
+			warn("\tCPU Does not support RDSEED!");
+
+		if (!CPU::Features::SHA)
+			warn("\tCPU Does not support SHA!");
+
+
+
 	}
 
 	void InitializePaging(const BootInfo& bootInfo)
@@ -217,13 +320,15 @@ namespace Kernel
 		for (u64 x = fbBase; x < fbBase + fbSize; x += PAGE_SIZE)
 		{
 			PageTableManager::MapMemory(x, x);
+			PageTableManager::SetVirtualFlag(x, PTFlag::Present, true);
+			PageTableManager::SetVirtualFlag(x, PTFlag::ReadWrite, false);
 		}
 		
 		// Enable paging (juuuust to be sure)
 		{
 			nint cr0 = 0;
 			asm("mov %0, %%cr0" : "=r"(cr0));
-			cr0 |= 0x80000000;
+			cr0 |= ControlRegister::CR0::PG;
 			asm("mov %%cr0, %0" : : "r" (cr0));
 		}
 

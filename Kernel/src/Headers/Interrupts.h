@@ -6,6 +6,7 @@
 #include <Globals.h>
 #include <cstr.h>
 #include <IOBus.hpp>
+#include <GDT.h>
 
 namespace Interrupts
 {
@@ -171,15 +172,17 @@ namespace Interrupts
 			FixedDiskController1 = IRQ_OFFSET + 0xE,
 			FixedDiskController2 = IRQ_OFFSET + 0xF,
 
-			SpuriousInterrupt = 0xFF,
+			TaskYield = IRQ_OFFSET + 0x10,
 
 		};
 	};
 
+	global RegisterState* GetRegisterDump();
 	forceinline void LoadGIDT() { asm("lidt %0" : : "m" (GlobalIDTR)); }
 
 	void RegisterInterruptStubs();
-	void RegisterInterrupt(vptr handlerAddress, u16 inter, IdtType interruptType = IdtType::InterruptGate);
+	void RegisterInterrupt(vptr handlerAddress, u16 inter, IdtType interruptType = IdtType::InterruptGate, byte ist = 0x00, SegmentSelector selector = (SegmentSelector)KERNEL_CODE_GDT_INDEX << 3);
+	void UnregisterInterrupt(u16 inter);
 
 	void hDivideByZeroFault(nint code, InterruptFrame* frame);
 	void hDebug();
@@ -201,8 +204,10 @@ namespace Interrupts
 	void hMachineCheck(nint code, InterruptFrame* frame);
 	void hSIMDFault(nint code, InterruptFrame* frame);
 	void hKeyboardInt();
-	void hPitTick(nint intr, InterruptFrame* frame);
+	void hPitTick(nint intr);
 	void hRtcTick();
+
+	void hPitScheduler(nint intr, InterruptFrame* frame);
 
 	void hStub(nint intr);
 

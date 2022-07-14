@@ -108,6 +108,12 @@ struct SystemSegmentDescriptor
 
 } attribute((packed));
 
+constexpr uint16 KERNEL_CODE_GDT_INDEX = 0x1;
+constexpr uint16 KERNEL_DATA_GDT_INDEX = 0x2;
+constexpr uint16 USER_CODE_GDT_INDEX = 0x3;
+constexpr uint16 USER_DATA_GDT_INDEX = 0x4;
+constexpr uint16 TSS_GDT_INDEX = 0x5;
+
 struct GDT
 {
 	SegmentDescriptor KernelNull;

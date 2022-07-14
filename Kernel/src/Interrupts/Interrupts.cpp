@@ -10,7 +10,6 @@
 namespace Interrupts
 {
 
-	global RegisterState* GetRegisterDump();
 	global nint GlobalHandlerStubTable[];
 	global nint GlobalInterruptTable[];
 	nint GlobalInterruptTable[0xFF];
@@ -22,7 +21,7 @@ namespace Interrupts
 		IDTDescEntry* intDescEntry = (IDTDescEntry*)(GlobalIDTR.Offset);
 		for (int x = 0; x < 0xFF; x++)
 		{
-			intDescEntry[x].Selector = 0x08;
+			intDescEntry[x].Selector = (SegmentSelector)KERNEL_CODE_GDT_INDEX << 3;
 			intDescEntry[x].TypeAttribs = IdtType::InterruptGate;
 			intDescEntry[x].SetOffset((nint)GlobalHandlerStubTable[x]);
 			intDescEntry[x].IST = 0x00;
@@ -30,11 +29,24 @@ namespace Interrupts
 		}
 	}
 
-	void RegisterInterrupt(vptr handlerAddress, u16 inter, IdtType interruptType)
+	void RegisterInterrupt(vptr handlerAddress, u16 inter, IdtType interruptType, byte ist, SegmentSelector selector)
 	{
 		IDTDescEntry* intDescEntry = (IDTDescEntry*)(GlobalIDTR.Offset + inter * sizeof(IDTDescEntry));
 		intDescEntry->TypeAttribs = interruptType;
+		intDescEntry->Selector = selector;
+		intDescEntry->IST = ist;
+
 		GlobalInterruptTable[inter] = (nint)handlerAddress;
+	}
+
+	void UnregisterInterrupt(u16 inter)
+	{
+		IDTDescEntry* intDescBase = (IDTDescEntry*)(GlobalIDTR.Offset);
+		intDescBase[inter].TypeAttribs = IdtType::InterruptGate;
+		intDescBase[inter].IST = 0x00;
+		intDescBase[inter].Selector = (SegmentSelector)KERNEL_CODE_GDT_INDEX << 3;
+
+		GlobalInterruptTable[inter] = (nint)hStub;
 	}
 
 	forceinline void PanicScreen()
@@ -49,23 +61,28 @@ namespace Interrupts
 	{
 		auto regs = GetRegisterDump();
 
-		printlnf("rax: %x0 \nrbx: %x1 \nrcx: %x2 \nrdx: %x3 \n", regs->rax, regs->rbx, regs->rcx, regs->rdx);
+		println("rax: %x0\trbx: %x1 \nrcx: %x2\trdx: %x3 \n", regs->rax, regs->rbx, regs->rcx, regs->rdx);
 
-		printlnf("rsi: %x0 \nrdi: %x1 \n", regs->rsi, regs->rdi);
+		println("rsi: %x0\trdi: %x1 \n", regs->rsi, regs->rdi);
 
-		printlnf("rsp: %x0 \nrbp: %x1 \n", frame->rsp, regs->rbp);
+		println("rsp: %x0\trbp: %x1 \n", frame->rsp, regs->rbp);
 
-		printlnf("r8: %x0 \nr9: %x1 \nr10: %x2 \nr11: %x3 \nr12: %x4 \nr13: %x5 \nr14: %x6 \nr15: %x7 \n",
-			regs->r8, regs->r9, regs->r10, regs->r11, regs->r12, regs->r13, regs->r14, regs->r15);
-		
-		printlnf("rip: %x0 \n", frame->rip);
+		println("r8: %x0\tr9: %x1\tr10: %x2 \nr11: %x3\tr12: %x4\tr13: %x5 \n\tr14: %x6\tr15: %x7 \n",
+				 regs->r8, regs->r9, regs->r10, regs->r11, regs->r12, regs->r13, regs->r14, regs->r15);
 
-		printlnf("cs: %x0 \nss: %x1 \nds: %x2 \nes: %x3", frame->cs, frame->ss);
+		println("rip: %x0 \n", frame->rip);
 
-		printlnf("rflags: %x0 \n", frame->rflags);
+		println("cs: %x0\tss: %x1 \nds: %x2\tes: %x3", frame->cs, frame->ss, regs->ds, regs->es);
+		println("gs: %x0\tfs: %x1 \n", regs->gs, regs->fs);
 
-		printlnf("Threads: %0 \nThreads Since Boot: %1", Scheduler::GetThreadCount(), Scheduler::GetThreadsCreated());
+		println("rflags: %x0 \n", frame->rflags);
 
+		println("Threads: %0 \nThreads Since Boot: %1", Scheduler::GetThreadCount(), Scheduler::GetThreadsCreated());
+		auto thread = Scheduler::GetCurrentThread();
+		if (thread)
+		{
+			print("Current Thread: "); println(thread->Name);
+		}
 	}
 
 	void hDivideByZeroFault(nint code, InterruptFrame* frame)
@@ -112,7 +129,7 @@ namespace Interrupts
 	void hInvalidOpcodeFault(nint code, InterruptFrame* frame)
 	{
 		PanicScreen();
-		printlnf("Invalid Opcode at address: %x0", frame->rip);
+		println("Invalid Opcode at address: %x0", frame->rip);
 		PrintRegisterDump(frame);
 		halt;
 	}
@@ -127,10 +144,11 @@ namespace Interrupts
 
 	void hDoubleFault(nint intr, InterruptFrame* frame, nint code)
 	{
+		gConsole.DisableCursor();
 		Console.Clear(Color::Red);
 		Console.SetBackgroundColor(Color::Red);
 		Console.SetForegroundColor(Color::White);
-		Console.WriteLine("ERROR: DOUBLE FAULT!");
+		println("ERROR: DOUBLE FAULT! \nCODE: %x0", code);
 		PrintRegisterDump(frame);
 		halt;
 	}
@@ -146,7 +164,7 @@ namespace Interrupts
 	void hInvalidStateSegmentFault(nint intr, InterruptFrame* frame, nint code)
 	{
 		PanicScreen();
-		printlnf("Invalid State Segment!\nCode: %x0", code);
+		println("Invalid Task State Segment!\nCode: %x0", code);
 		PrintRegisterDump(frame);
 		halt;
 	}
@@ -154,7 +172,7 @@ namespace Interrupts
 	void hSegmentMissingFault(nint intr, InterruptFrame* frame, nint code)
 	{
 		PanicScreen();
-		printlnf("Segment Missing!\nCode: %x0", code);
+		println("Segment Missing!\nCode: %x0", code);
 		PrintRegisterDump(frame);
 		halt;
 	}
@@ -162,7 +180,7 @@ namespace Interrupts
 	void hStackFault(nint intr, InterruptFrame* frame, nint code)
 	{
 		PanicScreen();
-		printlnf("Stack Exception!\nCode: %x0", code);
+		println("Stack-Segment Fault!\nCode: %x0", code);
 		PrintRegisterDump(frame);
 		halt;
 	}
@@ -170,7 +188,7 @@ namespace Interrupts
 	void hGeneralProtectionFault(nint intr, InterruptFrame* frame, nint code)
 	{
 		PanicScreen();
-		printlnf("ERROR: GENERAL PROTECTION FAULT!\nCode: %x0", code);
+		println("ERROR: GENERAL PROTECTION FAULT!\nCode: %x0", code);
 		PrintRegisterDump(frame);
 		halt;
 	}
@@ -179,23 +197,44 @@ namespace Interrupts
 	{
 		PanicScreen();
 
+		char* bitDefs[] =
+		{
+			"    Present Flag: %0",
+			"    Read/Write Flag: %0\n",
+			"    User/Supervisor Flag: %0",
+			"    Reserved Flag: %0\n",
+			"    Instruction/Data Flag: %0",
+			"    Protection-Key Violation: %0\n",
+			"    Shadow-Stack Access Fault: %0"
+		};
+
 		uint64 addr = 0;
 		// cr2 contains the page fault linear address (PFLA)
-		asm ("mov %0, %%cr2" : "=r" (addr) );
+		asm("mov %0, %%cr2" : "=r" (addr));
 
-		printlnf("ERROR: PAGE FAULT!");
-		printlnf("ATTEMPTED TO ACCESS ADDRESS: %x0", addr);
+		println("ERROR: PAGE FAULT!");
+		println("ATTEMPTED TO ACCESS ADDRESS: %x0", addr);
 
-		printlnf("Error Code: %x0", code);
+		println("Error Code: %x0", code);
+
+		nint codeTemp = code;
+		for (byte x = 0; x < 7; x++)
+		{
+			print(bitDefs[x], codeTemp & 1);
+			codeTemp >>= 1;
+		}
+
+		println("    SGX Violaton: %0\n", code & (1 << 15));
 
 		PrintRegisterDump(frame);
+
 		halt;
 	}
 
 	void hCoprocessorFault(nint intr, InterruptFrame* frame)
 	{
 		PanicScreen();
-		Console.WriteLine("ERROR: COPROCESSOR FAULT!\n");
+		println("ERROR: COPROCESSOR FAULT!\n");
 		PrintRegisterDump(frame);
 		halt;
 	}
@@ -203,7 +242,7 @@ namespace Interrupts
 	void hAlignmentCheck(nint intr, InterruptFrame* frame, nint code)
 	{
 		PanicScreen();
-		printlnf("Alignment Check \nCode: %x0\n", code);
+		println("Alignment Check \nCode: %x0\n", code);
 		PrintRegisterDump(frame);
 		halt;
 	}
@@ -234,16 +273,8 @@ namespace Interrupts
 
 	}
 
-	void hPitTick(nint intr, InterruptFrame* frame)
+	void hPitTick(nint intr)
 	{
-		if (Scheduler::Running)
-		{
-			Scheduler::TaskSwitch(GetRegisterDump(), frame);
-			if (APIC::InUse) APIC::EndOfInterrupt();
-			else PIC::SendEIO(false);
-			return;
-		}
-
 		PIT::Tick();
 		if (APIC::InUse) APIC::EndOfInterrupt();
 		else PIC::SendEIO(false);
@@ -252,10 +283,17 @@ namespace Interrupts
 	void hRtcTick()
 	{
 		RTC::Tick();
-
-		//RTC::EndOfInterrupt();
+		RTC::EndOfInterrupt();
 		if (APIC::InUse) APIC::EndOfInterrupt();
 		else PIC::SendEIO(false);
+	}
+
+	void hPitScheduler(nint intr, InterruptFrame* frame)
+	{
+		Scheduler::TimerInterrupt(GetRegisterDump(), frame);
+
+		if (APIC::InUse) APIC::EndOfInterrupt();
+		else PIC::SendEIO((intr - IRQ_OFFSET) > 7);
 	}
 
 	void hStub(nint intr)

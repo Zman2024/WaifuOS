@@ -52,7 +52,11 @@ inline void memset(void* address, T value, const uint64 nBytes)
 // asmUtils.asm
 global void memset64(vptr destination, nint value, nint numBytes);
 
-void memcpy(vptr dest, const vptr src, uint64 nBytes);
+// asmUtils.asm
+global void memcpy(vptr dest, const vptr src, uint64 nBytes);
+
+// asmUtils.asm
+global void repmovsb(vptr dest, const vptr src, uint64 nBytes);
 
 forceinline vptr operator new(nint size)				{ return malloc(size); }
 forceinline vptr operator new[](nint size)				{ return malloc(size); }

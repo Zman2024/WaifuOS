@@ -1,10 +1,13 @@
 #include <PCI.h>
 #include <AHCI.hpp>
 #include <XHCI.h>
+#include <List.h>
 
 namespace PCI
 {
 	using namespace ACPI;
+
+	List<USB::XHCIDriver*> XHCIDrivers = List<USB::XHCIDriver*>();
 
 	void EnumerateFunction(u64 deviceAddress, u64 func)
 	{
@@ -89,7 +92,7 @@ namespace PCI
 
 							case 0x30: // XHCI (USB3) Controller
 								debug("\tFound USB XHCI Controller (USB3)");
-								//new USB::XHCIDriver(pci);
+								XHCIDrivers.Add(new USB::XHCIDriver(pci));
 								break;
 
 							case 0x80: // Unspecified
@@ -166,6 +169,13 @@ namespace PCI
 
 	void EnumeratePCI(MCFGHeader* mcfg)
 	{
+		static bool _init = true;
+		if (_init)
+		{
+			XHCIDrivers = List<USB::XHCIDriver*>();
+			_init = false;
+		}
+
 		debug("MCFG Table: ");
 		u32 entries = (mcfg->Length - sizeof(MCFGHeader)) / sizeof(DeviceConfig);
 
@@ -173,7 +183,7 @@ namespace PCI
 		{
 			DeviceConfig* cfg = (DeviceConfig*)((u64)mcfg + sizeof(MCFGHeader) + (sizeof(DeviceConfig) * x));
 
-			for (u64 bus = cfg->StartBus; bus < cfg->EndBus; bus++)
+			for (nint bus = cfg->StartBus; bus < cfg->EndBus; bus++)
 			{
 				EnumerateBus(cfg->BaseAddress, bus);
 			}

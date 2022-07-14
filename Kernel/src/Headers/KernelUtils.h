@@ -51,6 +51,9 @@ namespace Kernel
 	// Initializes the global descriptor table for interrupts
 	void InitializeGDT();
 
+	// Enables SSE / AVX instructions
+	void EnableHardwareFeatures();
+
 	// Shows loading image loaded from bootloader
 	void ShowLoadingImage(const BootInfo& info);
 

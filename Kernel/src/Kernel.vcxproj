@@ -105,6 +105,8 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="cstr.cpp" />
     <ClCompile Include="EFI.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Hardware\CPU.cpp" />
+    <ClCompile Include="icxxabi.cpp" />
     <ClCompile Include="Interrupts\APIC.cpp" />
     <ClCompile Include="Interrupts\IDT.cpp" />
     <ClCompile Include="Interrupts\Interrupts.cpp" />
@@ -142,6 +144,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\EFI.h" />
     <ClInclude Include="Headers\GDT.h" />
     <ClInclude Include="Headers\Globals.h" />
+    <ClInclude Include="Headers\icxxabi.h" />
     <ClInclude Include="Headers\IDT.h" />
     <ClInclude Include="Headers\Interrupts.h" />
     <ClInclude Include="Headers\IOAPIC.h" />
@@ -174,6 +177,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <None Include="..\kernel.ld" />
     <None Include="..\Makefile" />
     <None Include="asmUtils.asm" />
+    <None Include="Hardware\CPU.asm" />
     <None Include="Interrupts\GDT.asm" />
     <None Include="Interrupts\Handlers.asm" />
     <None Include="Interrupts\Interrupts.asm" />

@@ -10,7 +10,7 @@ namespace Memory
 	vptr heapBase;
 	vptr heapEnd;
 	SegmentHeader* LastSegment;
-	bool HeapInitialized;
+	bool HeapInitialized = false;
 
 	uint64 CalculateMemorySize(vptr map, uint64 nEntries, uint64 descSize)
 	{
@@ -236,11 +236,3 @@ void free(vptr address)
 	memoryLock.Free();
 }
 
-void memcpy(vptr dest, const vptr src, uint64 nBytes)
-{
-	fast const byte* srcb = (const byte*)src;
-	fast byte* destb = (byte*)dest;
-
-	for (fast uint64 x = 0; x < nBytes; x++) destb[x] = srcb[x];
-
-}

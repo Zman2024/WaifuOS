@@ -60,6 +60,9 @@
     <Filter Include="Headers\Hardware">
       <UniqueIdentifier>{da96d153-5349-406d-8252-e6ba951a75fa}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Hardware">
+      <UniqueIdentifier>{f361a077-fd15-46b8-a809-392158a5e844}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KernelUtils.cpp">
@@ -145,6 +148,12 @@
     </ClCompile>
     <ClCompile Include="Memory\List.cpp">
       <Filter>Source\Memory</Filter>
+    </ClCompile>
+    <ClCompile Include="icxxabi.cpp">
+      <Filter>Source</Filter>
+    </ClCompile>
+    <ClCompile Include="Hardware\CPU.cpp">
+      <Filter>Source\Hardware</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -265,6 +274,9 @@
     <ClInclude Include="Headers\CPU.h">
       <Filter>Headers\Hardware</Filter>
     </ClInclude>
+    <ClInclude Include="Headers\icxxabi.h">
+      <Filter>Headers</Filter>
+    </ClInclude>
   </ItemGroup>
   <ItemGroup>
     <None Include="Interrupts\GDT.asm">
@@ -286,6 +298,9 @@
     </None>
     <None Include="Synchronization\Synchronization.asm">
       <Filter>Source\Synchronization</Filter>
+    </None>
+    <None Include="Hardware\CPU.asm">
+      <Filter>Source\Hardware</Filter>
     </None>
   </ItemGroup>
   <ItemGroup>

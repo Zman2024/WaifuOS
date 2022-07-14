@@ -9,10 +9,30 @@ enum struct IdtType : byte
 	TrapGate = 0b10001111,
 };
 
+
+struct SegmentSelector
+{
+	forceinline SegmentSelector() {  }
+	forceinline SegmentSelector(uint16 value) { *(uint16*)this = value; }
+	forceinline SegmentSelector(uint16 index, byte privilegeLevel, bool UseLDT)
+	{
+		DTIndex = index;
+		PrivilegeLevel = privilegeLevel & 0b11;
+		UseLDT = (UseLDT == true);
+	}
+
+	forceinline operator uint16() { return *(uint16*)this; }
+
+	uint16 PrivilegeLevel : 2;
+	uint16 UseLDT : 1;
+	uint16 DTIndex : 13;
+
+} attribute((packed));
+
 struct IDTDescEntry
 {
 	uint16 Offset0;
-	uint16 Selector; // Code segment selector in GTD / LDT
+	SegmentSelector Selector; // Segment Selector in GTD / LDT
 
 	byte IST;
 	IdtType TypeAttribs;

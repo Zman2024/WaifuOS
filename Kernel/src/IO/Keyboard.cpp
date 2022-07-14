@@ -1,5 +1,6 @@
 #include <Keyboard.h>
 #include <IOBus.hpp>
+#include <Interrupts.h>
 
 namespace IO
 {
@@ -175,6 +176,10 @@ namespace IO
 
 				case PS2Key1::Escape:
 					gConsole.Clear();
+					return;
+
+				case PS2Key1::F12:
+					intcall(Interrupts::Interrupt::MachineCheck);
 					return;
 
 			}

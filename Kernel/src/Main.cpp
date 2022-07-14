@@ -27,24 +27,6 @@ namespace Kernel
 
 	}
 
-	Mutex mut = Mutex();
-	void mutexFunc(nint ID)
-	{
-		mut.Lock();
-		debug("Mutex Thread #%0", ID);
-		Scheduler::Yield();
-		mut.Unlock();
-	}
-
-	SpinLock lock = SpinLock();
-	void spinLockFunc(nint ID)
-	{
-		lock.Aquire();
-		debug("SpinLock Thread #%0", ID);
-		Scheduler::Yield();
-		lock.Free();
-	}
-
 	global void KernelStart(BootInfo bootInfo)
 	{
 		// Clear uninitialized data (just to be sure)
@@ -66,19 +48,8 @@ namespace Kernel
 		Kernel::InitializeKernel(bootInfo);
 
 		gConsole.WriteLine(string(OSName) + " Initialized!", Color::Green);
-		Memory::PrintLeaks();
 		gConsole.EnableCursor();
-
-		Scheduler::Start();
-
-		while (Scheduler::CreateThread(mutexFunc) < 0x1000)
-		{
-			pause;
-		}
-		while (Scheduler::CreateThread(spinLockFunc) < 0x1000)
-		{
-			pause;
-		}
+		gConsole.ScrollDown(3);
 		while (true) hlt;
 	}
 }
