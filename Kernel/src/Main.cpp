@@ -1,6 +1,7 @@
 #include <KernelUtils.h>
 #include <Synchronization.hpp>
 #include <Scheduling.h>
+#include <FAT32.h>
 
 namespace Kernel
 {
@@ -12,14 +13,17 @@ namespace Kernel
 		memset64(bssStart, 0x00, bssSize);
 	}
 
-	void _ctor()
+	void _ctor(BootInfo& bootInfo)
 	{
+		// Clear uninitialized data (I'd rather it be zero than random)
+		ClearBss(bootInfo);
+
 		u64* ctorStart = &_ctorStart;
 		u64* ctorEnd = &_ctorEnd;
-		uint64 ctorCount = (u64(ctorEnd) - u64(ctorStart)) / sizeof(size_t);
+		uint64 ctorCount = (u64(ctorEnd) - u64(ctorStart)) / sizeof(nint);
 
 		// im doing ctors here because doing it in bootloader was a hassle
-		for (size_t x = 0; x < ctorCount; x++)
+		for (nint x = 0; x < ctorCount; x++)
 		{
 			void(*constructor)() = (void(*)())(ctorStart[x]);
 			constructor();
@@ -29,11 +33,8 @@ namespace Kernel
 
 	global void KernelStart(BootInfo bootInfo)
 	{
-		// Clear uninitialized data (just to be sure)
-		ClearBss(bootInfo);
-
 		// Run global constructors
-		_ctor();
+		_ctor(bootInfo);
 
 		// Create console
 		gConsole = PrimitiveConsole(bootInfo.Framebuffer, bootInfo.font);
@@ -49,7 +50,10 @@ namespace Kernel
 
 		gConsole.WriteLine(string(OSName) + " Initialized!", Color::Green);
 		gConsole.EnableCursor();
-		gConsole.ScrollDown(3);
-		while (true) hlt;
+		
+		while (true)
+		{
+			hlt;
+		}
 	}
 }

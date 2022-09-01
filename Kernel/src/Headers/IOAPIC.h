@@ -4,6 +4,7 @@
 #include <Types.h>
 #include <APICStructs.h>
 #include <Interrupts.h>
+#include <APICShared.h>
 
 namespace APIC
 {
@@ -18,9 +19,9 @@ namespace APIC
 
 	inline bool SetEntry(byte irq, RedirectionEntry entry)
 	{
-		for (byte x = 0; x < IOAPICsCount; x++)
+		for (byte x = 0; x < IOAPICs.GetCount(); x++)
 		{
-			auto ioapic = IOAPICs + x;
+			auto ioapic = IOAPICs[x];
 			if (ioapic->GetInterruptBase() > irq) continue;
 			if (ioapic->GetInterruptBase() + ioapic->GetMaxRedirectionEntries() < irq) continue;
 
@@ -39,12 +40,10 @@ namespace APIC
 
 	inline void InitializeIOAPIC()
 	{
-		IOAPICsCount = 0x00;
-		for (byte x = 0; x < IOAPICRecords->GetCount(); x++)
+		for (byte x = 0; x < IOAPICRecords.GetCount(); x++)
 		{
-			auto record = IOAPICRecords->Get(x);
-			IOAPICs[x] = IOAPIC(record);
-			IOAPICsCount++;
+			auto record = IOAPICRecords.Get(x);
+			IOAPICs.Add(new IOAPIC(record));
 		}
 	}
 

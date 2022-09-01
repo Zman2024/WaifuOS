@@ -103,7 +103,7 @@ namespace APIC
 		uint32 LapicAddress;
 		uint32 Flags;
 
-	} attribute((packed));
+	} packed;
 
 	struct BaseRecord
 	{
@@ -289,13 +289,12 @@ namespace APIC
 		forceinline uint64 GetInterruptBase() { return this->mGlobalInterruptBase; }
 
 	protected:
-		static const u32 IOApicRedirectionTableOffset = 0x10;
+		static constexpr u32 IOApicRedirectionTableOffset = 0x10;
 
 		vptr mPhysicalAddress;
-		vptr mVirtualAddress;
 
-		uint32 volatile* mRegIORW;
-		uint32 volatile* mRegSel;
+		uint32 volatile* mRegisterRW;
+		uint32 volatile* mRegisterSelect;
 
 		IOAPICRecord mRecord;
 
@@ -309,31 +308,6 @@ namespace APIC
 		uint64 mGlobalInterruptBase;
 
 	};
-
-	// Local APIC ptr
-	extern LocalAPIC* LAPIC;
-
-	// Physical address of the LAPIC
-	extern LocalAPIC* PhysicalLAPIC;
-
-	extern uint16 IOAPICsCount;
-	extern IOAPIC IOAPICs[];
-
-	// index = IRQ num that's been overidden
-	// if IRQOverrides[irq] == nullptr then there isn't a source override
-	extern IRQRemapRecord* IRQOverrides[];
-	extern uint16 IRQOverridesCount;
-
-	//extern uint16 LocalAPICRecordsCount;
-	extern List<LAPICRecord*>* LocalAPICRecords;
-
-	//extern byte IOAPICRecordsCount;
-	extern List<IOAPICRecord*>* IOAPICRecords;
-
-	// When true, the APIC is found and usable
-	extern bool UsableAPIC;
-	// When true, the apic is in use
-	extern bool InUse;
 
 }
 

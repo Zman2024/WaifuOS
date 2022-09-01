@@ -63,6 +63,24 @@
     <Filter Include="Source\Hardware">
       <UniqueIdentifier>{f361a077-fd15-46b8-a809-392158a5e844}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Interrupts\APIC">
+      <UniqueIdentifier>{8e3015c4-4c66-4791-ac02-555b4b06d5a2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Interrupts\APIC">
+      <UniqueIdentifier>{bf39f96e-6874-40b1-909d-5dbf9673b7d2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\IO\FileSystem">
+      <UniqueIdentifier>{bb525507-fc72-4c09-936c-37998946c23b}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\IO\FileSystem\FAT32">
+      <UniqueIdentifier>{103591c8-908c-44e7-bdf1-8d32970ebff2}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\IO\FileSystem">
+      <UniqueIdentifier>{7167c3d1-cb12-428c-986e-d33d40758e17}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Source\IO\FileSystem\FAT32">
+      <UniqueIdentifier>{588c2c2e-f7a7-4366-87a6-7e83b4a664f8}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KernelUtils.cpp">
@@ -110,19 +128,10 @@
     <ClCompile Include="IO\PCI.cpp">
       <Filter>Source\IO</Filter>
     </ClCompile>
-    <ClCompile Include="Interrupts\APIC.cpp">
-      <Filter>Source\Interrupts</Filter>
-    </ClCompile>
     <ClCompile Include="IO\IOBus.cpp">
       <Filter>Source\IO</Filter>
     </ClCompile>
     <ClCompile Include="Interrupts\PIC.cpp">
-      <Filter>Source\Interrupts</Filter>
-    </ClCompile>
-    <ClCompile Include="Interrupts\IOAPIC.cpp">
-      <Filter>Source\Interrupts</Filter>
-    </ClCompile>
-    <ClCompile Include="Interrupts\LocalAPIC.cpp">
       <Filter>Source\Interrupts</Filter>
     </ClCompile>
     <ClCompile Include="string.cpp">
@@ -154,6 +163,21 @@
     </ClCompile>
     <ClCompile Include="Hardware\CPU.cpp">
       <Filter>Source\Hardware</Filter>
+    </ClCompile>
+    <ClCompile Include="Interrupts\APIC.cpp">
+      <Filter>Source\Interrupts\APIC</Filter>
+    </ClCompile>
+    <ClCompile Include="Interrupts\IOAPIC.cpp">
+      <Filter>Source\Interrupts\APIC</Filter>
+    </ClCompile>
+    <ClCompile Include="Interrupts\LocalAPIC.cpp">
+      <Filter>Source\Interrupts\APIC</Filter>
+    </ClCompile>
+    <ClCompile Include="Interrupts\APICShared.cpp">
+      <Filter>Source\Interrupts\APIC</Filter>
+    </ClCompile>
+    <ClCompile Include="IO\FileSystem\FAT32.cpp">
+      <Filter>Source\IO\FileSystem\FAT32</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -214,22 +238,10 @@
     <ClInclude Include="Headers\PCI.h">
       <Filter>Headers\IO</Filter>
     </ClInclude>
-    <ClInclude Include="Headers\APIC.h">
-      <Filter>Headers\Interrupts</Filter>
-    </ClInclude>
     <ClInclude Include="Headers\IOBus.hpp">
       <Filter>Headers\IO</Filter>
     </ClInclude>
     <ClInclude Include="Headers\PIC.hpp">
-      <Filter>Headers\Interrupts</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\IOAPIC.h">
-      <Filter>Headers\Interrupts</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\APICStructs.h">
-      <Filter>Headers\Interrupts</Filter>
-    </ClInclude>
-    <ClInclude Include="Headers\LocalAPIC.h">
       <Filter>Headers\Interrupts</Filter>
     </ClInclude>
     <ClInclude Include="Headers\string.h">
@@ -276,6 +288,24 @@
     </ClInclude>
     <ClInclude Include="Headers\icxxabi.h">
       <Filter>Headers</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\APIC.h">
+      <Filter>Headers\Interrupts\APIC</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\APICStructs.h">
+      <Filter>Headers\Interrupts\APIC</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\IOAPIC.h">
+      <Filter>Headers\Interrupts\APIC</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\LocalAPIC.h">
+      <Filter>Headers\Interrupts\APIC</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\APICShared.h">
+      <Filter>Headers\Interrupts\APIC</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\FAT32.h">
+      <Filter>Headers\IO\FileSystem\FAT32</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

@@ -17,7 +17,7 @@ namespace ACPI
 		uint64 XSDTAddress;
 		byte ExtendedChecksum;
 		byte Reserved[3];
-	} attribute((packed));
+	} packed;
 
 	struct XSDTHeader
 	{
@@ -30,13 +30,13 @@ namespace ACPI
 		uint32 OEMRevision;
 		uint32 CreatorID;
 		uint32 CreatorRevision;
-	} attribute((packed));
+	} packed;
 
 	struct MCFGHeader : XSDTHeader
 	{
 	private:
 		uint64 Reserved;
-	} attribute((packed));
+	} packed;
 
 
 	void PrintTables(XSDTHeader* xsdt);

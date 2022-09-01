@@ -9,8 +9,6 @@
 #include <Memory.h>
 #include <string.h>
 
-// #define NO_ANIME
-
 global PrimitiveConsole gConsole;
 global IDTR GlobalIDTR;
 global GDT GlobalGDT; // yeah i know, "Global Global Descriptor Table" makes no sense. Cope.

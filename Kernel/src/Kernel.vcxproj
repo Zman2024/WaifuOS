@@ -108,12 +108,14 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="Hardware\CPU.cpp" />
     <ClCompile Include="icxxabi.cpp" />
     <ClCompile Include="Interrupts\APIC.cpp" />
+    <ClCompile Include="Interrupts\APICShared.cpp" />
     <ClCompile Include="Interrupts\IDT.cpp" />
     <ClCompile Include="Interrupts\Interrupts.cpp" />
     <ClCompile Include="Interrupts\IOAPIC.cpp" />
     <ClCompile Include="Interrupts\LocalAPIC.cpp" />
     <ClCompile Include="Interrupts\PIC.cpp" />
     <ClCompile Include="IO\ACPI.cpp" />
+    <ClCompile Include="IO\FileSystem\FAT32.cpp" />
     <ClCompile Include="IO\IOBus.cpp" />
     <ClCompile Include="IO\Keyboard.cpp" />
     <ClCompile Include="IO\PCI.cpp" />
@@ -135,6 +137,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\ACPI.h" />
     <ClInclude Include="Headers\AHCI.hpp" />
     <ClInclude Include="Headers\APIC.h" />
+    <ClInclude Include="Headers\APICShared.h" />
     <ClInclude Include="Headers\APICStructs.h" />
     <ClInclude Include="Headers\asmUtils.h" />
     <ClInclude Include="Headers\BitMap.h" />
@@ -142,6 +145,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\CPU.h" />
     <ClInclude Include="Headers\Direction.h" />
     <ClInclude Include="Headers\EFI.h" />
+    <ClInclude Include="Headers\FAT32.h" />
     <ClInclude Include="Headers\GDT.h" />
     <ClInclude Include="Headers\Globals.h" />
     <ClInclude Include="Headers\icxxabi.h" />

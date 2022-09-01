@@ -44,10 +44,14 @@ typedef uint32 Color32;
 constexpr auto PAGE_SIZE = 0x1000; // The size of a physical page
 
 // Macros //
-#define QEMU_WINDOWS_BUILD // only if this is being built for QEMU
+
+#define QEMU_WINDOWS_BUILD // only if this is being built for QEMU on windows
+
+// #define NO_ANIME // because anime = bad
 
 #ifdef VISUAL_STUDIO_EDITOR
 #define attribute(x) 
+#define packed
 #define forceinline
 #define asm(x)
 #define cli
@@ -63,6 +67,7 @@ constexpr auto PAGE_SIZE = 0x1000; // The size of a physical page
 #define fast
 #else
 #define attribute __attribute__
+#define packed __attribute__((packed))
 #define forceinline inline __attribute__((always_inline))
 
 #define global extern "C"

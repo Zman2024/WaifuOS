@@ -2,12 +2,13 @@
 #include <AHCI.hpp>
 #include <XHCI.h>
 #include <List.h>
+#include <FAT32.h>
 
 namespace PCI
 {
 	using namespace ACPI;
 
-	List<USB::XHCIDriver*> XHCIDrivers = List<USB::XHCIDriver*>();
+	List<PCIDeviceHeader*> SupportedFunctions;
 
 	void EnumerateFunction(u64 deviceAddress, u64 func)
 	{
@@ -15,11 +16,11 @@ namespace PCI
 		u64 funcAddress = deviceAddress + offset;
 
 		PageTableManager::MapMemory(funcAddress, funcAddress);
+		PageFrameAllocator::LockPage((vptr)funcAddress);
 		PCIDeviceHeader* pci = (PCIDeviceHeader*)funcAddress;
 		if (!pci->DeviceID || pci->DeviceID == 0xFFFF) return;
 
-		// Do stuff like cache or something idk
-		fast byte lclass = pci->Class, subclass = pci->Subclass, progif = pci->ProgIF;
+		byte lclass = pci->Class, subclass = pci->Subclass, progif = pci->ProgIF;
 
 		switch (lclass)
 		{
@@ -31,7 +32,8 @@ namespace PCI
 						{
 							case 0x01: // ACHI 1.0 Host
 								debug("\tFound ACHI 1.0 Device");
-								new AHCI::AHCIDriver(pci);
+								SupportedFunctions.Add(pci);
+								// new AHCI::AHCIDriver(pci);
 								break;
 						}
 						break;
@@ -92,7 +94,7 @@ namespace PCI
 
 							case 0x30: // XHCI (USB3) Controller
 								debug("\tFound USB XHCI Controller (USB3)");
-								XHCIDrivers.Add(new USB::XHCIDriver(pci));
+								SupportedFunctions.Add(pci);
 								break;
 
 							case 0x80: // Unspecified
@@ -142,6 +144,7 @@ namespace PCI
 		u64 deviceAddress = busAddress + offset;
 
 		PageTableManager::MapMemory(deviceAddress, deviceAddress);
+		PageFrameAllocator::LockPage((vptr)deviceAddress);
 		PCIDeviceHeader* pci = (PCIDeviceHeader*)deviceAddress;
 		if (!pci->DeviceID || pci->DeviceID == 0xFFFF) return;
 
@@ -157,6 +160,7 @@ namespace PCI
 		u64 busAddress = baseAddress + offset;
 
 		PageTableManager::MapMemory(busAddress, busAddress);
+		PageFrameAllocator::LockPage((vptr)busAddress);
 		PCIDeviceHeader* pci = (PCIDeviceHeader*)busAddress;
 		if (!pci->DeviceID || pci->DeviceID == 0xFFFF) return;
 
@@ -172,7 +176,7 @@ namespace PCI
 		static bool _init = true;
 		if (_init)
 		{
-			XHCIDrivers = List<USB::XHCIDriver*>();
+			SupportedFunctions = List<PCIDeviceHeader*>();
 			_init = false;
 		}
 
@@ -191,4 +195,34 @@ namespace PCI
 		}
 
 	}
+
+	void InitializePCIDevices()
+	{
+		constexpr uint32 SIG_AHCI = 0x010601;
+		constexpr uint32 SIG_XHCI = 0x0C0330;
+
+		debug("Initializing PCI...");
+
+		for (nint x = 0; x < SupportedFunctions.GetCount(); x++)
+		{
+			PCIDeviceHeader* pci = SupportedFunctions.Get(x);
+			uint32 sig = (nint(pci->Class) << 16) | (nint(pci->Subclass) << 8) | (nint(pci->ProgIF) << 0);
+			switch (sig)
+			{
+				case SIG_AHCI:
+				{
+					debug("\tInitializing ACHI 1.0 Driver");
+					auto driver = new AHCI::AHCIDriver(pci);
+					FAT32::DoesDriveContainF32(driver);
+					break;
+				}
+
+				case SIG_XHCI:
+					debug("\tInitializing XHCI Driver");
+					new USB::XHCIDriver(pci);
+					break;
+			}
+		}
+	}
+
 }

@@ -36,8 +36,11 @@ namespace Kernel
 	// Initializes hardware and kernel resources
 	void InitializeKernel(const BootInfo& bootInfo);
 
+	// Use PIC
+	void InitializeEarlyIRQ();
+
 	// Use PIC / APIC
-	void InitializeIRQ(bool forceUsePic = false);
+	void InitializeSMP(bool forceUsePic = false);
 
 	// Init ACPI
 	void InitializeACPI(const BootInfo& bootInfo);

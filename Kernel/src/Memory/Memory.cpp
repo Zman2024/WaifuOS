@@ -173,9 +173,8 @@ vptr malloc(nint size)
 
 	if (size == 0)
 	{
-		// cause nullptr pagefult
-		asm("mov %%cr2, %0" : : "a" (nullptr));
-		intcall(0x0E);
+		// cause nullptr page fault
+		*(byte*)nullptr;
 		return nullptr;
 	}
 	
@@ -223,8 +222,7 @@ void free(vptr address)
 	if (!HeapInitialized || !address)
 	{
 		// cause nullptr pagefult
-		asm("mov %%cr2, %0" : : "a" (nullptr));
-		intcall(0x0E);
+		*(byte*)nullptr;
 		return nullptr;
 	}
 

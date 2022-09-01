@@ -6,6 +6,8 @@
 #include <PCI.h>
 #include <PageTableManager.h>
 #include <PageFrameAllocator.h>
+#include <Synchronization.hpp>
+#include <Scheduling.h>
 
 namespace AHCI 
 {
@@ -48,58 +50,58 @@ namespace AHCI
 
 	struct HBAPort
 	{
-		uint32 CommandListBase;
-		uint32 CommandListBaseUpper;
+		volatile uint32 CommandListBase;
+		volatile uint32 CommandListBaseUpper;
 
-		uint32 fisBaseAddress;
-		uint32 fisBaseAddressUpper;
+		volatile uint32 fisBaseAddress;
+		volatile uint32 fisBaseAddressUpper;
 
-		uint32 InterruptStatus;
-		uint32 InterruptEnabled;
+		volatile uint32 InterruptStatus;
+		volatile uint32 InterruptEnabled;
 
-		uint32 cmdStatus;
-		uint32 rsv0;
+		volatile uint32 cmdStatus;
+		volatile uint32 rsv0;
 
-		uint32 TaskFileData;
-		uint32 Signature;
+		volatile uint32 TaskFileData;
+		volatile uint32 Signature;
 
-		uint32 sataStatus;
-		uint32 sataControl;
-		uint32 sataError;
-		uint32 sataActive;
-		uint32 CommandIssue;
-		uint32 sataNotification;
+		volatile uint32 sataStatus;
+		volatile uint32 sataControl;
+		volatile uint32 sataError;
+		volatile uint32 sataActive;
+		volatile uint32 CommandIssue;
+		volatile uint32 sataNotification;
 
-		uint32 fisSwitchControl;
-		uint32 rsv1[11];
+		volatile uint32 fisSwitchControl;
+		volatile uint32 rsv1[11];
 
-		uint32 Vendor[4];
+		volatile uint32 Vendor[4];
 
-	};
+	} packed;
 
 	struct HBAMemory
 	{
-		uint32 HostCapability;
-		uint32 GlobalHostControl;
-		uint32 InterruptStatus;
-		uint32 PortsImplemented;
+		volatile uint32 HostCapability;
+		volatile uint32 GlobalHostControl;
+		volatile uint32 InterruptStatus;
+		volatile uint32 PortsImplemented;
 
-		uint32 Version;
+		volatile uint32 Version;
 
-		uint32 cccControl;
-		uint32 cccPorts;
-		uint32 EnclosureManagementLocation;
-		uint32 EnclosureManagementControl;
+		volatile uint32 cccControl;
+		volatile uint32 cccPorts;
+		volatile uint32 EnclosureManagementLocation;
+		volatile uint32 EnclosureManagementControl;
 
-		uint32 HostCapabilityExt;
-		uint32 BIOSHandoffCtrlSts;
+		volatile uint32 HostCapabilityExt;
+		volatile uint32 BIOSHandoffCtrlSts;
 
-		uint8 rsv0[0x74];
-		uint8 Vendor[0x60];
+		volatile uint8 rsv0[0x74];
+		volatile uint8 Vendor[0x60];
 
-		HBAPort Ports[1];
+		volatile HBAPort Ports[1];
 
-	};
+	} packed;
 
 	struct HBACommandHeader
 	{
@@ -194,22 +196,24 @@ namespace AHCI
 	{
 		HBAPort* hbaPort;
 		byte PortType;
-		byte* Buffer;
+		byte* mBuffer;
+		uint32 mBufferSize;
 		byte PortNumber;
 
 		inline void Configure()
 		{
 			StopCMD();
+			mMutex.Lock();
 
 			fast vptr newBase = PageFrameAllocator::RequestPage();
+			memset64(newBase, 0x00, PAGE_SIZE);
 			hbaPort->CommandListBase = u32(newBase);
 			hbaPort->CommandListBaseUpper = u32(u64(newBase) >> 32);
-			memset64(newBase, 0x00, PAGE_SIZE);
 
 			fast vptr fisBase = PageFrameAllocator::RequestPage();
+			memset64(fisBase, 0x00, PAGE_SIZE);
 			hbaPort->fisBaseAddress = u32(fisBase);
 			hbaPort->fisBaseAddressUpper = u32(u64(fisBase) >> 32);
-			memset64(fisBase, 0x00, PAGE_SIZE);
 
 			auto cmdHeader = (HBACommandHeader*)(u64(hbaPort->CommandListBase) | (u64(hbaPort->CommandListBaseUpper) << 32));
 
@@ -227,45 +231,103 @@ namespace AHCI
 				}
 			}
 
+			mMutex.Unlock();
 			StartCMD();
 		}
 
 		inline bool StopCMD()
 		{
+			mMutex.Lock();
+
 			hbaPort->cmdStatus &= (~HbaPxCMD_FRE);
 			hbaPort->cmdStatus &= (~HbaPxCMD_ST);
 
 			u64 timeout = 0;
 			while (true)
 			{
+				if (timeout >= 100000)
+				{
+					mMutex.Unlock();
+					return false;
+				}
 				if (hbaPort->cmdStatus & (HbaPxCMD_FR | HbaPxCMD_CR))
 				{
-					pause;
+					Yield();
+					timeout++;
 					continue;
 				}
 				break;
 			}
+			mMutex.Unlock();
 			return true;
 		}
 
 		inline bool StartCMD()
 		{
+			mMutex.Lock();
 			u64 timeout = 0;
 			while (hbaPort->cmdStatus & HbaPxCMD_CR)
 			{
-				pause;
-				if (timeout++ > 0x100000) return false;
+				Yield();
+				if (timeout++ > 100000)
+				{
+					mMutex.Unlock();
+					return false;
+				}
 			}
 			
 			hbaPort->cmdStatus |= HbaPxCMD_FRE;
 			hbaPort->cmdStatus |= HbaPxCMD_ST;
+			mMutex.Unlock();
 			return true;
 		}
 
 		inline bool Read(uint64 sector, uint16 sectorCount, vptr buffer)
 		{
-			u32 sectorL = sector, sectorH = sector >> 32;
+			mMutex.Lock();
+
+			// the number of sectors the buffer can hold
+			u32 bufferSectorCount = mBufferSize / 512;
+
+			// how many times the read buffer can be fully filled
+			u32 fillCount = sectorCount / bufferSectorCount;
 			
+			// Get remainder of sectors
+			sectorCount -= bufferSectorCount * fillCount;
+
+			// Some offset values
+			uint64 sectorOffset = sector;
+			byte* bufferOffset = (byte*)buffer;
+
+			for (nint x = 0; x < fillCount; x++)
+			{
+				// Fill the read buffer
+				if (!ReadFillBuffer(sectorOffset))
+				{
+					// Retry one more time
+					if (!ReadFillBuffer(sectorOffset))
+					{
+						// Give up
+						memset64(buffer, 0x00, sectorCount * 512);
+						mMutex.Unlock();
+						return false;
+					}
+				}
+
+				// Copy over contents to the caller's buffer
+				memcpy(bufferOffset, mBuffer, mBufferSize);
+
+				// Increase offsets
+				sectorOffset += bufferSectorCount;
+				bufferOffset += mBufferSize;
+			}
+
+			// Read the remainder now
+
+			if (sectorCount == 0) return true;
+
+			u32 sectorL = sectorOffset, sectorH = sectorOffset >> 32;
+
 			hbaPort->InterruptStatus = ~((u32)0);
 			auto cmdHeader = (HBACommandHeader*)(u64(hbaPort->CommandListBase) | (u64(hbaPort->CommandListBaseUpper) << 32));
 			{
@@ -277,9 +339,9 @@ namespace AHCI
 			auto commandTable = (HBACommandTable*)(u64(cmdHeader->CommandTableBase) | (u64(cmdHeader->CommandTableBaseUpper) << 32));
 			{
 				memset64(commandTable, 0x00, sizeof(HBACommandTable) + (cmdHeader->prdtLength - 1) * sizeof(HbaPrdtEntry));
-				commandTable->prdtEntry->DataBase = (u32)buffer;
-				commandTable->prdtEntry->DataBaseUpper = u32(u64(buffer) >> 32);
-				commandTable->prdtEntry->ByteCount = (sectorCount * SECTOR_SIZE) - 1;
+				commandTable->prdtEntry->DataBase = (u32)mBuffer;
+				commandTable->prdtEntry->DataBaseUpper = u32(u64(mBuffer) >> 32);
+				commandTable->prdtEntry->ByteCount = (sectorCount * 512)-1;
 				commandTable->prdtEntry->InterruptOnCompleteion = 1;
 			}
 
@@ -307,20 +369,124 @@ namespace AHCI
 			{
 				while (hbaPort->TaskFileData & (AtaDevBusy | AtaDevDRQ))
 				{
-					if (spinLock++ > 1000000) return false;
-					pause;
+					if (spinLock++ > 100000)
+					{
+						// Give up
+						memset64(buffer, 0x00, sectorCount * 512);
+						mMutex.Unlock();
+						return false;
+					}
+					Yield();
 				}
 			}
 
 			hbaPort->CommandIssue = 1;
 
-			while (true)
+			spinLock = 0;
+			while (spinLock++ < 100000)
 			{
-				if (!hbaPort->CommandIssue) return true;
-				if (hbaPort->InterruptStatus & HbaPxIS_TFES) return false;
-				pause;
+				if (!hbaPort->CommandIssue)
+				{
+					// Copy the rest over
+					memcpy(bufferOffset, mBuffer, sectorCount * 512);
+					mMutex.Unlock();
+					return true;
+				}
+				if (hbaPort->InterruptStatus & HbaPxIS_TFES)
+				{
+					// Give up
+					memset64(buffer, 0x00, sectorCount * 512);
+					mMutex.Unlock();
+					return false;
+				}
+				Yield();
 			}
 
+			// Give up
+			memset64(buffer, 0x00, sectorCount * 512);
+			mMutex.Unlock();
+			return false;
+		}
+
+		inline ~Port()
+		{
+			PageFrameAllocator::FreePage(mBuffer);
+		}
+
+	private:
+		
+		Mutex mMutex = Mutex();
+
+		inline bool ReadFillBuffer(uint64 sector)
+		{
+			if (!mMutex.IsLocked()) return false; // caller does not own port
+			u32 sectorL = sector, sectorH = sector >> 32;
+			uint16 sectorCount = mBufferSize / 512;
+
+			hbaPort->InterruptStatus = ~((u32)0);
+			auto cmdHeader = (HBACommandHeader*)(u64(hbaPort->CommandListBase) | (u64(hbaPort->CommandListBaseUpper) << 32));
+			{
+				cmdHeader->CommandFISLength = sizeof(FIS_REG_H2D) / sizeof(uint32);
+				cmdHeader->Write = 0;
+				cmdHeader->prdtLength = 1;
+			}
+
+			auto commandTable = (HBACommandTable*)(u64(cmdHeader->CommandTableBase) | (u64(cmdHeader->CommandTableBaseUpper) << 32));
+			{
+				memset64(commandTable, 0x00, sizeof(HBACommandTable) + (cmdHeader->prdtLength - 1) * sizeof(HbaPrdtEntry));
+				commandTable->prdtEntry->DataBase = (u32)mBuffer;
+				commandTable->prdtEntry->DataBaseUpper = u32(u64(mBuffer) >> 32);
+				commandTable->prdtEntry->ByteCount = (mBufferSize) - 1;
+				commandTable->prdtEntry->InterruptOnCompleteion = 1;
+			}
+
+			auto cmdFIS = (FIS_REG_H2D*)(&commandTable->CommandFIS);
+			{
+				cmdFIS->fisType = FisType::RegH2D;
+				cmdFIS->CommandControl = 1; // this is a command
+				cmdFIS->Command = AtaCMD::ReadDmaEX;
+
+				cmdFIS->lba0 = (byte)sectorL;
+				cmdFIS->lba1 = (byte)(sectorL >> 8);
+				cmdFIS->lba2 = (byte)(sectorL >> 16);
+
+				cmdFIS->lba3 = (byte)sectorH;
+				cmdFIS->lba4 = (byte)(sectorH >> 8);
+				cmdFIS->lba5 = (byte)(sectorH >> 16);
+
+				cmdFIS->DeviceRegister = 1 << 6; // LBA Mode
+
+				cmdFIS->CountLow = (byte)sectorCount;
+				cmdFIS->CountHigh = (byte)(sectorCount >> 8);
+			}
+
+			u64 spinLock = 0;
+			{
+				while (hbaPort->TaskFileData & (AtaDevBusy | AtaDevDRQ))
+				{
+					if (spinLock++ > 100000)
+					{
+						return false;
+					}
+					Yield();
+				}
+			}
+
+			hbaPort->CommandIssue = 1;
+
+			spinLock = 0;
+			while (spinLock++ < 100000)
+			{
+				if (!hbaPort->CommandIssue)
+				{
+					return true;
+				}
+				if (hbaPort->InterruptStatus & HbaPxIS_TFES)
+				{
+					return false;
+				}
+				Yield();
+			}
 			// cant get here lol
 			return false;
 		}
@@ -379,7 +545,6 @@ namespace AHCI
 				auto port = mPorts[x]; 
 				port->Configure();
 			}
-
 		}
 
 		inline ~AHCIDriver()
@@ -413,17 +578,25 @@ namespace AHCI
 							AddPort(PortType::SATAPI, portptr);
 							break;
 
-						case PortType::SEMB: //debug("\SEMB Drive Found!");
+						case PortType::SEMB: debug("\SEMB Drive Found!");
 							break;
 
-						case PortType::PM: //debug("\tPM Drive Found!");
+						case PortType::PM: debug("\tPM Drive Found!");
 							break;
 
-						default: //debug("\tUnknown Drive Found");
+						default: debug("\tUnknown Drive Found");
 							break;
 					}
 				}
 			}
+		}
+
+		inline bool Read(byte portIndex, uint64 sector, uint16 sectorCount, vptr buffer)
+		{
+			if (portIndex >= mPortCount) return false;
+
+			auto port = mPorts[portIndex];
+			return port->Read(sector, sectorCount, buffer);
 		}
 
 	private:
@@ -432,7 +605,8 @@ namespace AHCI
 		{
 			fast Port* port = new Port();
 			{
-				port->Buffer = nullptr;
+				port->mBuffer = PageFrameAllocator::RequestPage();
+				port->mBufferSize = PAGE_SIZE;
 				port->hbaPort = hbaport;
 				port->PortNumber = mPortCount;
 				port->PortType = portType;

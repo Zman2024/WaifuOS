@@ -84,7 +84,7 @@ namespace PageTableManager
 		PT->Entries[indexer.Pi] = tempPDE;
 	}
 
-	void MapMemory(fast u64 virtualMemory, fast u64 physMemory)
+	void MapMemory(u64 virtualMemory, u64 physMemory)
 	{
 		PageMapIndexer indexer = PageMapIndexer(virtualMemory);
 		fast PageDirectoryEntry tempPDE;

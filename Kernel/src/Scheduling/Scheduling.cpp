@@ -177,3 +177,5 @@ namespace Scheduler
 	}
 
 }
+
+global void Yield() { intcall(Interrupts::Interrupt::TaskYield); }

@@ -19,7 +19,7 @@ enum struct PTFlag : uint64
 	Custom1			=	1 << 10,
 	Custom2			=	1 << 11,
 						  	 
-	NX				=	1 << 63,
+	NX				=	1UL << 63UL,
 
 };
 

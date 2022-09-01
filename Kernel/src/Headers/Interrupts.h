@@ -74,7 +74,7 @@ namespace Interrupts
 		fp64 ymm14[4] = { 0, 0, 0, 0 };
 		fp64 ymm15[4] = { 0, 0, 0, 0 };
 
-	} attribute((packed));
+	} packed;
 
 	/* From: https://wiki.osdev.org/Interrupt_Vector_Table#CPU_Interrupt_Layout
 	| INT #     | Description

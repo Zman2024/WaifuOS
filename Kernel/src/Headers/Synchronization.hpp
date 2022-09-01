@@ -33,7 +33,7 @@ struct Mutex
 
 	forceinline void Lock() { MutexLock(&mLock); }
 	forceinline void Unlock() { MutexUnlock(&mLock); }
-	forceinline bool GetState() { return this->mLock != 0; }
+	forceinline bool IsLocked() { return this->mLock != 0; } // true = locked, false = free
 
 private:
 	volatile uint32 mLock;

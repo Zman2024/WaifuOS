@@ -27,7 +27,7 @@ struct SegmentSelector
 	uint16 UseLDT : 1;
 	uint16 DTIndex : 13;
 
-} attribute((packed));
+} packed;
 
 struct IDTDescEntry
 {
@@ -50,7 +50,7 @@ struct IDTR
 {
 	uint16 Limit;
 	uint64 Offset;
-} attribute((packed));
+} packed;
 
 
 #endif

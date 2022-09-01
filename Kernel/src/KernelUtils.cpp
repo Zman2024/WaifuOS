@@ -10,14 +10,14 @@ namespace Kernel
 		warn("================ QEMU WINDOWS BUILD ================");
 		#endif
 
+		// Enable Features like AVX, OSXSAVE etc.
+		EnableHardwareFeatures();
+
 		// Do GDT stuff
 		InitializeGDT();
 
 		// Basic Interrupts / CPU exceptions
 		InitializeExceptions();
-
-		// Enable Features like AVX, OSXSAVE etc.
-		EnableHardwareFeatures();
 
 		// Paging / Memory Mapping
 		InitializePaging(bootInfo);
@@ -27,44 +27,60 @@ namespace Kernel
 
 		// OH NONONONO I HAVE DEPENDENCY LOOPS AAAAAAAAAAAAAAAAAA HELP //
 
-		// ACPI / PCI
-		InitializeACPI(bootInfo);
-
-		// IRQs
-		InitializeIRQ();
+		// IRQs (PIC)
+		InitializeEarlyIRQ();
 
 		// Scheduling
 		Scheduler::Start();
 
 		sti;
+
+		// ACPI / PCI Enumeration
+		InitializeACPI(bootInfo);
+
+		// PCI Initialization
+		PCI::InitializePCIDevices();
+
+		// IRQs / MP (APIC)
+		InitializeSMP();
 	}
 
-	void InitializeIRQ(bool forceUsePic)
+	void InitializeEarlyIRQ()
 	{
-		debug("Initializing IRQs...");
-		
-		if (APIC::UsableAPIC & !forceUsePic)
-		{
-			debug("\tUsing APIC");
-
-			APIC::Initialize(); // inits both lapic and ioapic
-
-			APIC::SetEntry(Interrupts::Interrupt::PIT); // Programable Interrupt Timer
-			APIC::SetEntry(Interrupts::Interrupt::RTC); // IRQ 8 (RTC)
-			APIC::SetEntry(Interrupts::Interrupt::Keyboard); // adds IRQ 1 entry (Keyboard)
-
-			APIC::Enable();
-		}
-		else
-		{
-			debug("\tUsing PIC");
-			PIC::Mask(PicMask::Keyboard | PicMask::PIT | PicMask::RTC, true);
-		}
+		PIC::Mask(PicMask::Keyboard | PicMask::PIT | PicMask::RTC, true);
 
 		// init stuff that can fire IRQs
 		PIT::Initialize();
 		RTC::Initialize();
+	}
 
+	void InitializeSMP(bool forceUsePic)
+	{
+		asm("pushfq");
+		{
+			cli;
+			debug("Initializing IRQs...");
+
+			if (APIC::UsableAPIC & !forceUsePic)
+			{
+				debug("\tUsing APIC");
+				
+				PIC::Disable();
+
+				APIC::Initialize(); // inits both lapic and ioapic
+
+				APIC::SetEntry(Interrupts::Interrupt::PIT); // Programable Interrupt Timer
+				APIC::SetEntry(Interrupts::Interrupt::RTC); // IRQ 8 (RTC)
+				APIC::SetEntry(Interrupts::Interrupt::Keyboard); // adds IRQ 1 entry (Keyboard)
+
+				APIC::Enable();
+			}
+			else
+			{
+				debug("\tUsing PIC");
+			}
+		}
+		asm("popfq");
 	}
 
 	void InitializeACPI(const BootInfo& bootInfo)
@@ -122,8 +138,6 @@ namespace Kernel
 		}
 
 	}
-
-	global nint GlobalInterruptTable[];
 
 	void InitializeExceptions()
 	{
@@ -308,10 +322,10 @@ namespace Kernel
 		PageTable* PML4 = PageFrameAllocator::RequestPage<PageTable>();
 		memset64(PML4, 0x00, PAGE_SIZE);
 		PageTableManager::PageTableManager(PML4);
-
+		
 		// Map all memory (this causes rainbow in qemu)
 		u64 memorySize = Memory::CalculateMemorySize(bootInfo.MemoryMap, nMapEntries, bootInfo.MapDescriptorSize);
-		for (u64 x = 0; x < memorySize; x += PAGE_SIZE)
+		for (u64 x = PAGE_SIZE << 4; x < memorySize; x += PAGE_SIZE)
 		{
 			PageTableManager::MapMemory(x, x);
 		}
@@ -332,15 +346,16 @@ namespace Kernel
 			asm("mov %%cr0, %0" : : "r" (cr0));
 		}
 
-		// set nullptr RW, US and present flags
+		// set nullptr and ~nullptr to an impossible address
+		PageTableManager::MapMemory(nullptr, ~nint(nullptr));
+		PageTableManager::SetVirtualFlag(nullptr, PTFlag::NX, true);
+		PageTableManager::SetVirtualFlag(nullptr, PTFlag::UserSuper, true);
 		PageTableManager::SetVirtualFlag(nullptr, PTFlag::ReadWrite, false);
-		PageTableManager::SetVirtualFlag(nullptr, PTFlag::UserSuper, false);
-		PageTableManager::SetVirtualFlag(nullptr, PTFlag::Present, true);
 
-		// nullpr - PAGE_SIZE moment
-		PageTableManager::SetVirtualFlag((vptr)(~nint(nullptr) - PAGE_SIZE), PTFlag::ReadWrite, false);
-		PageTableManager::SetVirtualFlag((vptr)(~nint(nullptr) - PAGE_SIZE), PTFlag::UserSuper, false);
-		PageTableManager::SetVirtualFlag((vptr)(~nint(nullptr) - PAGE_SIZE), PTFlag::Present, true);
+		PageTableManager::MapMemory(~nint(nullptr), ~nint(nullptr));
+		PageTableManager::SetVirtualFlag(~nint(nullptr), PTFlag::NX, true);
+		PageTableManager::SetVirtualFlag(~nint(nullptr), PTFlag::UserSuper, true);
+		PageTableManager::SetVirtualFlag(~nint(nullptr), PTFlag::ReadWrite, false);
 
 		// Load PML4 into control3
 		asm("mov %%cr3, %0" : : "r" (PML4));

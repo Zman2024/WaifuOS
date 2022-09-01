@@ -101,9 +101,10 @@ namespace PCI
 		byte StartBus;
 		byte EndBus;
 		uint32 Reserved;
-	} attribute((packed));
+	} packed;
 
 	void EnumeratePCI(ACPI::MCFGHeader* mcfg);
+	void InitializePCIDevices();
 }
 
 #endif

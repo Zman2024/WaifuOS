@@ -3,6 +3,7 @@
 #include <PageFrameAllocator.h>
 #include <PageTableManager.h>
 #include <Memory.h>
+#include <APICShared.h>
 
 namespace APIC
 {
@@ -14,22 +15,20 @@ namespace APIC
 	IOAPIC::IOAPIC(IOAPICRecord* ioapic)
 	{
 		// address shit first
-		this->mPhysicalAddress = this->mVirtualAddress = vptr((u64)ioapic->Address);
+		this->mPhysicalAddress = vptr((u64)ioapic->Address);
 
-		// No reason to memory map it somewhere else
-		//if (!this->mVirtualAddress)
-		//{
-		//	debug("IOAPIC: PFA didn't give me a valid address (nullptr, very zad) we just memory map to physical");
-		//	this->mVirtualAddress = this->mPhysicalAddress;
-		//}
+		// Map to itself
+		PageTableManager::MapMemory(this->mPhysicalAddress, this->mPhysicalAddress);
 
-		PageTableManager::MapMemory(this->mVirtualAddress, this->mPhysicalAddress);
+		// Setup PTFlags
+		//PageTableManager::SetVirtualFlag(this->mPhysicalAddress, PTFlag::Present, true);
+		//PageTableManager::SetVirtualFlag(this->mPhysicalAddress, PTFlag::ReadWrite, true);
 
 		// Lock physical page
 		PageFrameAllocator::LockPage(this->mPhysicalAddress);
 
-		mRegSel = (uint32 volatile*)mVirtualAddress;
-		mRegIORW = (uint32 volatile*)(u64(mVirtualAddress) + 0x10);
+		mRegisterSelect = (uint32 volatile*)this->mPhysicalAddress;
+		mRegisterRW = (uint32 volatile*)(u64(this->mPhysicalAddress) + 0x10);
 
 		this->mIOApicId = ioapic->ioApicID;
 		this->mGlobalInterruptBase = ioapic->GlobalSysInterruptBase;
@@ -51,14 +50,14 @@ namespace APIC
 
 	uint32 IOAPIC::ReadIOAPIC(uint32 reg)
 	{
-		*mRegSel = (reg & 0xFF);
-		return *mRegIORW;
+		*mRegisterSelect = (reg & 0xFF);
+		return *mRegisterRW;
 	}
 
 	void IOAPIC::WriteIOAPIC(uint32 reg, uint32 value)
 	{
-		*mRegSel = (reg & 0xFF);
-		*mRegIORW = value;
+		*mRegisterSelect = (reg & 0xFF);
+		*mRegisterRW = value;
 	}
 
 	RedirectionEntry IOAPIC::ReadIOAPICRedirectionEntry(byte entry)

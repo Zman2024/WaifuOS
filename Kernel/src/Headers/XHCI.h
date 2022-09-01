@@ -6,6 +6,7 @@
 #include <PageMapIndexer.h>
 #include <PageFrameAllocator.h>
 #include <MMIO.hpp>
+#include <List.h>
 
 namespace USB
 {
@@ -42,6 +43,15 @@ namespace USB
 
 	struct OperationalRegister
 	{
+	private:
+		static constexpr uint32 CMD_HC_RUN = 0x1;
+		static constexpr uint32 CMD_HC_RESET = 0x2;
+
+		static constexpr uint32 STS_HC_HALTED = 0x1;
+		static constexpr uint32 STS_HC_NOTREADY = 0x800;
+		static constexpr uint32 STS_HC_ERROR = 0x1000;
+
+	public:
 		Register32 USBCommand;
 		Register32 USBStatus;
 		Register32 PageSize;
@@ -59,6 +69,15 @@ namespace USB
 
 		Port PortRegisterSet[0x1000 / sizeof(Port)];
 
+		void Start();
+		void Stop();
+		void Reset();
+
+		forceinline bool IsRunning() { return USBCommand & CMD_HC_RUN; }
+		forceinline bool IsHalted() { return USBStatus & STS_HC_HALTED; }
+		forceinline bool IsReady() { return !(USBStatus & STS_HC_NOTREADY); }
+		forceinline bool HasError() { return USBStatus & STS_HC_ERROR; }
+
 	};
 
 	struct USBRegisters
@@ -70,12 +89,13 @@ namespace USB
 	struct XHCIDriver
 	{
 		XHCIDriver(PCIDeviceHeader* device);
-
 		~XHCIDriver();
 
 	private:
 		PCIHeader0* xhciDeviceHeader;
 		USBRegisters Registers;
 	};
+
+	extern List<XHCIDriver*> XHCIDrivers;
 }
 #endif

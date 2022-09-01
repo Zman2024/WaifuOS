@@ -15,6 +15,7 @@ public:
 	{
 		mArray = new T[5];
 		mArraySize = 5;
+		mCount = 0;
 	}
 
 	inline List<T>(const List<T>& value)
@@ -72,6 +73,7 @@ public:
 	inline List<T>(nint initialCount)
 	{
 		mArray = new T[initialCount];
+		mCount = initialCount;
 		mArraySize = initialCount;
 	}
 
@@ -129,7 +131,12 @@ public:
 
 	inline T& Get(nint index)
 	{
-		if (index + 1 > mCount) intcall(0x0E); // #PF if bruh
+		if (index + 1 > mCount) // #PF if bruh
+		{
+			// cause nullptr pagefult
+			error("INDEX WAS OUTSIDE BOUNDS OF ARRAY! index: %0, mCount: %1", index, mCount);
+			*(byte*)nullptr;
+		}
 		return mArray[index];
 	}
 

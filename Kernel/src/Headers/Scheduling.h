@@ -6,6 +6,7 @@
 #include <Interrupts.h>
 #include <List.h>
 
+// im not even using this rn but aaaauuuuuhhhh
 struct TaskStateSegment
 {
 	uint32 rsv0 = 0x00;
@@ -68,11 +69,11 @@ struct Thread
 
 };
 
-// Retarded Robbin 2.0 scheduler
+// Retarded Robbin 2.0 Scheduler
 namespace Scheduler
 {
 	void Start();
-	global inline void Yield(){ intcall(Interrupts::Interrupt::TaskYield); }
+	forceinline void Yield() { intcall(Interrupts::Interrupt::TaskYield); }
 	void TimerInterrupt(Interrupts::RegisterState* registers, Interrupts::InterruptFrame* frame);
 	void TaskSwitchOnEnd(Interrupts::RegisterState* registers, Interrupts::InterruptFrame* frame);
 	void TaskSwitch(Interrupts::RegisterState* registers, Interrupts::InterruptFrame* frame);
@@ -82,5 +83,7 @@ namespace Scheduler
 	Thread* GetCurrentThread();
 	void ThreadExit();
 }
+
+global void Yield();
 
 #endif // !H_Scheduling

@@ -7,7 +7,7 @@ struct GDTDescriptor
 {
 	uint16 Size;
 	uint64 Offset;
-} attribute((packed));
+} packed;
 
 // https://wiki.osdev.org/Global_Descriptor_Table#Segment_Descriptor
 struct AccessByte
@@ -22,7 +22,7 @@ struct AccessByte
 	byte PrivilegeLevel : 2;
 	byte Present : 1;
 	
-} attribute((packed));
+} packed;
 
 // https://wiki.osdev.org/Global_Descriptor_Table#Segment_Descriptor
 struct SegmentDescriptor
@@ -46,7 +46,7 @@ struct SegmentDescriptor
 		Base2 = base & 0xFF;
 	}
 
-} attribute((packed));
+} packed;
 
 // https://wiki.osdev.org/Global_Descriptor_Table#System_Segment_Descriptor 
 struct SystemAccessByte
@@ -58,7 +58,7 @@ struct SystemAccessByte
 	byte PrivilegeLevel : 2;
 	byte Present : 1;
 
-} attribute((packed));
+} packed;
 
 // https://wiki.osdev.org/Global_Descriptor_Table#Long_Mode_System_Segment_Descriptor
 struct SystemSegmentDescriptor
@@ -106,7 +106,7 @@ struct SystemSegmentDescriptor
 		Limit1Flags |= flags; // restore flags
 	}
 
-} attribute((packed));
+} packed;
 
 constexpr uint16 KERNEL_CODE_GDT_INDEX = 0x1;
 constexpr uint16 KERNEL_DATA_GDT_INDEX = 0x2;
@@ -124,7 +124,7 @@ struct GDT
 	SegmentDescriptor UserData;
 	SystemSegmentDescriptor TaskSS;
 
-} attribute((packed)) attribute((aligned(0x10)));
+} packed attribute((aligned(0x10)));
 
 global void LoadGDT(GDTDescriptor* desc);
 
