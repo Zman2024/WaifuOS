@@ -4,16 +4,34 @@
 #include <Types.h>
 #include <AHCI.hpp>
 #include <Memory.h>
+#include <List.h>
 
 namespace FAT32
 {
+	constexpr uint16 BOOT_SIG = 0xAA55;
+	constexpr uint32 SectorSize = 0x200;
+
+	namespace EntryAttribute
+	{
+		enum : byte
+		{
+			ReadOnly = 0x01,
+			Hidden = 0x02,
+			System = 0x04,
+			VolumeID = 0x08,
+			Directory = 0x10,
+			Archive = 0x20,
+			LFN = (ReadOnly | Hidden | System | VolumeID),
+		};
+	}
+
 	// BIOS Parameter Block
 	struct BPB
 	{
 		byte CodeJMP[3]; // this should be "jmp short (somewhere); nop;"
 		char OEM[8]; // OEM Identifier
 
-		uint16 BytesPerSector;
+		uint16 SectorSizeBytes;
 		byte SectorsPerCluster;
 		uint16 NumReservedSectors;
 		byte NumFAT; // Number of File Allocation Tables (FAT's) on the storage media.
@@ -55,9 +73,50 @@ namespace FAT32
 
 	} packed;
 
+	struct DirectoryEntry
+	{
+		char ShortName[11]; // first 8 chars = name
+		
+		byte EntryAttributes; // See FAT32::EntryAttribute
+		byte rsvNT; // Ok mr windows nt reserving random bytes
+
+		byte CreationTimestampTS; // Creation time in tenths of a second. Range 0-199 inclusive
+		uint16 CreationTimestampHMS; // The time that the file was created. Multiply Seconds by 2.
+		uint16 CreationTimestampDate; // The date on which the file was created.
+
+		uint16 LastAccessDate; // Last accessed date. Same format as the creation date.
+		uint16 EntryFirstClusterHigh; // The high 16 bits of this entry's first cluster number.
+
+		uint16 ModificationTimestampHMS; // The time that the file was created. Multiply Seconds by 2.
+		uint16 ModificationTimestampDate; // The date on which the file was created.
+
+		uint16 EntryFirstClusterLow; // The low 16 bits of this entry's first cluster number.
+		uint32 FileSize; // The size of the file in bytes.
+
+	} packed;
+
+	// The long file name entries are always placed immediately before their 8.3 entry
+	struct LFNEntry
+	{
+		byte EntryOrder; // The order of this entry in the sequence of long file name entries
+		wchar Name0[5]; // The first 5, 2-byte characters of this entry.
+		byte LFNAttribute; // Attribute. Always equals 0x0F. (the long file name attribute)
+		byte EntryType; // 	Long entry type. Zero for name entries.
+
+		byte ShortChecksum; // Checksum generated of the short file name when the file was created
+		wchar Name1[6]; // The next 6, 2-byte characters of this entry.
+		uint16 Zero; // Always zero.
+		wchar Name2[2]; // The final 2, 2-byte characters of this entry.
+
+	} packed;
+
 	// File System Info struct
 	struct FSInfo
 	{
+		static constexpr uint32 LEAD_SIG = 0x41615252;
+		static constexpr uint32 MID_SIG = 0x61417272;
+		static constexpr uint32 TRAIL_SIG = 0xAA550000;
+
 		uint32 LeadSignature; // must be 0x41615252 to indicate a valid FSInfo structure
 		byte rsv0[480];
 
@@ -70,12 +129,33 @@ namespace FAT32
 
 	} packed;
 
-	extern bool DoesDriveContainF32(AHCI::AHCIDriver* drive);
+	extern bool DoesDriveContainF32(AHCI::ATAPort* drive);
 
 	class FSDriver
 	{
 	public:
-		FSDriver(AHCI::AHCIDriver* drive);
+		FSDriver(AHCI::ATAPort* drive);
+
+		~FSDriver();
+
+	private:
+		uint32 mTotalSectors;
+		uint32 mFatSizeSectors;
+		uint32 mFirstDataSector;
+		uint32 mFirstFatSector;
+		uint32 mFirstRootDirSector;
+		uint32 mTotalDataSectors;
+		uint32 mTotalClusters;
+
+		EBR* mBootRecord;
+		FSInfo* mFSInfo;
+
+
+
+		forceinline uint32 GetFirstSectorOfCluster(uint32 cluster)
+		{
+			return ((cluster - 2) * mBootRecord->SectorsPerCluster) + mFirstDataSector;
+		}
 
 	};
 

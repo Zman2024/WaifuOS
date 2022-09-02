@@ -213,7 +213,13 @@ namespace PCI
 				{
 					debug("\tInitializing ACHI 1.0 Driver");
 					auto driver = new AHCI::AHCIDriver(pci);
-					FAT32::DoesDriveContainF32(driver);
+					auto port = driver->GetPort(0);
+					if (port && FAT32::DoesDriveContainF32(port))
+					{
+						// Has fat32 partition at mbr
+						new FAT32::FSDriver(port);
+					}
+					
 					break;
 				}
 

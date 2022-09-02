@@ -9,6 +9,7 @@
 #include <Synchronization.hpp>
 #include <Scheduling.h>
 
+// TODO: redo this whole thing why did i put everything in the header please kill me
 namespace AHCI 
 {
 	using namespace PCI;
@@ -192,7 +193,7 @@ namespace AHCI
 	constexpr uint32 AtaDevBusy = 0x80;
 	constexpr uint32 AtaDevDRQ = 0x08;
 
-	struct Port
+	struct ATAPort
 	{
 		HBAPort* hbaPort;
 		byte PortType;
@@ -408,14 +409,14 @@ namespace AHCI
 			return false;
 		}
 
-		inline ~Port()
+		inline ~ATAPort()
 		{
 			PageFrameAllocator::FreePage(mBuffer);
 		}
 
 	private:
-		
 		Mutex mMutex = Mutex();
+		bool mReadOnlyMode = false;
 
 		inline bool ReadFillBuffer(uint64 sector)
 		{
@@ -536,6 +537,7 @@ namespace AHCI
 			this->mABAR = (HBAMemory*)nint(((PCIHeader0*)device)->BAR5);
 
 			PageTableManager::MapMemory(mABAR, mABAR);
+			PageFrameAllocator::LockPage(mABAR);
 			
 			mPortCount = 0x00;
 			ProbePorts();
@@ -555,6 +557,35 @@ namespace AHCI
 			}
 		}
 
+		inline bool Read(byte portIndex, uint64 sector, uint16 sectorCount, vptr buffer)
+		{
+			if (portIndex >= mPortCount) return false;
+
+			auto port = mPorts[portIndex];
+			return port->Read(sector, sectorCount, buffer);
+		}
+
+		inline ATAPort* GetPort(byte portNum)
+		{
+			if (portNum >= mPortCount) return nullptr;
+			return mPorts[portNum];
+		}
+
+	private:
+
+		forceinline void AddPort(byte portType, HBAPort* hbaport)
+		{
+			fast ATAPort* port = new ATAPort();
+			{
+				port->mBuffer = PageFrameAllocator::RequestPage();
+				port->mBufferSize = PAGE_SIZE;
+				port->hbaPort = hbaport;
+				port->PortNumber = mPortCount;
+				port->PortType = portType;
+			}
+			mPorts[mPortCount++] = port;
+		}
+
 		inline void ProbePorts()
 		{
 			fast u32 portsImpl = mABAR->PortsImplemented;
@@ -568,55 +599,32 @@ namespace AHCI
 
 					switch (portType)
 					{
-						case PortType::SATA: 
-							debug("\tSATA Drive Found!");
-							AddPort(PortType::SATA, portptr);
-							break;
+					case PortType::SATA:
+						debug("\tSATA Drive Found!");
+						AddPort(PortType::SATA, portptr);
+						break;
 
-						case PortType::SATAPI: 
-							debug("\tSATAPI Drive Found!");
-							AddPort(PortType::SATAPI, portptr);
-							break;
+					case PortType::SATAPI:
+						debug("\tSATAPI Drive Found!");
+						AddPort(PortType::SATAPI, portptr);
+						break;
 
-						case PortType::SEMB: debug("\SEMB Drive Found!");
-							break;
+					case PortType::SEMB: debug("\SEMB Drive Found!");
+						break;
 
-						case PortType::PM: debug("\tPM Drive Found!");
-							break;
+					case PortType::PM: debug("\tPM Drive Found!");
+						break;
 
-						default: debug("\tUnknown Drive Found");
-							break;
+					default: debug("\tUnknown Drive Found");
+						break;
 					}
 				}
 			}
 		}
 
-		inline bool Read(byte portIndex, uint64 sector, uint16 sectorCount, vptr buffer)
-		{
-			if (portIndex >= mPortCount) return false;
-
-			auto port = mPorts[portIndex];
-			return port->Read(sector, sectorCount, buffer);
-		}
-
-	private:
-
-		forceinline void AddPort(byte portType, HBAPort* hbaport)
-		{
-			fast Port* port = new Port();
-			{
-				port->mBuffer = PageFrameAllocator::RequestPage();
-				port->mBufferSize = PAGE_SIZE;
-				port->hbaPort = hbaport;
-				port->PortNumber = mPortCount;
-				port->PortType = portType;
-			}
-			mPorts[mPortCount++] = port;
-		}
-
 		PCIDeviceHeader* mPCIBaseAddress;
 		HBAMemory* mABAR;
-		Port* mPorts[32];
+		ATAPort* mPorts[32];
 		byte mPortCount;
 	};
 }

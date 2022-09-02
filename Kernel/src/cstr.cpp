@@ -269,4 +269,37 @@ namespace cstr
 		return _ToIntBase10(str);
 	}
 
+
+	char wcharBuffer[256];
+	char* wstrTocstr(const wchar * wstr, nint len)
+	{
+		for (nint x = 0; x < len; x++)
+		{
+			if (!(byte)wstr[x])
+				break;
+
+			wcharBuffer[x] = (char)(wstr[x]);
+		}
+
+		wcharBuffer[len] = 0;
+		return wcharBuffer;
+	}
+
+	void wstrncpy(wchar* dest, const wchar* src, nint max)
+	{
+
+		nint index = 0;
+		while (index < max && src[index] != 0)
+		{
+			dest[index] = src[index];
+			index++;
+		}
+
+		if (index < max)
+		{
+			dest[index] = 0x00;
+		}
+
+	}
+
 }

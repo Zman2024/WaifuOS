@@ -22,6 +22,12 @@ namespace cstr
 
 	// Convert a cstring to an int
 	int64 ToInt(const char* str, bool hex = false);
+
+	// A very lazy conversion from wchar (UTF-16 LE) to ASCII
+	char* wstrTocstr(const wchar* wstr, nint len);
+
+	void wstrncpy(wchar* dest, const wchar* src, nint max);
+
 }
 
 #endif
