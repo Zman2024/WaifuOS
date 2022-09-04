@@ -11,7 +11,7 @@ typedef void* vptr;
 typedef signed char sbyte;
 typedef signed char int8;
 typedef signed short int16;
-typedef int16 wchar;
+typedef wchar_t wchar;
 typedef signed int int32;
 typedef signed long long int64;
 

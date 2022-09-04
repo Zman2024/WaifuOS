@@ -1,12 +1,12 @@
 #include <cstr.h>
 #include <Memory.h>
-#include <string.h>
 
 namespace cstr
 {
 	char hexBuffer[32];
 	char strBuffer[32];
 	char revBuffer[256];
+	char wcharBuffer[256];
 	char formatBuffer[512];
 
 	bool strcmp(const char* str0, const char* str1)
@@ -23,6 +23,88 @@ namespace cstr
 			if (str0[x] != str1[x]) return false;
 
 		return true;
+	}
+
+	bool wstrcmp(const wchar* str0, const wchar* str1)
+	{
+		u64 len = wstrlen(str0);
+		if (len != wstrlen(str1)) return false;
+
+		return wstrcmp(str0, str1, len);
+	}
+
+	bool wstrcmp(const wchar* str0, const wchar* str1, nint len)
+	{
+		for (nint x = 0; x < len; x++)
+			if (str0[x] != str1[x]) return false;
+
+		return true;
+	}
+
+	char* substring(const char* str, nint startIndex, nint endIndex)
+	{
+		if (startIndex >= endIndex) return nullptr; // wtf?
+
+		{
+			auto len = strlen(str);
+			if (endIndex > len) return nullptr; // outside bounds of string
+		}
+
+		nint bufflen = (endIndex - startIndex) + 1; // + 1 cuz zero termination
+		char* buffer = new char[bufflen]; 
+
+		for (nint x = startIndex; x < endIndex; x++)
+		{
+			buffer[x] = str[x];
+		}
+
+		buffer[bufflen-1] = 0x00; // null terminate
+		return buffer;
+	}
+
+	wchar* wsubstring(const wchar* str, nint startIndex, nint endIndex)
+	{
+		if (startIndex >= endIndex) return nullptr; // wtf?
+
+		{
+			auto len = wstrlen(str);
+			if (endIndex > len) return nullptr; // outside bounds of string
+		}
+
+		nint bufflen = (endIndex - startIndex) + 1; // + 1 cuz zero termination
+		wchar* buffer = new wchar[bufflen];
+
+		for (nint x = startIndex; x < endIndex; x++)
+		{
+			buffer[x] = str[x];
+		}
+
+		buffer[bufflen - 1] = 0x00; // null terminate
+		return buffer;
+	}
+
+	void ToLower(char* str)
+	{
+		nint len = strlen(str);
+		for (nint x = 0; x < len; x++)
+		{
+			if (str[x] >= 'A' && str[x] <= 'Z')
+			{
+				str[x] += ('a' - 'A');
+			}
+		}
+	}
+
+	void ToUpper(char* str)
+	{
+		nint len = strlen(str);
+		for (nint x = 0; x < len; x++)
+		{
+			if (str[x] >= 'a' && str[x] <= 'z')
+			{
+				str[x] -= ('a' - 'A');
+			}
+		}
 	}
 
 	void Reverse(char* str, uint64 length)
@@ -246,13 +328,14 @@ namespace cstr
 	{
 		int64 value = 0;
 		const char* buffer = str;
-
-		if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
-		{
-			buffer = str + 2;
-		}
-
 		u64 length = strlen(buffer);
+
+		if (length >= 2)
+			if (str[0] == '0' && (str[1] == 'x' || str[1] == 'X'))
+			{
+				buffer = str + 2;
+				length -= 2;
+			}
 
 		for (u64 x = 0; x < length; x++)
 		{
@@ -269,8 +352,6 @@ namespace cstr
 		return _ToIntBase10(str);
 	}
 
-
-	char wcharBuffer[256];
 	char* wstrTocstr(const wchar * wstr, nint len)
 	{
 		for (nint x = 0; x < len; x++)
@@ -283,6 +364,21 @@ namespace cstr
 
 		wcharBuffer[len] = 0;
 		return wcharBuffer;
+	}
+
+	wchar cstrbuffer[256];
+	wchar* cstrTowstr(const char* cstr, nint len)
+	{
+		for (nint x = 0; x < len; x++)
+		{
+			if (cstr[x] == 0x00)
+				break;
+
+			cstrbuffer[x] = (wchar)(cstr[x]);
+		}
+
+		cstrbuffer[len] = 0;
+		return cstrbuffer;
 	}
 
 	void wstrncpy(wchar* dest, const wchar* src, nint max)
@@ -300,6 +396,47 @@ namespace cstr
 			dest[index] = 0x00;
 		}
 
+	}
+
+	nint wstrlen(const wchar* str)
+	{
+		nint len = 0;
+		while (str[len] != 0) len++;
+		return len;
+	}
+
+	int64 IndexOf(const char* str, char character, nint len)
+	{
+		for (nint x = 0; x < len; x++)
+		{
+			if (str[x] == character) return x;
+		}
+
+		return -1L;
+	}
+
+	void wstrToLower(wchar* str)
+	{
+		nint len = wstrlen(str);
+		for (nint x = 0; x < len; x++)
+		{
+			if (str[x] >= L'A' && str[x] <= L'Z')
+			{
+				str[x] += (L'a' - L'A');
+			}
+		}
+	}
+
+	int64 wstrIndexOf(const wchar* str, wchar character)
+	{
+		nint len = wstrlen(str);
+
+		for (nint x = 0; x < len; x++)
+		{
+			if (str[x] == character) return x;
+		}
+
+		return -1L;
 	}
 
 }

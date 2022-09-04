@@ -151,10 +151,22 @@ public:
 		delete mArray;
 	}
 
+	forceinline void Clear()
+	{
+		memset64(mArray, 0x00, mCount * sizeof(T));
+		mCount = 0x00;
+	}
+
 protected:
+
+	// The underlying array
 	T* mArray = nullptr;
+
+	// The number of elements the array has allocated
 	nint mArraySize = 0;
-	nint mCount = 0;
+
+	// The current number of elements in the list
+	nint mCount = 0; 
 
 };
 

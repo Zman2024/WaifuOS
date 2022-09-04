@@ -22,6 +22,7 @@ namespace Memory
 	void InitializeHeap(vptr heapStart, nint numpages);
 	void ExpandHeap(nint length);
 	void PrintLeaks();
+	nint GetRemainingHeap();
 }
 
 global vptr malloc(nint size);
@@ -59,7 +60,7 @@ global void memcpy(vptr dest, const vptr src, uint64 nBytes);
 global void repmovsb(vptr dest, const vptr src, uint64 nBytes);
 
 forceinline vptr operator new(nint size)				{ return malloc(size); }
-forceinline vptr operator new[](nint size)				{ return malloc(size); }
+forceinline vptr operator new[](nint size)				{ return calloc(size); }
 forceinline void operator delete(vptr ptr)				{ free(ptr); }
 forceinline void operator delete[](vptr ptr)			{ free(ptr); }
 forceinline void operator delete(vptr ptr, nint sz)		{ free(ptr); }

@@ -45,17 +45,42 @@ namespace Memory
 		}
 
 		nint nAllocs = 0;
+		nint nFreeBytes = 0;
 		while (pos && pos >= heapBase && pos <= heapEnd)
 		{
 			if (!pos->Free)
 			{
 				debug("Alloc #%0: %x1, Length: %2 bytes", nAllocs++, pos, pos->Length);
 			}
+			else nFreeBytes += pos->Length;
 			pos = pos->Next;
 		}
 
 		if (LastSegment)
-			debug("Remaining heap: %x0 bytes", LastSegment->Length);
+			debug("Remaining heap: %x0 bytes", LastSegment->Length + nFreeBytes);
+	}
+
+	nint GetRemainingHeap()
+	{
+		SegmentHeader* pos = heapBase;
+		if (!pos)
+		{
+			error("SOMETHING HAS GONE VERY WRONG (heapBase = nullptr?)");
+			OS_HLT;
+		}
+
+		nint nFreeBytes = 0;
+		while (pos && pos >= heapBase && pos <= heapEnd)
+		{
+			if (pos->Free)
+			{
+				nFreeBytes += pos->Length;
+			}
+			pos = pos->Next;
+		}
+
+		if (LastSegment) return LastSegment->Length + nFreeBytes;
+		return nFreeBytes;
 	}
 
 	void InitializeHeap(vptr heapStart, nint pages)
@@ -94,6 +119,12 @@ namespace Memory
 
 	void ExpandHeap(nint length)
 	{
+		if (!HeapInitialized)
+		{
+			error("Ran out of early memory!");
+			OS_HLT;
+		}
+
 		if (length % PAGE_SIZE)
 		{
 			length -= length % PAGE_SIZE;
@@ -162,10 +193,35 @@ namespace Memory
 
 using namespace Memory;
 
+constexpr nint earlyMallocSize = 0x4000;
+byte* earlyMallocBase[earlyMallocSize]; // 4 pages
+
+vptr earlyMalloc(nint size)
+{
+	static bool earlyMallocInit = false;
+	static nint baseOffset = 0;
+
+	if (!earlyMallocInit)
+	{
+		memset64(earlyMallocBase, 0x00, earlyMallocSize);
+		earlyMallocInit = true;
+	}
+
+	size -= (size & 0b1111) ? size & 0b1111 : 0x10;
+	size += 0x10;
+
+	if (size == 0) return nullptr;
+
+	vptr alloc = vptr(earlyMallocBase + baseOffset);
+	baseOffset += size;
+
+	return alloc;
+}
+
 SpinLock memoryLock = SpinLock();
 vptr malloc(nint size)
 {
-	if (!HeapInitialized) return nullptr;
+	if (!HeapInitialized) return earlyMalloc(size);
 
 	// bit hacc + cmov go brrrrrrrr
 	size -= (size & 0b1111) ? size & 0b1111 : 0x10;
@@ -212,6 +268,9 @@ vptr malloc(nint size)
 
 vptr calloc(nint size)
 {
+	size -= (size & 0b1111) ? size & 0b1111 : 0x10;
+	size += 0x10;
+
 	vptr ptr = malloc(size);
 	if (ptr) memset64(ptr, 0x00, size);
 	return ptr;
@@ -219,15 +278,23 @@ vptr calloc(nint size)
 
 void free(vptr address)
 {
-	if (!HeapInitialized || !address)
+	if (!address)
 	{
 		// cause nullptr pagefult
 		*(byte*)nullptr;
 		return nullptr;
 	}
 
+	if (!HeapInitialized)
+	{
+		return;
+	}
+
+	if (address >= earlyMallocBase && address < earlyMallocBase + earlyMallocSize) return;
+
 	memoryLock.Aquire();
 	SegmentHeader* seg = (SegmentHeader*)address - 1;
+	memset64(address, 0x33, seg->Length);
 	seg->Free = true;
 	seg->CombineForward();
 	seg->CombineBackward();

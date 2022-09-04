@@ -179,6 +179,9 @@
     <ClCompile Include="IO\FileSystem\FAT32.cpp">
       <Filter>Source\IO\FileSystem\FAT32</Filter>
     </ClCompile>
+    <ClCompile Include="IO\AHCI.cpp">
+      <Filter>Source\IO</Filter>
+    </ClCompile>
   </ItemGroup>
   <ItemGroup>
     <ClInclude Include="headers\EFI.h">

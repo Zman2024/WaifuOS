@@ -79,6 +79,7 @@ buildimg:
 	mcopy -i $(BUILDDIR)/$(OSNAME).img $(BUILDDIR)/kernel.elf ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img zap-light16.psf ::
 	mcopy -i $(BUILDDIR)/$(OSNAME).img loadingicon.raw ::
+	mcopy -i $(BUILDDIR)/$(OSNAME).img testfile.txt ::
 
 	cp $(BOOTEFI) $(BUILDDIR)/dsk/efi/boot
 	cp $(BOOTEFI) $(BUILDDIR)/dsk/efi/boot/bootx64.efi

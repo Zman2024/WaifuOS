@@ -50,7 +50,17 @@ namespace Kernel
 
 		gConsole.WriteLine(string(OSName) + " Initialized!", Color::Green);
 		gConsole.EnableCursor();
-		
+
+		debug("Trying to read testfile.txt");
+
+		char* text = new char[0x100];
+		if (FAT32::ReadFile(L"0:/testfile.txt", text))
+		{
+			gConsole.Write("YAY, Contents: ");
+			gConsole.WriteLine(text);
+		}
+		else error("FUCKING KILL ME");
+
 		while (true)
 		{
 			hlt;

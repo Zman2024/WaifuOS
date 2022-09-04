@@ -212,12 +212,13 @@ namespace PCI
 				case SIG_AHCI:
 				{
 					debug("\tInitializing ACHI 1.0 Driver");
-					auto driver = new AHCI::AHCIDriver(pci);
-					auto port = driver->GetPort(0);
+					auto ahci = new AHCI::AHCIDriver(pci);
+					auto port = ahci->GetPort(0);
 					if (port && FAT32::DoesDriveContainF32(port))
 					{
 						// Has fat32 partition at mbr
-						new FAT32::FSDriver(port);
+						auto fs = new FAT32::FSDriver(port);
+
 					}
 					
 					break;

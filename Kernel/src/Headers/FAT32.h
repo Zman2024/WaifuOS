@@ -11,6 +11,9 @@ namespace FAT32
 	constexpr uint16 BOOT_SIG = 0xAA55;
 	constexpr uint32 SectorSize = 0x200;
 
+	constexpr byte ENTRY_DELETED = 0xE5;
+	constexpr byte ENTRY_END = 0x00;
+
 	namespace EntryAttribute
 	{
 		enum : byte
@@ -75,8 +78,9 @@ namespace FAT32
 
 	struct DirectoryEntry
 	{
-		char ShortName[11]; // first 8 chars = name
-		
+		char ShortName[8]; // space terminated
+		char ShortExt[3]; // space terminated
+
 		byte EntryAttributes; // See FAT32::EntryAttribute
 		byte rsvNT; // Ok mr windows nt reserving random bytes
 
@@ -129,16 +133,107 @@ namespace FAT32
 
 	} packed;
 
+	struct EntryInfo
+	{
+		forceinline EntryInfo() {  }
+
+		forceinline EntryInfo(const EntryInfo& entry)
+		{
+			EntryInfo* info = &entry;
+			if (info != this)
+			{
+				memcpy(this, info, sizeof(EntryInfo));
+				this->refCount[0] += 1;
+			}
+		}
+
+		forceinline EntryInfo(const EntryInfo&& entry)
+		{
+			EntryInfo* info = &entry;
+			if (info != this)
+			{
+				memcpy(this, info, sizeof(EntryInfo));
+				this->refCount[0] += 1;
+			}
+		}
+
+		forceinline EntryInfo& operator=(const EntryInfo& rvalue)
+		{
+			this->~EntryInfo();
+			EntryInfo* info = &rvalue;
+			memcpy(this, info, sizeof(EntryInfo));
+			this->refCount[0]++;
+		}
+
+		byte EntryAttributes; // See FAT32::EntryAttribute
+
+		byte CreationTimestampTS; // Creation time in tenths of a second. Range 0-199 inclusive
+		uint16 CreationTimestampHMS; // The time that the file was created. Multiply Seconds by 2.
+		uint16 CreationTimestampDate; // The date on which the file was created.
+
+		uint16 LastAccessDate; // Last accessed date. Same format as the creation date.
+
+		uint16 ModificationTimestampHMS; // The time that the file was created. Multiply Seconds by 2.
+		uint16 ModificationTimestampDate; // The date on which the file was created.
+
+		uint16 EntryFirstClusterLow; // The low 16 bits of this entry's first cluster number.
+		uint16 EntryFirstClusterHigh; // The high 16 bits of this entry's first cluster number.
+
+		uint32 FileSize; // The size of the file in bytes.
+
+		byte DriveID;
+
+		wchar* wEntryName = nullptr;
+
+		char ShortName[8];
+		char ShortExt[3];
+
+		forceinline ~EntryInfo()
+		{
+			if (refCount && --*refCount == 0)
+			{
+				if (wEntryName)
+				{
+					warn("Entry deleted");
+					delete wEntryName;
+					wEntryName = nullptr;
+				}
+				delete refCount;
+				refCount = nullptr;
+			}
+		}
+
+	private:
+		uint16* refCount = new uint16(1);
+
+	} packed;
+
+	EntryInfo FromEntry(DirectoryEntry& base, byte driveID = 0, wchar* lfn = nullptr);
+
 	extern bool DoesDriveContainF32(AHCI::ATAPort* drive);
+
+	extern bool GetEntryInfo(const wchar* path, EntryInfo& info);
+	extern bool ReadFile(const wchar* path, vptr out);
+	extern bool ReadFile(const EntryInfo& info, vptr out);
+
 
 	class FSDriver
 	{
 	public:
 		FSDriver(AHCI::ATAPort* drive);
-
 		~FSDriver();
 
+		void PrintRootDir();
+		bool GetEntryInfo(const wchar* path, EntryInfo& info);
+		bool FindEntry(const wchar* name, EntryInfo& out, EntryInfo* root = nullptr);
+		bool ReadCluster(uint32 cluster, vptr buffer);
+		bool ReadFile(const EntryInfo& info, vptr out);
+
+		forceinline uint16 GetID() { return mDriveID; }
+
 	private:
+		static uint16 sNextDriveID;
+		uint16 mDriveID;
 		uint32 mTotalSectors;
 		uint32 mFatSizeSectors;
 		uint32 mFirstDataSector;
@@ -149,7 +244,7 @@ namespace FAT32
 
 		EBR* mBootRecord;
 		FSInfo* mFSInfo;
-
+		AHCI::ATAPort* mDrive;
 
 
 		forceinline uint32 GetFirstSectorOfCluster(uint32 cluster)
