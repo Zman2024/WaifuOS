@@ -50,7 +50,7 @@ forceinline void println(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 =
 	if (state) gConsole.EnableCursor();
 }
 
-static void debug(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
+forceinline void debug(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
 {
 	bool state = gConsole.GetCursorEnabled();
 	if (state) gConsole.DisableCursor();
@@ -58,7 +58,7 @@ static void debug(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int
 	if (state) gConsole.EnableCursor();
 }
 
-static void warn(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
+forceinline void warn(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
 {
 	bool state = gConsole.GetCursorEnabled();
 	if (state) gConsole.DisableCursor();
@@ -66,7 +66,7 @@ static void warn(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int6
 	if (state) gConsole.EnableCursor();
 }
 
-static void error(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
+forceinline void error(const char* str, int64 p0 = 0, int64 p1 = 0, int64 p2 = 0, int64 p3 = 0, int64 p4 = 0, int64 p5 = 0, int64 p6 = 0, int64 p7 = 0, int64 p8 = 0, int64 p9 = 0)
 {
 	bool state = gConsole.GetCursorEnabled();
 	if (state) gConsole.DisableCursor();

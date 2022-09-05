@@ -14,6 +14,16 @@ namespace FAT32
 	constexpr byte ENTRY_DELETED = 0xE5;
 	constexpr byte ENTRY_END = 0x00;
 
+	enum struct Status
+	{
+		Ok = 0x00,
+		Error,
+		NotFound,
+		BadPath,
+		BadVolume,
+		ReadError,
+	};
+
 	namespace EntryAttribute
 	{
 		enum : byte
@@ -24,6 +34,7 @@ namespace FAT32
 			VolumeID = 0x08,
 			Directory = 0x10,
 			Archive = 0x20,
+			Device = 0x40,
 			LFN = (ReadOnly | Hidden | System | VolumeID),
 		};
 	}
@@ -165,6 +176,8 @@ namespace FAT32
 			this->refCount[0]++;
 		}
 
+		static EntryInfo FromDirectoryEntry(DirectoryEntry& base, byte driveID = 0, wchar* lfn = nullptr);
+
 		byte EntryAttributes; // See FAT32::EntryAttribute
 
 		byte CreationTimestampTS; // Creation time in tenths of a second. Range 0-199 inclusive
@@ -194,10 +207,11 @@ namespace FAT32
 			{
 				if (wEntryName)
 				{
-					warn("Entry deleted");
+					warn("Entry name deleted");
 					delete wEntryName;
 					wEntryName = nullptr;
 				}
+				warn("Entry deleted");
 				delete refCount;
 				refCount = nullptr;
 			}
@@ -208,13 +222,11 @@ namespace FAT32
 
 	} packed;
 
-	EntryInfo FromEntry(DirectoryEntry& base, byte driveID = 0, wchar* lfn = nullptr);
-
 	extern bool DoesDriveContainF32(AHCI::ATAPort* drive);
 
-	extern bool GetEntryInfo(const wchar* path, EntryInfo& info);
-	extern bool ReadFile(const wchar* path, vptr out);
-	extern bool ReadFile(const EntryInfo& info, vptr out);
+	extern Status GetEntryInfo(const wchar* path, EntryInfo& info);
+	extern Status ReadFile(const wchar* path, vptr out);
+	extern Status ReadFile(const EntryInfo& info, vptr out);
 
 
 	class FSDriver
@@ -224,8 +236,8 @@ namespace FAT32
 		~FSDriver();
 
 		void PrintRootDir();
-		bool GetEntryInfo(const wchar* path, EntryInfo& info);
-		bool FindEntry(const wchar* name, EntryInfo& out, EntryInfo* root = nullptr);
+		Status GetEntryInfo(const wchar* path, EntryInfo& info);
+		Status FindEntry(const wchar* name, EntryInfo& out, EntryInfo* root = nullptr);
 		bool ReadCluster(uint32 cluster, vptr buffer);
 		bool ReadFile(const EntryInfo& info, vptr out);
 

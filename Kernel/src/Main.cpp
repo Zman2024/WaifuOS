@@ -52,14 +52,21 @@ namespace Kernel
 		gConsole.EnableCursor();
 
 		debug("Trying to read testfile.txt");
-
 		char* text = new char[0x100];
-		if (FAT32::ReadFile(L"0:/testfile.txt", text))
+		nint leakage = Memory::GetRemainingHeap();
+
+		FAT32::ReadFile(L"0:/testfile.txt", text);
+		FAT32::ReadFile(L"0:/testfile.txt", text);
+		
+		if (FAT32::ReadFile(L"0:/testfile.txt", text) == FAT32::Status::Ok)
 		{
 			gConsole.Write("YAY, Contents: ");
 			gConsole.WriteLine(text);
 		}
 		else error("FUCKING KILL ME");
+		debug("Bytes leaked: %x0", leakage - Memory::GetRemainingHeap());
+		delete text;
+
 
 		while (true)
 		{

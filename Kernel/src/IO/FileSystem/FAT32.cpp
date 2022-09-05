@@ -4,12 +4,12 @@ namespace FAT32
 {
 	List<FSDriver*> Drives = List<FSDriver*>();
 
-	bool GetEntryInfo(const wchar* path, EntryInfo& info)
+	Status GetEntryInfo(const wchar* path, EntryInfo& info)
 	{
 		nint pathLength = cstr::wstrlen(path);
 		if (pathLength < 2)
 		{
-			return false;
+			return Status::BadPath;
 		}
 		byte driveNum = (byte)(path[0]);
 		{
@@ -29,31 +29,29 @@ namespace FAT32
 		}
 
 		if (drive == nullptr)
-		{
-			return false;
-		}
+			return Status::BadVolume;
 
 		wchar* pathOffset = path + 2; // first 2 chars are "{driveNum}:"
 		pathLength -= 2;
 
-		// if the length is now == 0 then they want the root dir info
+		// if the length is now == 0 then they want the root dir info, so auuuhhhhh
+
+
 
 		return drive->GetEntryInfo(pathOffset, info);
 	}
 
-	bool ReadFile(const wchar* path, vptr out)
+	Status ReadFile(const wchar* path, vptr out)
 	{
-		EntryInfo info;
-		if (!GetEntryInfo(path, info))
-		{
-			warn("didnt find the file");
-			return false;
-		}
+		EntryInfo info = EntryInfo();
+		auto sts = GetEntryInfo(path, info);
+		if (sts != Status::Ok)
+			return sts;
 
 		return ReadFile(info, out);
 	}
 
-	bool ReadFile(const EntryInfo& info, vptr out)
+	Status ReadFile(const EntryInfo& info, vptr out)
 	{
 		FSDriver* drive = nullptr;
 		for (nint x = 0; x < Drives.GetCount(); x++)
@@ -65,12 +63,12 @@ namespace FAT32
 		}
 
 		if (drive == nullptr)
-		{
-			return false;
-		}
+			return Status::BadVolume;
 
-		
-		return drive->ReadFile(info, out);
+		if (drive->ReadFile(info, out))
+			return Status::Ok;
+
+		return Status::ReadError;
 	}
 
 	bool DoesDriveContainF32(AHCI::ATAPort* drive)
@@ -84,30 +82,35 @@ namespace FAT32
 		if (!drive->Read(0, 1, ebr))
 		{
 			error("FAILED TO READ DRIVE!");
-			delete ebr, fsinfo;
+			delete ebr;
+			delete fsinfo;
 			return false;
 		}
 		
 		if (ebr->BootSignature != BOOT_SIG || (ebr->Signature != 0x28 && ebr->Signature != 0x29) || ebr->SectorsPerFAT32 == 0)
 		{
-			delete ebr, fsinfo;
+			delete ebr;
+			delete fsinfo;
 			return false;
 		}
 
 		if (!drive->Read(ebr->FSInfoSector, 1, fsinfo))
 		{
 			error("FAILED TO READ DRIVE!");
-			delete ebr, fsinfo;
+			delete ebr;
+			delete fsinfo;
 			return false;
 		}
 
 		if (fsinfo->LeadSignature != FSInfo::LEAD_SIG || fsinfo->MidSignature != FSInfo::MID_SIG || fsinfo->TrailSignature != FSInfo::TRAIL_SIG)
 		{
-			delete ebr, fsinfo;
+			delete ebr;
+			delete fsinfo;
 			return false;
 		}
 
-		delete ebr, fsinfo;
+		delete ebr;
+		delete fsinfo;
 		return true;
 	}
 
@@ -165,7 +168,7 @@ namespace FAT32
 		return buffer;
 	}
 
-	EntryInfo FromEntry(DirectoryEntry& base, byte driveID, wchar* lfn)
+	static EntryInfo EntryInfo::FromDirectoryEntry(DirectoryEntry& base, byte driveID, wchar* lfn)
 	{
 		EntryInfo ret = EntryInfo();
 		{
@@ -282,11 +285,14 @@ namespace FAT32
 		Drives.Remove(this);
 	}
 
-	bool FSDriver::FindEntry(const wchar* name, EntryInfo& out, EntryInfo* root)
+	Status FSDriver::FindEntry(const wchar* name, EntryInfo& out, EntryInfo* root)
 	{
-		if (root && (!(root->EntryAttributes & EntryAttribute::Directory) || root->DriveID != mDriveID))
+		if (root)
 		{
-			return false;
+			if (root->DriveID != mDriveID)
+				return Status::BadVolume;
+			if (!(root->EntryAttributes & EntryAttribute::Directory))
+				return Status::Error;
 		}
 
 		List<LFNEntry> nameEntries = List<LFNEntry>();
@@ -303,8 +309,8 @@ namespace FAT32
 		{
 			if (!ReadCluster(startCluster, clusterBuffer))
 			{
-				delete clusterBuffer;
-				return false;
+				delete[] clusterBuffer;
+				return Status::ReadError;
 			}
 
 			for (nint x = 0; x < entriesPerCluster; x++)
@@ -314,8 +320,8 @@ namespace FAT32
 				{
 					case ENTRY_END:
 					{
-						delete clusterBuffer;
-						return false;
+						delete[] clusterBuffer;
+						return Status::NotFound;
 					}
 
 					case ENTRY_DELETED:
@@ -340,27 +346,28 @@ namespace FAT32
 
 					if (cstr::wstrcmp(name, lfnNameLower)) // we found it
 					{
-						out = FromEntry(*entry, mDriveID, lfnName); // we dont deallocate lfnName, it belongs to caller now
-						delete clusterBuffer, lfnNameLower;
-						return true;
+						out = EntryInfo::FromDirectoryEntry(*entry, mDriveID, lfnName); // we dont deallocate lfnName, it belongs to caller now
+						delete[] clusterBuffer;
+						delete lfnNameLower;
+						return Status::Ok;
 					}
 
 					nameEntries.Clear();
-					delete lfnName, lfnNameLower, clusterBuffer;
+					delete lfnName;
+					delete lfnNameLower;
 					continue;
 				}
 
 				// the entry doesn't have any LFNs
 				char* entryName = GetEntryName(*entry);
-
 				wchar* wEntryName = cstr::cstrTowstr(entryName, strlen(entryName));
 				delete entryName;
 				if (cstr::wstrcmp(name, wEntryName))
 				{
 					// we found it
-					out = FromEntry(*entry, mDriveID, nullptr);
-					delete clusterBuffer;
-					return true;
+					out = EntryInfo::FromDirectoryEntry(*entry, mDriveID, nullptr);
+					delete[] clusterBuffer;
+					return Status::Ok;
 				}
 
 			}
@@ -384,7 +391,6 @@ namespace FAT32
 	bool FSDriver::ReadFile(const EntryInfo& info, vptr out)
 	{
 		uint32 sector = GetFirstSectorOfCluster(info.EntryFirstClusterLow | u32(info.EntryFirstClusterHigh) << 16);
-
 		if (!mDrive->ReadBytes(sector, info.FileSize, out))
 		{
 			return mDrive->ReadBytes(sector, info.FileSize, out);
@@ -466,7 +472,7 @@ namespace FAT32
 		delete clusterBuffer;
 	}
 
-	bool FSDriver::GetEntryInfo(const wchar* path, EntryInfo& info)
+	Status FSDriver::GetEntryInfo(const wchar* path, EntryInfo& info)
 	{
 		nint wlen = cstr::wstrlen(path);
 		if (path[0] == L'/' || path[0] == L'\\')
@@ -475,12 +481,12 @@ namespace FAT32
 			wlen -= 1;
 		}
 
-		if (wlen == 0 || wlen == -1L) return false;
+		if (wlen == 0 || wlen == -1L) return Status::BadPath;
 
 		if (path[wlen - 1] == L'/' || path[wlen - 1] == L'\\')
 		{
 			wlen -= 1;
-			if (wlen == 0) return false;
+			if (wlen == 0) return Status::BadPath;
 		}
 
 		// Root dir
@@ -506,7 +512,7 @@ namespace FAT32
 				indexOfSlash = cstr::wstrIndexOf(currentPath, L'\\');
 				if (indexOfSlash < 0) // they are looking for something in the current directory
 				{
-					bool ret = FindEntry(currentPath, currentEntry, &currentEntry);
+					Status ret = FindEntry(currentPath, currentEntry, &currentEntry);
 					info = currentEntry;
 
 					delete cleanedPath;
@@ -515,10 +521,12 @@ namespace FAT32
 			}
 
 			wchar* ffname = cstr::wsubstring(currentPath, 0, indexOfSlash);
-			if (!FindEntry(ffname, currentEntry, &currentEntry))
+			auto stat = FindEntry(ffname, currentEntry, &currentEntry);
+			if (stat != Status::Ok)
 			{
-				delete cleanedPath, ffname;
-				return false;
+				delete cleanedPath;
+				delete ffname;
+				return stat;
 			}
 
 			delete ffname;

@@ -390,7 +390,6 @@ namespace AHCI
 		// Give up
 		mMutex.Unlock();
 		return false;
-		return false;
 	}
 
 	bool ATAPort::ReadFillBuffer(uint64 sector)
