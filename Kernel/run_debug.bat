@@ -4,21 +4,19 @@ set OSNAME=WaifuOS
 set BUILDDIR=bin
 set OVMFDIR=../OVMFbin
 
-qemu-system-x86_64 ^
+start qemu-system-x86_64 ^
+ --bios "%OVMFDIR%/OVMF_CODE-pure-efi.fd" ^
  -device qemu-xhci ^
  -machine q35 ^
  -rtc base=localtime ^
- -drive file=%BUILDDIR%/%OSNAME%.img ^
  -m 16G ^
- -cpu qemu64,+sse2,+sse3,+sse4.1,+sse4.2 ^
- -smp cores=4 ^
- -drive if=pflash,format=raw,unit=0,file=%OVMFDIR%/OVMF_CODE-pure-efi.fd,readonly=on ^
- -drive if=pflash,format=raw,unit=1,file=%OVMFDIR%/OVMF_VARS-pure-efi.fd ^
+ -cpu qemu64,+mmx,+sse,+sse2,+sse3,+sse4.1,+sse4.2,+rdrand,+xsave,+aes,+avx,+avx2,enforce ^
+ -smp cores=6 ^
  -net none ^
  -vga virtio ^
- -smp 4 ^
- -soundhw pcspk ^
+ -smp 6 ^
  -s ^
- -S
+ -S ^
+ %BUILDDIR%/%OSNAME%.img
 
-:: start C:/Windows/SysNative/wsl.exe gdb bin/kernel.elf
+C:/Windows/SysNative/wsl.exe gdb bin/kernel.elf

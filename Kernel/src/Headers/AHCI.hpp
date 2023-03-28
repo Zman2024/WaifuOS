@@ -226,11 +226,11 @@ namespace AHCI
 
 		bool Read(byte portIndex, uint64 sector, uint16 sectorCount, vptr buffer);
 		ATAPort* GetPort(byte portNum);
+		forceinline nint GetPortCount() { return mPortCount; }
 
 	private:
 
 		void AddPort(byte portType, HBAPort* hbaport);
-
 		void ProbePorts();
 
 		PCIDeviceHeader* mPCIBaseAddress;

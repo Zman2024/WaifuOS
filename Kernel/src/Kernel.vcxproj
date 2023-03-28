@@ -105,6 +105,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClCompile Include="cstr.cpp" />
     <ClCompile Include="EFI.cpp" />
     <ClCompile Include="Globals.cpp" />
+    <ClCompile Include="Graphics\WindowManager.cpp" />
     <ClCompile Include="Hardware\CPU.cpp" />
     <ClCompile Include="icxxabi.cpp" />
     <ClCompile Include="Interrupts\APIC.cpp" />
@@ -176,6 +177,7 @@ C:\Windows\sysnative\wsl ./build</NMakeReBuildCommandLine>
     <ClInclude Include="Headers\Synchronization.hpp" />
     <ClInclude Include="Headers\Types.h" />
     <ClInclude Include="Headers\KernelUtils.h" />
+    <ClInclude Include="Headers\WindowManager.h" />
     <ClInclude Include="Headers\XHCI.h" />
   </ItemGroup>
   <ItemGroup>

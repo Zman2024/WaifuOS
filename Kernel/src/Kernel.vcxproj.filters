@@ -81,6 +81,12 @@
     <Filter Include="Source\IO\FileSystem\FAT32">
       <UniqueIdentifier>{588c2c2e-f7a7-4366-87a6-7e83b4a664f8}</UniqueIdentifier>
     </Filter>
+    <Filter Include="Source\Graphics">
+      <UniqueIdentifier>{0b24d031-6a4b-4a6b-99e6-e774f523bffc}</UniqueIdentifier>
+    </Filter>
+    <Filter Include="Headers\Graphics">
+      <UniqueIdentifier>{7784bc16-2335-49eb-992d-b3c1c5024047}</UniqueIdentifier>
+    </Filter>
   </ItemGroup>
   <ItemGroup>
     <ClCompile Include="KernelUtils.cpp">
@@ -181,6 +187,9 @@
     </ClCompile>
     <ClCompile Include="IO\AHCI.cpp">
       <Filter>Source\IO</Filter>
+    </ClCompile>
+    <ClCompile Include="Graphics\WindowManager.cpp">
+      <Filter>Source\Graphics</Filter>
     </ClCompile>
   </ItemGroup>
   <ItemGroup>
@@ -309,6 +318,9 @@
     </ClInclude>
     <ClInclude Include="Headers\FAT32.h">
       <Filter>Headers\IO\FileSystem\FAT32</Filter>
+    </ClInclude>
+    <ClInclude Include="Headers\WindowManager.h">
+      <Filter>Headers\Graphics</Filter>
     </ClInclude>
   </ItemGroup>
   <ItemGroup>

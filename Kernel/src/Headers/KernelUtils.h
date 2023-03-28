@@ -27,6 +27,7 @@
 #include <Keyboard.h>
 #include <asmUtils.h>
 #include <Scheduling.h>
+#include <WindowManager.h>
 
 namespace Kernel
 {

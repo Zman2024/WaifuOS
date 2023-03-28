@@ -4,6 +4,25 @@ namespace FAT32
 {
 	List<FSDriver*> Drives = List<FSDriver*>();
 
+	const char* StatusStrings[] = {
+		"Ok",
+		"Unspecified Error",
+		"Entry Not Found",
+		"Bad Path",
+		"Bad Volume",
+		"Read Error"
+	};
+
+	const char* GetStatusString(Status sts)
+	{
+		byte val = (byte)sts;
+		if (val < (sizeof(StatusStrings) / sizeof(nint)))
+		{
+			return StatusStrings[val];
+		}
+		return nullptr;
+	}
+
 	Status GetEntryInfo(const wchar* path, EntryInfo& info)
 	{
 		nint pathLength = cstr::wstrlen(path);
@@ -41,17 +60,17 @@ namespace FAT32
 		return drive->GetEntryInfo(pathOffset, info);
 	}
 
-	Status ReadFile(const wchar* path, vptr out)
+	Status ReadFile(const wchar* path, vptr out, nint numBytes)
 	{
 		EntryInfo info = EntryInfo();
 		auto sts = GetEntryInfo(path, info);
 		if (sts != Status::Ok)
 			return sts;
 
-		return ReadFile(info, out);
+		return ReadFile(info, out, numBytes);
 	}
 
-	Status ReadFile(const EntryInfo& info, vptr out)
+	Status ReadFile(const EntryInfo& info, vptr out, nint numBytes)
 	{
 		FSDriver* drive = nullptr;
 		for (nint x = 0; x < Drives.GetCount(); x++)
@@ -65,7 +84,7 @@ namespace FAT32
 		if (drive == nullptr)
 			return Status::BadVolume;
 
-		if (drive->ReadFile(info, out))
+		if (drive->ReadFile(info, out, numBytes))
 			return Status::Ok;
 
 		return Status::ReadError;
@@ -203,7 +222,7 @@ namespace FAT32
 
 	FSDriver::FSDriver(AHCI::ATAPort* drive)
 	{
-		debug("Initializing FAT32 driver for drive #%0", drive->PortNumber);
+		debug("\tInitializing FAT32 driver for drive #%0", drive->PortNumber);
 
 		mBootRecord = new EBR();
 		mFSInfo = new FSInfo();
@@ -388,12 +407,15 @@ namespace FAT32
 		return true;
 	}
 
-	bool FSDriver::ReadFile(const EntryInfo& info, vptr out)
+	bool FSDriver::ReadFile(const EntryInfo& info, vptr out, nint numBytes)
 	{
 		uint32 sector = GetFirstSectorOfCluster(info.EntryFirstClusterLow | u32(info.EntryFirstClusterHigh) << 16);
-		if (!mDrive->ReadBytes(sector, info.FileSize, out))
+
+		nint min = numBytes > info.FileSize ? info.FileSize : numBytes;
+
+		if (!mDrive->ReadBytes(sector, min, out))
 		{
-			return mDrive->ReadBytes(sector, info.FileSize, out);
+			return mDrive->ReadBytes(sector, min, out);
 		}
 
 		return true;
@@ -539,4 +561,3 @@ namespace FAT32
 	}
 
 }
-

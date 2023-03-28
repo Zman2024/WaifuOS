@@ -269,3 +269,5 @@ __pycache__/
 Kernel/stuff for apic.txt
 Bootloader/x86_64/
 Bootloader/x86_64/*
+/IA32-Specification.pdf
+/Kernel/run.bat.bak

@@ -66,6 +66,9 @@ link:
 
 setup:
 	@mkdir $(BUILDDIR)
+	@mkdir $(BUILDDIR)/dsk
+	@mkdir $(BUILDDIR)/dsk/efi
+	@mkdir $(BUILDDIR)/dsk/efi/boot
 	@mkdir $(SRCDIR)
 	@mkdir $(OBJDIR)
 

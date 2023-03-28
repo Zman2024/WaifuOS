@@ -214,7 +214,7 @@ namespace Kernel
 	void EnableHardwareFeatures()
 	{
 		/*
-			OK, so qemu is really stupid on bindows ben and "doesn't support AVX"
+			OK, so qemu is really stupid on winglows and "doesn't support AVX"
 			which doesn't make sense because qemu will still execute AVX instructions
 			without raising any #UD or crashing. HOWEVER it WILL freeze if i try and
 			use OSXSAVE instructions like xgetbv and xsetbv, and the cpuid for AVX support
@@ -243,6 +243,11 @@ namespace Kernel
 			error("CPU DOES NOT SUPPORT AVX2! CANNOT RUN OS!");
 			OS_HLT;
 		}
+		if (!CPU::Features::OSXSAVE) 
+		{
+			error("CPU DOES NOT SUPPORT OSXSAVE! CANNOT RUN OS!");
+			OS_HLT;
+		}
 		#endif
 
 		// Enable Features //
@@ -269,7 +274,7 @@ namespace Kernel
 			if (CPU::Features::AVX)
 			{
 				cr4 |= ControlRegister::CR4::OSXSAVE;
-				asm("mov %%cr4, %0" : : "r"(cr4));
+				//asm("mov %%cr4, %0" : : "r"(cr4));
 
 				uint32 xcr0 = CPU::GetXCR0();
 				xcr0 |= ControlRegister::XCR0::X87;

@@ -17,12 +17,14 @@ namespace FAT32
 	enum struct Status
 	{
 		Ok = 0x00,
-		Error,
-		NotFound,
-		BadPath,
-		BadVolume,
-		ReadError,
+		Error = 0x01,
+		NotFound = 0x02,
+		BadPath = 0x03,
+		BadVolume = 0x04,
+		ReadError = 0x05,
 	};
+
+	const char* GetStatusString(Status sts);
 
 	namespace EntryAttribute
 	{
@@ -146,7 +148,7 @@ namespace FAT32
 
 	struct EntryInfo
 	{
-		forceinline EntryInfo() {  }
+		forceinline EntryInfo() { }
 
 		forceinline EntryInfo(const EntryInfo& entry)
 		{
@@ -225,8 +227,8 @@ namespace FAT32
 	extern bool DoesDriveContainF32(AHCI::ATAPort* drive);
 
 	extern Status GetEntryInfo(const wchar* path, EntryInfo& info);
-	extern Status ReadFile(const wchar* path, vptr out);
-	extern Status ReadFile(const EntryInfo& info, vptr out);
+	extern Status ReadFile(const wchar* path, vptr out, nint numBytes);
+	extern Status ReadFile(const EntryInfo& info, vptr out, nint numBytes);
 
 
 	class FSDriver
@@ -239,7 +241,7 @@ namespace FAT32
 		Status GetEntryInfo(const wchar* path, EntryInfo& info);
 		Status FindEntry(const wchar* name, EntryInfo& out, EntryInfo* root = nullptr);
 		bool ReadCluster(uint32 cluster, vptr buffer);
-		bool ReadFile(const EntryInfo& info, vptr out);
+		bool ReadFile(const EntryInfo& info, vptr out, nint numBytes);
 
 		forceinline uint16 GetID() { return mDriveID; }
 

@@ -58,7 +58,7 @@ namespace Scheduler
 			RegisterInterrupt((vptr)hStartScheduler, Interrupt::TaskYield);
 
 			// start stuff (i dont wanna manually iretq in asm)
-			Yield();
+			Yield(); // logic wise this calls hStartScheduler
 
 			PIT::SetFrequency(200);
 			Running = true;
@@ -123,14 +123,16 @@ namespace Scheduler
 	{
 		if (!Running) return;
 
-		uint32* stack = (u32*)calloc(PAGE_SIZE * 4);
+		constexpr nint defaultStackSize = PAGE_SIZE * 4;
+
+		uint32* stack = (u32*)calloc(defaultStackSize);
 
 		Thread* newThread = new Thread(NextThreadID++);
 		newThread->CurrentTimeQuantum = GetTimeQuantum();
 		newThread->StackBaseAddress = stack;
 		newThread->SetName(title);
 
-		stack += PAGE_SIZE - 3;
+		stack += defaultStackSize - 3;
 		stack[0] = (u32)ThreadExit;
 
 		newThread->InterruptFrame.cs = 0x08;
@@ -147,7 +149,6 @@ namespace Scheduler
 		newThread->Registers.rdi = newThread->ThreadID;
 
 		ReadyQueue.Add(newThread);
-
 	}
 
 	nint GetThreadCount()
@@ -172,7 +173,7 @@ namespace Scheduler
 		delete CurrentThread;
 		CurrentThread = nullptr;
 		sti;
-
+		Yield();
 		while (true) hlt;
 	}
 

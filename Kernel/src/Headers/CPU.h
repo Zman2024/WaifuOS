@@ -184,7 +184,7 @@ namespace ControlRegister
 	enum CR0 : uint32
 	{
 		PE = 1 << 0, // Protected Mode Enable
-		MP = 1 << 1, // Monitor Co-Processor
+		MP = 1 << 1, // Monitor Co-Processor (Controls interaction of WAIT/FWAIT instructions with TS flag in CR0)
 		EM = 1 << 2, // x87 FPU Emulation
 		TS = 1 << 3, // Task Switched
 		ET = 1 << 4, // Extension Type (???)
